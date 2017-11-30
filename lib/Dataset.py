@@ -1,9 +1,9 @@
 import os
 
 
-class LoadDataset(object):
+class Dataset(object):
 
-    # Atributes
+    # Attributes
     list_of_files = []
 
     def __init__(self, f_path, csv_file, ext='mgz'):
@@ -13,7 +13,7 @@ class LoadDataset(object):
 
     def find_files(self):
         files = [os.path.join(root, name)
-                 for root, dirs, files in os.walk(data_path)
+                 for root, dirs, files in os.walk(self.f_path)
                  for name in files
                  if name.endswith(self.ext)]
         return files
