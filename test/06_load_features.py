@@ -25,7 +25,7 @@ print('[  OK  ] Image loaded')
 
 # Load annotations
 annot_path = os.path.join(dataset_folder, df['folder'].iloc[i], 'label', 'lh.aparc.annot')
-annot = nbfs.read_annot(annot_path)
+labels, ctab, names = nbfs.read_annot(annot_path)
 print('[  OK  ] Annotations file loaded')
 
 # Load thickness
@@ -34,3 +34,9 @@ tk = nbfs.read_morph_data(tk_path)
 print('[  OK  ] Thickness file loaded')
 
 #
+regions = pd.DataFrame({
+    key: val for (key, val) in zip(names, np.linspace(-1,36,37, dtype=int))
+})
+
+# data = {annot[0]: tk}
+# tk1 = pd.DataFrame(data)
