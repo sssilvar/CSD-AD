@@ -6,8 +6,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import logging
 
+# Define params
+root = os.path.join(os.getcwd(), '..')
+params_file = os.path.join(root, 'param', 'params.json')
+
 # Load params
-with open('param/params.json') as json_file:
+with open(params_file) as json_file:
     jf = json.load(json_file)
     dataset_folder = jf['dataset_folder']
     data_file = jf['data_file']
