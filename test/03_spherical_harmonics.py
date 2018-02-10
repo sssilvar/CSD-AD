@@ -27,17 +27,17 @@ r, theta, phi = np.nan_to_num((
 plt.imshow(r[:, :, slide], cmap='gray')
 
 # Calculate SH
-sph_lambda = (lambda r, theta, phi: sp.sph_harm(r, 4, theta, phi))
+sph_lambda = (lambda r, theta, phi: sp.sph_harm(r, 5, theta, phi))
 
 sh_func = np.vectorize(sph_lambda)
 sh = sh_func(r, theta, phi)
-sh_mag = np.abs(sh)
-sh_mag_norm = sh_mag / sh_mag.max()
+sh_mag = np.nan_to_num(np.abs(sh))
+sh_mag_norm = (sh_mag / sh_mag.max())
 print(sh)
 
 # Plot
 plt.figure()
 plt.imshow(img[:, :, slide], cmap='gray')
 plt.figure()
-plt.imshow(sh_mag[:, :, slide], cmap='gray')
+plt.imshow(sh_mag_norm[:, :, slide], cmap='gray')
 plt.show(block=False)
