@@ -6,7 +6,8 @@ import nibabel as nb
 import matplotlib.pyplot as plt
 
 # Assign images directory
-filename = os.path.join(os.getcwd(), 'test_data', 'fsaverage.mgz')
+# filename = os.path.join(os.getcwd(), 'test_data', 'fsaverage.mgz')
+filename = '/run/media/sssilvar/DATA/FreeSurferSD/002_S_0729/mri/aseg.mgz'
 slide = 128
 
 # Load image
