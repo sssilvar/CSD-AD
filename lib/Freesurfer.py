@@ -6,15 +6,16 @@ import nibabel.freesurfer as nbfs
 
 class Freesurfer:
 
-    columns = ['region_id', 'region_name', 'mean', 'std']
+    columns = ['region_id', 'region_name', 'mean', 'std', 'hemisphere']
 
     def __init__(self, dataset_folder, df):
         self.dataset_folder = dataset_folder
         self.df = df
 
-    def read_thickness(self, i, hemi):
+    def read_thickness(self, subject_id, hemi):
         # Set subject folder
-        subject_folder = os.path.join(self.dataset_folder, self.df['folder'][i])
+        subject_folder = os.path.join(self.dataset_folder, subject_id)
+        print('[  FS  ] Loading subject %s' % subject_folder)
 
         # Load labels
         labels_id, ctab, labels = nbfs.read_annot(os.path.join(subject_folder, 'label', hemi + '.aparc.annot'))
@@ -30,10 +31,11 @@ class Freesurfer:
                 tk_mean = 0
                 tk_std = 0
 
-            tk_stats.loc[i] = [i, labels[i], tk_mean, tk_std]
+            tk_stats.loc[i] = [i, labels[i], tk_mean, tk_std, hemi]
 
         morph_data = {
-            'labels_id': labels_id,
+            # 'tk_stats_mean': tk_stats.pivot(index=i, columns=labels, values='mean'),
+            # 'tk_stats_std': tk_stats.pivot(index=i, columns=labels, values='std'),
             'ctab': ctab,
             'labels': labels
         }

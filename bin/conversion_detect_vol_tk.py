@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import os
 import json
 import pandas as pd
@@ -56,10 +58,12 @@ if not os.path.exists(os.path.join(os.getcwd(), 'features.csv')):
             tk_stats_rh, _ = Fs.read_thickness(subject, 'rh')
 
             # Merge Hemispheres info
+            print('[  OK  ] Concatenating DataFrames')
             frames = [tk_stats_lh, tk_stats_rh]
             tk_stats_df = pd.concat(frames)
 
             # Add extra info
+            print('[  OK  ] Processing data')
             tk_stats_df['hemi_and_reg'] = tk_stats_df['hemisphere'] + '_' + tk_stats_df['region_name']
             tk_stats_df['subject_id'] = subject
             tk_stats_df['target_name'] = dx_group
@@ -80,28 +84,34 @@ if not os.path.exists(os.path.join(os.getcwd(), 'features.csv')):
     features_df.to_csv('features.csv')
 
 
-# Start Classification
-print('\n\n[  OK  ] STARTING CLASSIFICATION')
-features_df = pd.read_csv('features.csv')
-
-# Define X and y
-X = features_df[['mean', 'std']].values
-y = features_df['target'].values
-
-# Split data
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.7, random_state=21, stratify=y)
-
-# Select relevant features: coef
-# lasso = Lasso(alpha=0.4, normalize=True)
-lasso = Lasso(alpha=0.4)
-lasso.fit(X, y)
-
-lasso_coef = lasso.coef_
-print(lasso_coef)
-
-# Plot features
-plt.figure()
-plt.plot(range(X.shape[1]), lasso_coef)
-plt.xticks(range(X.shape[1]), features_df['region_name'], rotation=60)
-plt.margins(0.02)
-plt.show(block=False)
+# # Start Classification
+# print('\n\n[  OK  ] STARTING CLASSIFICATION')
+# features_df = pd.read_csv('features.csv')
+#
+# # Extract features (mean and std)
+# df_mean = features_df.pivot(index='subject_id', columns='hemi_and_reg', values='mean')
+# df_std = features_df.pivot(index='subject_id', columns='hemi_and_reg', values='std')
+#
+# df_mean['target'] = df_mean.apply(lambda x: print(x.index))
+#
+# # Define X and y
+# X = features_df[['mean', 'std']].values
+# y = features_df['target'].values
+#
+# # Split data
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.7, random_state=21, stratify=y)
+#
+# # Select relevant features: coef
+# # lasso = Lasso(alpha=0.4, normalize=True)
+# lasso = Lasso(alpha=0.4)
+# lasso.fit(X, y)
+#
+# lasso_coef = lasso.coef_
+# print(lasso_coef)
+#
+# # Plot features
+# plt.figure()
+# plt.plot(range(X.shape[1]), lasso_coef)
+# plt.xticks(range(X.shape[1]), features_df['region_name'], rotation=60)
+# plt.margins(0.02)
+# plt.show(block=False)
