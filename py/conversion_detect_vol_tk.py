@@ -1,14 +1,15 @@
 from __future__ import print_function
 
+import sys
+
 import os
 import json
 import numpy as np
 import pandas as pd
-import lib.Freesurfer as Fs
+
 import matplotlib.pyplot as plt
 
 from sklearn.svm import SVC
-from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import Lasso
 from sklearn.preprocessing import StandardScaler
@@ -20,13 +21,14 @@ root = os.path.join(os.getcwd(), '..')
 params_file = os.path.join(root, 'param', 'params.json')
 features_file = 'thickness_features.csv'
 features_file = os.path.join(root, 'features', features_file)
+sys.path.append(root)
+import lib.Freesurfer as Fs
 
 # Load params
 with open(params_file) as json_file:
     jf = json.load(json_file)
     dataset_folder = jf['dataset_folder']
     data_file = jf['data_file']
-
 
 # Load dataset data into a DataFrame: df
 df = pd.read_csv(os.path.join(root, data_file))
@@ -82,25 +84,22 @@ if not os.path.exists(features_file):
     print('[  OK  ] Process finished with %d errors' % error['counter'])
     print('List of subjects with errors: \n', error['subjects'])
 
-    # Save results to a csv file
+    # Clean and save results to a csv file
     features_df = features_df.reset_index()
     features_df.to_csv(features_file)
-
 
 # Start Classification
 print('\n\n[  OK  ] STARTING CLASSIFICATION')
 features_df = pd.read_csv(features_file)
-features_df = features_df.drop(['Unnamed: 0', 'index'], axis=1)
-
 
 # Define X and y
+features_df = features_df.drop(['Unnamed: 0', 'index'], axis=1)  # Clean Dataframe
 X_df = features_df.drop(['subject_id', 'target_name', 'target'], axis=1)
 X = X_df.values
 y = features_df['target'].values
 
 # Split data
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.7, random_state=21, stratify=y)
-
 
 # # Start Classifying: SVM-RBF
 lasso = Lasso(alpha=0.020408163265306121)
@@ -127,7 +126,7 @@ X = X_df[selected_features_cols]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.7, random_state=21, stratify=y)
 
 # Start classifying
-print('[INFO]: Starting Pipeline...')
+print('[  OK  ]: Starting Pipeline...')
 pipeline = Pipeline([
     ('scaler', StandardScaler()),
     ('svm', SVC(kernel='rbf', probability=True))
@@ -140,8 +139,7 @@ param_grid = {
 
 pipeline = GridSearchCV(pipeline, param_grid)
 
-
-print('[INFO]: Fitting model...')
+print('[  OK  ]: Fitting model...')
 pipeline.fit(X_train, y_train)
 y_pred = pipeline.predict(X_test)
 
@@ -149,7 +147,7 @@ print('Classification report: \n {}'.format(classification_report(y_test, y_pred
 print('Score: {}'.format(pipeline.score(X_test, y_test)))
 print('Best Params: {}'.format(pipeline.best_params_))
 
-y_pred_proba = pipeline.predict_proba(X_test)[:,1]
+y_pred_proba = pipeline.predict_proba(X_test)[:, 1]
 
 fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
 auc = roc_auc_score(y_test, y_pred_proba)
@@ -162,4 +160,4 @@ plt.xlabel('False positive rate')
 plt.ylabel('True positive rate')
 plt.title('ROC curve')
 
-plt.show(block=False)
+plt.show()

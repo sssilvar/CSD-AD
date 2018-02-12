@@ -1,18 +1,26 @@
 import os
 import numpy as np
 import pandas as pd
+import nibabel as nb
 import nibabel.freesurfer as nbfs
 
 
 class Freesurfer:
 
-    # columns = ['region_id', 'region_name', 'mean', 'std', 'hemisphere']
+    freesurfer_lut_df = pd.read_csv(os.path.join(os.getcwd(), 'FreeSurferColorLUT.csv'))
 
     def __init__(self, dataset_folder, df):
         self.dataset_folder = dataset_folder
         self.df = df
 
     def read_thickness(self, subject_id):
+        """
+        Extracts thickness information from annot and label files (left and right hemisphere)
+        it returns a DataFrame with the regions (columns) and its mean-std values (single row)
+        :param subject_id: 'XXX_S_XXXX' folder from dataset (ADNI Structure)
+        :return:
+            tk_stats: DataFrame with the single observation (
+        """
         # Set subject folder
         subject_folder = os.path.join(self.dataset_folder, subject_id)
         print('[  FS  ] Loading subject %s' % subject_folder)
@@ -62,3 +70,27 @@ class Freesurfer:
         }
 
         return tk_stats, morph_data
+
+    def extract_sph_features(self, subject_id):
+        """
+        Extracts spherical harmonics features from brainmask.mgz
+        :param subject_id: 'XXX_S_XXXX' folder from dataset (ADNI Structure)
+        :return:
+            features_df: Spherical features (mag, phase) per each region
+            sph: Complex matrix with the components
+        """
+        # Set subject folder
+        subject_folder = os.path.join(self.dataset_folder, subject_id)
+        print('[  FS  ] Loading subject %s' % subject_folder)
+
+        brainmask = nb.load(os.path.join(subject_folder, 'mri', 'brainmask.mgz')).get_data()
+        aseg = nb.load(os.path.join(subject_folder, 'mri', 'aseg.mgz')).get_data()
+
+        x_, y_, z_ = np.gradient(brainmask, dtype=np.float, edge_order=2)
+
+        r, thetha, phi = (
+            np.sqrt(x_ ** 2 + y_ ** 2 + z_ ** 2),
+            np.tanh(y_ / x_),
+            np.tanh(np.sqrt(x_ ** 2 + y_ ** 2) / z_)
+        )
+
