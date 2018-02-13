@@ -7,8 +7,6 @@ import nibabel.freesurfer as nbfs
 
 class Freesurfer:
 
-    freesurfer_lut_df = pd.read_csv(os.path.join(os.getcwd(), 'FreeSurferColorLUT.csv'))
-
     def __init__(self, dataset_folder, df):
         self.dataset_folder = dataset_folder
         self.df = df
@@ -71,7 +69,7 @@ class Freesurfer:
 
         return tk_stats, morph_data
 
-    def extract_sph_features(self, subject_id):
+    def extract_sph_features(self, subject_id, lut_csv):
         """
         Extracts spherical harmonics features from brainmask.mgz
         :param subject_id: 'XXX_S_XXXX' folder from dataset (ADNI Structure)
@@ -79,6 +77,9 @@ class Freesurfer:
             features_df: Spherical features (mag, phase) per each region
             sph: Complex matrix with the components
         """
+        # Load LUT
+        freesurfer_lut_df = pd.read_csv(lut_csv)
+
         # Set subject folder
         subject_folder = os.path.join(self.dataset_folder, subject_id)
         print('[  FS  ] Loading subject %s' % subject_folder)
