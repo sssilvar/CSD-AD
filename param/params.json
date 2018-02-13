@@ -1,5 +1,5 @@
 {
-  "dataset_folder": "/run/media/sssilvar/DATA/FreeSurferSD",
+  "dataset_folder": "/run/media/sssilvar/2A3CA00E3C9FD2E5/Users/Smith/Documents/FreeSurferSD",
   "xls_orig": "./test_data/csv_xls/dataset.xlsx",
   "data_file": "./test/test_data/csv_xls/data_df.csv"
 }

@@ -62,10 +62,29 @@ if not os.path.exists(features_file):
         try:
             subject_folder = os.path.join(dataset_folder, subject)
             print(subject_folder)
+            print(dx_group)
 
             # Execute test:
-            features_df, aseg = fs_obj.extract_sph_features(subject, lut_csv)
+            sph_feat, aseg, sh_complex, brainmask = fs_obj.extract_sph_features(subject, lut_csv)
             cols_test.append(features_df.columns)  # Test feature names
+
+            # Add extra info
+            print('[  OK  ] Processing data')
+            sph_feat['subject_id'] = subject
+            sph_feat['target_name'] = dx_group
+            sph_feat['target'] = label
+
+            # Append to the main DataFrame
+            features_df = features_df.append(sph_feat)
+
+            # Extract the hippo and save it
+            region = sh_complex * (aseg == 17)
+            for j, slide in enumerate(region.__abs__()):
+                if slide.mean() > 0:
+                    plt.imsave(
+                        os.path.join(root, 'features', 'left_hippo', dx_group, '%d.png' % j),
+                        slide[90:140, 90:140]
+                    )
 
         except IOError as e:
             print('[  ERROR  ] it seems like subject %s does not exist' % subject)
@@ -73,7 +92,9 @@ if not os.path.exists(features_file):
             error['subjects'].append(subject)
             error['error_type'].append(e)
 
-        if i >= 10:
+
+
+        if i >= 1:
             break
     # Print Final report
     print('[  OK  ] Process finished with %d errors' % error['counter'])

@@ -78,6 +78,9 @@ class Freesurfer:
             features_df: Spherical features (mag, phase) per each region
             sph: Complex matrix with the components
         """
+        # Disable warning: division by zero
+        np.seterr(divide='ignore', invalid='ignore')
+
         # Load LUT
         freesurfer_lut_df = pd.read_csv(lut_csv)
 
@@ -85,23 +88,23 @@ class Freesurfer:
         subject_folder = os.path.join(self.dataset_folder, subject_id)
         print('[  FS  ] Loading subject %s' % subject_folder)
 
-        brainmask = nb.load(os.path.join(subject_folder, 'mri', 'brainmask.mgz')).get_data()
+        brainmask = nb.load(os.path.join(subject_folder, 'mri', 'brainmask.mgz')).get_data().astype(np.float32)
         aseg = nb.load(os.path.join(subject_folder, 'mri', 'aseg.mgz')).get_data()
 
         # Gradient calculation (cartesian coordinates)
         x_, y_, z_ = np.gradient(brainmask, edge_order=2)
 
-        # Transformation to shperical coordinates
+        # Transformation to spherical coordinates
         r, theta, phi = np.nan_to_num((
-            np.sqrt(x_ ** 2 + y_ ** 2 + z_ ** 2),
+            np.int8(np.sqrt(x_ ** 2 + y_ ** 2 + z_ ** 2)),
             np.tanh(y_ / x_),
             np.tanh(np.sqrt(x_ ** 2 + y_ ** 2) / z_)
         ))
 
-        # # Spherical harmonics calculation
-        # sph_lambda = (lambda r_, theta_, phi_: sp.sph_harm(r_, 2, theta_, phi_))
-        # sh_func = np.vectorize(sph_lambda)
-        # sh_complex = sh_func(r, theta, phi)
+        # Spherical harmonics calculation
+        sph_lambda = (lambda r_, theta_, phi_: sp.sph_harm(r_, 2, theta_, phi_))
+        sh_func = np.vectorize(sph_lambda)
+        sh_complex = np.nan_to_num(sh_func(r, theta, phi))
 
         # Assembly feature vector
         columns = []
@@ -109,17 +112,17 @@ class Freesurfer:
             try:
                 region_name = freesurfer_lut_df['label_name'][i]
                 region_mask = aseg == i
-                print(np.sum(region_mask))
 
                 if region_mask.any():
                     print('[  FS  ] Region "%s" found' % region_name)
-                    columns.append(region_name)
+                    columns.append(region_name + '_mean')
+                    columns.append(region_name + '_std')
             except:
                 print('Exception')
 
             features_df = pd.DataFrame(columns=columns)
 
-        return features_df, aseg
+        return features_df, aseg, sh_complex, brainmask
 
 
 
