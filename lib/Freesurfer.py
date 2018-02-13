@@ -2,6 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 import nibabel as nb
+import scipy.special as sp
 import nibabel.freesurfer as nbfs
 
 
@@ -87,11 +88,39 @@ class Freesurfer:
         brainmask = nb.load(os.path.join(subject_folder, 'mri', 'brainmask.mgz')).get_data()
         aseg = nb.load(os.path.join(subject_folder, 'mri', 'aseg.mgz')).get_data()
 
-        x_, y_, z_ = np.gradient(brainmask, dtype=np.float, edge_order=2)
+        # Gradient calculation (cartesian coordinates)
+        x_, y_, z_ = np.gradient(brainmask, edge_order=2)
 
-        r, thetha, phi = (
+        # Transformation to shperical coordinates
+        r, theta, phi = np.nan_to_num((
             np.sqrt(x_ ** 2 + y_ ** 2 + z_ ** 2),
             np.tanh(y_ / x_),
             np.tanh(np.sqrt(x_ ** 2 + y_ ** 2) / z_)
-        )
+        ))
+
+        # # Spherical harmonics calculation
+        # sph_lambda = (lambda r_, theta_, phi_: sp.sph_harm(r_, 2, theta_, phi_))
+        # sh_func = np.vectorize(sph_lambda)
+        # sh_complex = sh_func(r, theta, phi)
+
+        # Assembly feature vector
+        columns = []
+        for i in freesurfer_lut_df['region_id']:
+            try:
+                region_name = freesurfer_lut_df['label_name'][i]
+                region_mask = aseg == i
+                print(np.sum(region_mask))
+
+                if region_mask.any():
+                    print('[  FS  ] Region "%s" found' % region_name)
+                    columns.append(region_name)
+            except:
+                print('Exception')
+
+            features_df = pd.DataFrame(columns=columns)
+
+        return features_df, aseg
+
+
+
 
