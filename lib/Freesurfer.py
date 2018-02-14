@@ -125,5 +125,63 @@ class Freesurfer:
         return features_df, aseg, sh_complex, brainmask
 
 
+    def extract_grad_features(self, subject_id, lut_csv):
+        """
+        Extracts gradient features from brainmask.mgz
+        :param subject_id: 'XXX_S_XXXX' folder from dataset (ADNI Structure)
+        :return:
+            features_df: Spherical features (mag, phase) per each region
+            sph: Complex matrix with the components
+        """
+        # Disable warning: division by zero
+        np.seterr(divide='ignore', invalid='ignore')
+
+        # Load LUT
+        freesurfer_lut_df = pd.read_csv(lut_csv)
+
+        # Set subject folder
+        subject_folder = os.path.join(self.dataset_folder, subject_id)
+        print('[  FS  ] Loading subject %s' % subject_folder)
+
+        brainmask = nb.load(os.path.join(subject_folder, 'mri', 'brainmask.mgz')).get_data().astype(np.float32)
+        aseg = nb.load(os.path.join(subject_folder, 'mri', 'aseg.mgz')).get_data()
+
+        # Gradient calculation (cartesian coordinates)
+        x_, y_, z_ = np.gradient(brainmask, edge_order=2)
+
+        # Transformation to spherical coordinates
+        r, theta, phi = np.nan_to_num((
+            np.int8(np.sqrt(x_ ** 2 + y_ ** 2 + z_ ** 2)),
+            np.tanh(y_ / x_),
+            np.tanh(np.sqrt(x_ ** 2 + y_ ** 2) / z_)
+        ))
+
+        # Assembly feature vector
+        features_dict = {}
+        for i in freesurfer_lut_df['region_id']:
+            try:
+                region_name = freesurfer_lut_df['label_name'][i]
+                region_mask = aseg == i
+
+                if region_mask.any() and 'Unknown' not in region_name:
+                    print('[  FS  ] Region "%s" found' % region_name)
+
+                    region_r = r * region_mask
+                    region_theta = theta * region_mask
+                    region_phi = phi * region_mask
+
+                    features_dict[region_name + '_r_mean'] = np.mean(region_r > 0)
+                    features_dict[region_name + '_theta_mean'] = np.mean(region_theta > 0)
+                    features_dict[region_name + '_phi_mean'] = np.mean(region_phi > 0)
+
+            except:
+                pass
+                # print('Exception')
+
+        features_df = pd.DataFrame([features_dict])
+
+        return features_df, aseg, r, features_dict
+
+
 
 
