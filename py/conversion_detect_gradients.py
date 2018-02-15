@@ -83,6 +83,9 @@ if not os.path.exists(features_file):
             error['subjects'].append(subject)
             error['error_type'].append(e)
 
+        if i>=1:
+            break
+
     # Print Final report
     print('[  OK  ] Process finished with %d errors' % error['counter'])
     print('List of subjects with errors: \n', error['subjects'])
@@ -94,6 +97,7 @@ if not os.path.exists(features_file):
 # Start Classification
 print('\n\n[  OK  ] STARTING CLASSIFICATION')
 features_df = pd.read_csv(features_file)
+features_df = features_df.dropna(axis=1)
 
 # Clean DataFrame (drop cols)
 try:
@@ -105,26 +109,36 @@ except: pass
 
 
 # Define X and y
-X_df = features_df.drop(['subject_id', 'target_name', 'target'], axis=1)
+X_df = features_df.drop(['subject_id', 'target_name', 'target'], axis=1).astype(np.float32)
 X = X_df.values
 y = features_df['target'].values
 
 # Split data
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.7, random_state=21, stratify=y)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=21, stratify=y)
 
 # # Start Classifying: SVM-RBF
-lasso = Lasso(alpha=0.020408163265306121)
+param_grid = {
+    'alpha': np.linspace(0.001, 1, 15),
+    'max_iter': [1000, 5000, 10000]
+}
 
-lasso.fit(X_train, y_train)
+lasso = Lasso()
+lasso_cv = GridSearchCV(lasso, param_grid)
 
-lasso_coef = lasso.coef_
-print(lasso_coef)
+lasso_cv.fit(X_train, y_train)
+
+print(lasso_cv.best_params_)
+
+alpha = lasso_cv.best_params_['alpha']
+lasso_opt = Lasso(alpha=alpha, normalize=True)
+lasso_opt.fit(X_train, y_train)
+lasso_coef = lasso_opt.coef_
 
 # Plot features
 plt.style.use('ggplot')
 plt.figure()
 plt.plot(range(X.shape[1]), lasso_coef)
-plt.xticks(range(X.shape[1]), X_df.columns, rotation=30)
+plt.xticks(range(X.shape[1]), X_df.columns, rotation=5)
 plt.margins(0.02)
 
 selected_features_cols = X_df.columns[lasso_coef != 0]
@@ -140,15 +154,15 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.7, random_
 print('[  OK  ]: Starting Pipeline...')
 pipeline = Pipeline([
     ('scaler', StandardScaler()),
-    ('svm', SVC(kernel='rbf', probability=True))
+    ('svm', SVC(kernel='linear', probability=True))
 ])
 
 param_grid = {
-    'svm__C': np.logspace(-3, 2, 20),
-    'svm__gamma': np.logspace(-3, 2, 20)
+    'svm__C': np.logspace(-3, 20, 100),
+    'svm__gamma': np.linspace(0, 0.5, 20)
 }
 
-pipeline = GridSearchCV(pipeline, param_grid)
+pipeline = GridSearchCV(pipeline, param_grid, scoring='average_precision')
 
 print('[  OK  ]: Fitting model...')
 pipeline.fit(X_train, y_train)

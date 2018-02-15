@@ -7,4 +7,4 @@
     /run/media/sssilvar/DATA/FreeSurferSD
 
 ## In Windows 7 - Z50
-    C:\\Users\\Smith\Documents\\FreeSurferSD
+    C:/Users/Smith/Documents/FreeSurferSD
