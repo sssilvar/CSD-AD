@@ -12,7 +12,7 @@ params_file = os.path.join(root, 'param', 'params.json')
 # mri_cvs_register --mov ubject_id --mni --openmp 8
 def register_subject(subject_id):
     print('[ PROCESSING ] Subject: ' + subject_id)
-    cmd = 'mri_csv_register --mov ' + subject_id + ' --mni --openmp 8'
+    cmd = 'mri_cvs_register --mov ' + subject_id + ' --mni --openmp 8'
     # print(cmd)
     os.system(cmd)
 
