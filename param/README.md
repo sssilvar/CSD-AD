@@ -8,3 +8,6 @@
 
 ## In Windows 7 - Z50
     C:/Users/Smith/Documents/FreeSurferSD
+
+## In UMNG Server
+    /home/jullygh/sssilvar/Documents/Dataset/FreeSurferSD/
