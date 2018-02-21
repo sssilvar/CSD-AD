@@ -33,6 +33,6 @@ if __name__ == '__main__':
 
     # Start multicore
     print('[  OK  ] Starting pool')
-    pool = Pool(4)
+    pool = Pool(10)
     pool.map(register_subject, df['folder'])
     pool.close()
