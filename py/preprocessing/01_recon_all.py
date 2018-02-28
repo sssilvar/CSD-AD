@@ -36,7 +36,7 @@ if __name__ == '__main__':
     files = get_file_list(dataset_folder, ext)
 
     # Paralleling process
-    pool = Pool()
+    pool = Pool(9)
     pool.map(recon_all, files)
     pool.close()
     pool.join()
