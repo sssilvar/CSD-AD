@@ -17,7 +17,7 @@ def recon_all(files):
         command = 'recon-all -i ' + os.path.join(dataset_folder, file_input) + ' -sd ' + subjects_dir\
                   + ' -s ' + file_input[:-4] + ' -all'
         print(command)
-        # os.system(command)
+        os.system(command)
 
 
 def get_file_list(path, ext):
@@ -41,5 +41,6 @@ if __name__ == '__main__':
     pool = Pool(8)
     pool.map(recon_all, files)
     pool.close()
+    pool.join()
 
 
