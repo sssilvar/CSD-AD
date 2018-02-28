@@ -13,7 +13,7 @@ workspace_dir = os.path.normpath(workspace_dir)
 print('[  OK  ] Setting $SUBJECTS_DIR to: ', subjects_dir)
 # os.system('export SUBJECTS_DIR=%s' % subjects_dir)
 
-# Set the pipeline commands
+# Set the preprocessing commands
 hemis = ['lh', 'rh']
 pipeline_commands = {}
 for hemi in hemis:

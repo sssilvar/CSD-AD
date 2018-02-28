@@ -143,7 +143,7 @@ if not os.path.exists(features_file):
 #
 # # Start classifying
 # print('[  OK  ]: Starting Pipeline...')
-# pipeline = Pipeline([
+# preprocessing = Pipeline([
 #     ('scaler', StandardScaler()),
 #     ('svm', SVC(kernel='rbf', probability=True))
 # ])
@@ -153,17 +153,17 @@ if not os.path.exists(features_file):
 #     'svm__gamma': np.logspace(-3, 2, 20)
 # }
 #
-# pipeline = GridSearchCV(pipeline, param_grid)
+# preprocessing = GridSearchCV(preprocessing, param_grid)
 #
 # print('[  OK  ]: Fitting model...')
-# pipeline.fit(X_train, y_train)
-# y_pred = pipeline.predict(X_test)
+# preprocessing.fit(X_train, y_train)
+# y_pred = preprocessing.predict(X_test)
 #
 # print('Classification report: \n {}'.format(classification_report(y_test, y_pred)))
-# print('Score: {}'.format(pipeline.score(X_test, y_test)))
-# print('Best Params: {}'.format(pipeline.best_params_))
+# print('Score: {}'.format(preprocessing.score(X_test, y_test)))
+# print('Best Params: {}'.format(preprocessing.best_params_))
 #
-# y_pred_proba = pipeline.predict_proba(X_test)[:, 1]
+# y_pred_proba = preprocessing.predict_proba(X_test)[:, 1]
 #
 # fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
 # auc = roc_auc_score(y_test, y_pred_proba)
