@@ -1,12 +1,10 @@
-import os
-
-import matplotlib.pyplot as plt
-import nibabel as nb
 import numpy as np
+import nibabel as nb
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-from plotly.offline import iplot, plot
-from plotly import figure_factory as FF
 from skimage import measure
+import matplotlib.pyplot as plt
+from plotly.tools import FigureFactory as FF
+from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
 
 
 def make_mesh(image, threshold=-300, step_size=1):
@@ -24,8 +22,8 @@ def plotly_3d(verts, faces):
     print "Drawing"
 
     # Make the colormap single color since the axes are positional not intensity.
-    # colormap=['rgb(255,105,180)','rgb(255,255,51)','rgb(0,191,255)']
-    colormap = ['rgb(226, 226, 202)', 'rgb(226, 226, 202)']
+    #    colormap=['rgb(255,105,180)','rgb(255,255,51)','rgb(0,191,255)']
+    colormap = ['rgb(236, 236, 212)', 'rgb(236, 236, 212)']
 
     fig = FF.create_trisurf(x=x,
                             y=y,
@@ -35,7 +33,7 @@ def plotly_3d(verts, faces):
                             simplices=faces,
                             backgroundcolor='rgb(64, 64, 64)',
                             title="Interactive Visualization")
-    plot(fig)
+    iplot(fig)
 
 
 def plt_3d(verts, faces):
@@ -58,38 +56,8 @@ def plt_3d(verts, faces):
 
 
 if __name__ == '__main__':
-    # Choose the file to be played with
-    filename = 'test_data/941_S_1363.mgz'
+    nii = nb.load('./test_data/941_S_1363.mgz')
+    img = nii.get_data()
 
-    # Correct filename
-    filename = os.path.join(os.getcwd(), filename)
-    print('[  OK  ] File to be processed is located in: %s' % filename)
-
-    # Load MRI file
-    mri = nb.load(filename)
-    img = mri.get_data()
-
-    # Generate a sphere
-    r = 40
-    cx, cy, cz = (0, 0, 0)
-
-    ax_min, ax_max = (-128, 128)
-    y, x, z = np.ogrid[ax_min:ax_max, ax_min:ax_max, ax_min:ax_max]
-    eqn = (x - cx) ** 2 + (y - cy) ** 2 + (z - cz) ** 2
-    mask = np.bitwise_and(eqn < (r + 2. / 256 * r) ** 2, eqn > (r - 2. / 256 * r) ** 2)
-    img_sph = img * mask
-    img_ball = img * (eqn <= r ** 2)
-
-    slide = 128 + 0
-
-    plt.figure()
-    plt.subplot(1, 2, 1)
-    plt.imshow(img_sph[:, :, slide], cmap='gray')
-    plt.axis('off')
-
-    plt.subplot(1, 2, 2)
-    plt.imshow(img_ball[:, :, slide], cmap='gray')
-    plt.axis('off')
-
-    v, f = make_mesh(img_sph, threshold=60, step_size=2)
-    plotly_3d(v, f)
+    v, f = make_mesh(img, 2)
+    plt_3d(v, f)
