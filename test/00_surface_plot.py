@@ -3,7 +3,7 @@ import nibabel as nb
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from skimage import measure
 import matplotlib.pyplot as plt
-from plotly.tools import FigureFactory as FF
+import plotly.figure_factory as FF
 from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
 
 
@@ -33,7 +33,7 @@ def plotly_3d(verts, faces):
                             simplices=faces,
                             backgroundcolor='rgb(64, 64, 64)',
                             title="Interactive Visualization")
-    iplot(fig)
+    plot(fig)
 
 
 def plt_3d(verts, faces):
@@ -59,5 +59,5 @@ if __name__ == '__main__':
     nii = nb.load('./test_data/941_S_1363.mgz')
     img = nii.get_data()
 
-    v, f = make_mesh(img, 2)
-    plt_3d(v, f)
+    v, f = make_mesh(img, 60, 2)
+    plotly_3d(v, f)
