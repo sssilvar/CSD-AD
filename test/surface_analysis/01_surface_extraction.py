@@ -1,5 +1,5 @@
-import sys
-sys.path.append('/home/sssilvar/vtk/build/lib/python2.7/site-packages')
+# import sys
+# sys.path.append('/home/sssilvar/vtk/build/lib/python2.7/site-packages')
 import vtk
 
 import os
@@ -80,30 +80,39 @@ def write_vtk_file(obj, filename):
 
 
 if __name__ == '__main__':
-    vtk_filename = os.path.join(root, 'test', 'test_data', 'surf', 'lh.vtk')
+    hemispheres = ['rh', 'lh']
 
     print('INTERSECTION ANALYSIS')
-    r_min = 50
-    r_max = 70
 
-    sph_inf = create_sphere(radius=r_min)
-    sph_sup = create_sphere(radius=r_max)
-    brain = load_surface(vtk_filename)
+    radius = [0, 33, 66]
+    for hemi in hemispheres:
+        vtk_filename = os.path.join(root, 'test', 'test_data', 'surf', hemi + '.vtk')
+        for r in radius:
+            r_min = r
+            r_max = r + 33
+            print('Processing from r_min = %d to r_max=%d' % (r_min, r_max))
 
-    # Intersect
-    intersection = vtk_bool_operation(brain, sph_sup, operation='intersection')
-    intersection_2 = vtk_bool_operation(intersection, sph_inf, operation='difference')
+            # Create surfaces
+            sph_inf = create_sphere(radius=r_min)
+            sph_sup = create_sphere(radius=r_max)
+            brain = load_surface(vtk_filename)
 
-    # Write an output file
-    output_file = os.path.join(os.path.dirname(vtk_filename), 'scale_%d_to_%d.vtk' % (r_min, r_max))
-    write_vtk_file(intersection_2, output_file)
+            # Intersect
+            try:
+                intersection = vtk_bool_operation(brain, sph_sup, operation='intersection')
+                if r_min is 0:
+                    intersection_2 = intersection
+                elif r_min is not 0:
+                    intersection_2 = vtk_bool_operation(intersection, sph_inf, operation='difference')
 
-    # intersection_vtk = load_surface('/home/sssilvar/Downloads/pepe.vtk')
-    # intersection_2 = vtk_intersection(sph_inf, intersection_vtk)
-    #
+                output_file = os.path.join(os.path.dirname(vtk_filename), hemi + '_scale_%d_to_%d.vtk' % (r_min, r_max))
+                write_vtk_file(intersection_2, output_file)
+            except Exception as e:
+                print(e)
+
     # # Create mapper and actor for all
-    # sph_actor = get_actor(sph_inf)
-    # # brain_actor = get_actor(brain)
+    # # sph_actor = get_actor(sph_inf)
+    # brain_actor = get_actor(brain)
     # intersection_actor = get_actor(intersection_2)
     #
     # # Color
@@ -113,8 +122,8 @@ if __name__ == '__main__':
     #
     # # Create a Renderer
     # renderer = vtk.vtkRenderer()
-    # renderer.AddViewProp(sph_actor)
-    # # renderer.AddViewProp(brain_actor)
+    # # renderer.AddViewProp(sph_actor)
+    # renderer.AddViewProp(brain_actor)
     # renderer.AddViewProp(intersection_actor)
     # renderer.SetBackground(.1, .2, .3)
     #
