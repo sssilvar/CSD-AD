@@ -1,5 +1,8 @@
-import os
+import sys
+sys.path.append('/home/sssilvar/vtk/build/lib/python2.7/site-packages')
 import vtk
+
+import os
 
 # Set root folder
 root = os.path.join(os.getcwd(), '..', '..')
@@ -42,7 +45,7 @@ def create_sphere(radius=1, x_origin=0, y_origin=0, z_origin=0):
     return sphere
 
 
-def vtk_union(obj_1, obj_2):
+def vtk_bool_operation(obj_1, obj_2, operation='intersection'):
     # Triangles
     tri_1 = vtk.vtkTriangleFilter()
     tri_1.SetInputConnection(obj_1.GetOutputPort())
@@ -52,32 +55,19 @@ def vtk_union(obj_1, obj_2):
 
     # Create an intersection operation
     boolean_operation = vtk.vtkBooleanOperationPolyDataFilter()
-    boolean_operation.SetOperationToUnion()
+
+    if operation is 'union':
+        boolean_operation.SetOperationToUnion()
+    elif operation is 'difference':
+        boolean_operation.SetOperationToDifference()
+    else:
+        boolean_operation.SetOperationToIntersection()
 
     boolean_operation.SetInputConnection(0, tri_1.GetOutputPort())
     boolean_operation.SetInputConnection(1, tri_2.GetOutputPort())
     boolean_operation.Update()
 
-    print('[  OK  ] Intersection found')
-    return boolean_operation
-
-def vtk_intersection(obj_1, obj_2):
-    # Triangles
-    tri_1 = vtk.vtkTriangleFilter()
-    tri_1.SetInputConnection(obj_1.GetOutputPort())
-
-    tri_2 = vtk.vtkTriangleFilter()
-    tri_2.SetInputConnection(obj_2.GetOutputPort())
-
-    # Create an intersection operation
-    boolean_operation = vtk.vtkBooleanOperationPolyDataFilter()
-    boolean_operation.SetOperationToIntersection()
-
-    boolean_operation.SetInputConnection(0, tri_1.GetOutputPort())
-    boolean_operation.SetInputConnection(1, tri_2.GetOutputPort())
-    boolean_operation.Update()
-
-    print('[  OK  ] Intersection found')
+    print('[  OK  ] %s was already performed' % operation.title())
     return boolean_operation
 
 
@@ -93,17 +83,21 @@ if __name__ == '__main__':
     vtk_filename = os.path.join(root, 'test', 'test_data', 'surf', 'lh.vtk')
 
     print('INTERSECTION ANALYSIS')
-    r_min = 60
+    r_min = 50
     r_max = 70
 
     sph_inf = create_sphere(radius=r_min)
     sph_sup = create_sphere(radius=r_max)
     brain = load_surface(vtk_filename)
 
-
     # Intersect
-    intersection = vtk_intersection(sph_sup, brain)
-    intersection = vtk_intersection(intersection, sph_inf)
+    intersection = vtk_bool_operation(brain, sph_sup, operation='intersection')
+    intersection_2 = vtk_bool_operation(intersection, sph_inf, operation='difference')
+
+    # Write an output file
+    output_file = os.path.join(os.path.dirname(vtk_filename), 'scale_%d_to_%d.vtk' % (r_min, r_max))
+    write_vtk_file(intersection_2, output_file)
+
     # intersection_vtk = load_surface('/home/sssilvar/Downloads/pepe.vtk')
     # intersection_2 = vtk_intersection(sph_inf, intersection_vtk)
     #
