@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import nibabel as nb
+from multiprocessing import Pool
 import matplotlib.pyplot as plt
 
 # Set root folder
@@ -42,6 +43,22 @@ def sector_mask(shape, centre, min_radius, max_radius, theta_range, phi_range):
     return sphere_mask * anglemask
 
 
+def map_scale_to_plane(img):
+    """Map the scale to a plane by projecting the means"""
+    img_2d = np.zeros([360, 180])
+    for i, theta in enumerate(range(0, 360)):
+        for j, phi in enumerate(range(-90, 90)):
+            print('I: %d / J: %d' % (i, j))
+            # Calculate mask
+            mask = sector_mask(img.shape, (128, 128, 128),
+                               min_radius=30, max_radius=40, theta_range=(i, i + 1), phi_range=(j, j + 1))
+
+            # Project over the
+            img_2d[i, j] = np.mean(img * mask)
+
+    return img_2d
+
+
 if __name__ == '__main__':
     # Define shape parameters
     d = 10
@@ -52,37 +69,13 @@ if __name__ == '__main__':
 
     mgz = nb.load(os.path.join(root, 'test', 'test_data', '941_S_1363.mgz'))
     img = mgz.get_data()
-    img_slice = img[:, :, 128]
 
-    mask = sector_mask(img.shape, (128, 128, 128),
-                       min_radius=30, max_radius=40, theta_range=(0, 90), phi_range=(-90, 90))
-
-    # Apply mask
-    img_masked = img * mask
-    print(np.sum(img_masked))
-
-    # Slide
-    i_slice = 128
-
-    plt.figure()
-    plt.subplot(121)
-    plt.imshow(img[:, :, i_slice], cmap='gray')
-    plt.axis('off')
-
-    plt.subplot(122)
-    plt.imshow(img_masked[:, :, i_slice], cmap='gray')
-    plt.axis('off')
-
-    img_2d = np.zeros([360, 180])
-    for i, theta in enumerate(range(0, 360)):
-        for j, phi in enumerate(range(-90, 90)):
-            print('I: %d / J: %d' % (i, j))
-            # Calculate mask
-            mask = sector_mask(img.shape, (128, 128, 128),
-                               min_radius=30, max_radius=40, theta_range=(i, i+1), phi_range=(j, j+1))
-
-            # Project over the
-            img_2d[i, j] = np.mean(img * mask)
+    # Apply mask for all the angles
+    # pool = Pool(2)
+    # img_2d = pool.map(map_scale_to_plane, img)
+    # pool.close()
+    # pool.join()
+    img_2d = map_scale_to_plane(img)
 
     # Plot image
     plt.figure()
