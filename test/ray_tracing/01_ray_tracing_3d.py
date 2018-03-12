@@ -3,6 +3,8 @@ import os
 import matplotlib.pyplot as plt
 import nibabel as nb
 import numpy as np
+import cv2
+import time
 
 # Set root folder
 root = os.path.join(os.getcwd(), '..', '..')
@@ -45,16 +47,26 @@ def sector_mask(shape, centre, min_radius, max_radius, theta_range, phi_range):
 
 def map_scale_to_plane(img):
     """Map the scale to a plane by projecting the means"""
+    print('Shape img {}'.format(img.shape))
     img_2d = np.zeros([360, 180])
-    for i, theta in enumerate(range(0, 360)):
-        for j, phi in enumerate(range(-90, 90)):
+    for j, phi in enumerate(range(-90, 90)):
+        for i, theta in enumerate(range(0, 360)):
             print('I: %d / J: %d' % (i, j))
+            print('From theta %d and phi %d' % (theta, phi))
             # Calculate mask
             mask = sector_mask(img.shape, (128, 128, 128),
-                               min_radius=30, max_radius=40, theta_range=(i, i + 1), phi_range=(j, j + 1))
+                               min_radius=30, max_radius=40, theta_range=(theta, theta + 1), phi_range=(phi, phi + 1))
 
             # Project over the
-            img_2d[i, j] = np.mean(img * mask)
+            img_masked = img * mask
+            img_2d[i, j] = np.nan_to_num(np.mean(img_masked[np.where(img_masked > 0)]))
+
+            print('Mean: %d' % img_2d[i, j])
+            # print('Img masked: {}'.format(img_masked[np.where(img_masked > 0)]))
+            # cv2.imshow('Slice', img_masked[:, :, 128])
+            # # cv2.waitKey(0)
+            # cv2.waitKey(0)
+            # cv2.destroyAllWindows()
 
     return img_2d
 
