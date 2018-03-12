@@ -1,8 +1,8 @@
 import os
-import numpy as np
-import nibabel as nb
-from multiprocessing import Pool
+
 import matplotlib.pyplot as plt
+import nibabel as nb
+import numpy as np
 
 # Set root folder
 root = os.path.join(os.getcwd(), '..', '..')
@@ -71,15 +71,9 @@ if __name__ == '__main__':
     img = mgz.get_data()
 
     # Apply mask for all the angles
-    # pool = Pool(2)
-    # img_2d = pool.map(map_scale_to_plane, img)
-    # pool.close()
-    # pool.join()
     img_2d = map_scale_to_plane(img)
 
-    # Plot image
-    plt.figure()
-    plt.imshow(img_2d, cmap='gray')
-    plt.axis('off')
+    # Save the result
+    plt.imsave(os.path.join(root, '..', 'sph2plane.png'), img_2d, cmap='gray')
 
-    plt.show()
+    # plt.show()
