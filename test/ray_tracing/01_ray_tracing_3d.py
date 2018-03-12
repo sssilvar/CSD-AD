@@ -3,8 +3,7 @@ import os
 import matplotlib.pyplot as plt
 import nibabel as nb
 import numpy as np
-import cv2
-import time
+# import cv2
 
 # Set root folder
 root = os.path.join(os.getcwd(), '..', '..')
