@@ -3,12 +3,14 @@ import os
 import matplotlib.pyplot as plt
 import nibabel as nb
 import numpy as np
+from numba import jit
 # import cv2
 
 # Set root folder
 root = os.path.join(os.getcwd(), '..', '..')
 
 
+@jit
 def sector_mask(shape, centre, min_radius, max_radius, theta_range, phi_range):
     """
     Return a boolean mask for a circular sector. The start/stop angles in
@@ -29,7 +31,7 @@ def sector_mask(shape, centre, min_radius, max_radius, theta_range, phi_range):
     # convert cartesian --> polar coordinates
     r2 = (x - cx) ** 2 + (y - cy) ** 2 + (z - cz) ** 2
     theta = np.arctan2(y - cy, x - cx) - t_min
-    phi = np.arctan2(np.sqrt((x - cx) ** 2 + (y - cy) ** 2), (z - cz) ** 2)
+    phi = np.arctan2(np.sqrt((x - cx) ** 2 + (y - cy) ** 2), (z - cz) ** 2) - p_min
 
     # wrap angles between 0 and 2*pi
     theta %= (2 * np.pi)
@@ -44,21 +46,28 @@ def sector_mask(shape, centre, min_radius, max_radius, theta_range, phi_range):
     return sphere_mask * anglemask
 
 
-def map_scale_to_plane(img):
+@jit
+def map_scale_to_plane(img, radius_range, center, step=2):
     """Map the scale to a plane by projecting the means"""
+    # Cast to 8-bit
+    img = np.uint8(img)
+    # Assign Radius range variables
+    min_r, max_r = radius_range
+
     print('Shape img {}'.format(img.shape))
     img_2d = np.zeros([360, 180])
-    for j, phi in enumerate(range(-90, 90)):
-        for i, theta in enumerate(range(0, 360)):
+    for j, phi in enumerate(range(-90, 90, step)):
+        for i, theta in enumerate(range(0, 360, step)):
             print('I: %d / J: %d' % (i, j))
             print('From theta %d and phi %d' % (theta, phi))
             # Calculate mask
-            mask = sector_mask(img.shape, (128, 128, 128),
-                               min_radius=30, max_radius=40, theta_range=(theta, theta + 1), phi_range=(phi, phi + 1))
+            mask = sector_mask(img.shape, center,
+                               min_radius=min_r, max_radius=max_r,
+                               theta_range=(theta, theta + step), phi_range=(phi, phi + step))
 
             # Project over the
             img_masked = img * mask
-            img_2d[i, j] = np.nan_to_num(np.mean(img_masked[np.where(img_masked > 0)]))
+            img_2d[i, j] = np.nan_to_num(np.sum(img_masked) / np.sum(mask))
 
             print('Mean: %d' % img_2d[i, j])
             # print('Img masked: {}'.format(img_masked[np.where(img_masked > 0)]))
@@ -82,9 +91,14 @@ if __name__ == '__main__':
     img = mgz.get_data()
 
     # Apply mask for all the angles
-    img_2d = map_scale_to_plane(img)
+    r = 128 - 128
+    s = 128 + 128
+    c = abs(r - s)/2
+    print(c)
+    img_2d = map_scale_to_plane(img[r:s, r:s, r:s], radius_range=(0, 10), center=(c, c, c))
 
     # Save the result
     plt.imsave(os.path.join(root, '..', 'sph2plane.png'), img_2d, cmap='gray')
 
-    # plt.show()
+    plt.imshow(img[r:s, r:s, c])
+    plt.show()
