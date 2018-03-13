@@ -95,7 +95,7 @@ if __name__ == '__main__':
     s = 128 + 128
     c = abs(r - s)/2
     print(c)
-    img_2d = map_scale_to_plane(img[r:s, r:s, r:s], radius_range=(0, 10), center=(c, c, c))
+    img_2d = map_scale_to_plane(img[r:s, r:s, r:s], radius_range=(0, 10), center=(c, c, c), step=1)
 
     # Save the result
     plt.imsave(os.path.join(root, '..', 'sph2plane.png'), img_2d, cmap='gray')
