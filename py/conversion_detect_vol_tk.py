@@ -28,7 +28,7 @@ import lib.Freesurfer as Fs
 with open(params_file) as json_file:
     jf = json.load(json_file)
     dataset_folder = jf['dataset_folder']
-    data_file = jf['data_file']
+    data_file = os.path.normpath(root + jf['data_file'])
 
 # Load dataset data into a DataFrame: df
 df = pd.read_csv(os.path.join(root, data_file))
@@ -113,7 +113,7 @@ print(lasso_coef)
 plt.style.use('ggplot')
 plt.figure()
 plt.plot(range(X.shape[1]), lasso_coef)
-plt.xticks(range(X.shape[1]), X_df.columns, rotation=30)
+plt.xticks(range(X.shape[1]), X_df.columns, rotation=10)
 plt.margins(0.02)
 
 selected_features_cols = X_df.columns[lasso_coef != 0]
@@ -133,11 +133,12 @@ pipeline = Pipeline([
 ])
 
 param_grid = {
-    'svm__C': np.logspace(-3, 2, 20),
-    'svm__gamma': np.logspace(-3, 2, 20)
+    'svm__C': np.logspace(-3, 20, 20),
+    'svm__gamma': np.logspace(-2, 2, 20),
+    'svm__degree': range(2, 5)
 }
 
-pipeline = GridSearchCV(pipeline, param_grid)
+pipeline = GridSearchCV(pipeline, param_grid, scoring='roc_auc')
 
 print('[  OK  ]: Fitting model...')
 pipeline.fit(X_train, y_train)
