@@ -1,2 +1,3 @@
 # Ignore Virtual environment
 venv/
+output/
