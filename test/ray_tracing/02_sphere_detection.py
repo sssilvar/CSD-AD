@@ -5,6 +5,7 @@ import time
 from numpy import pi
 import nibabel as nb
 import matplotlib.pyplot as plt
+from scipy.ndimage.interpolation import rotate
 
 # Define the root folder
 root = os.path.dirname(os.path.dirname(os.getcwd()))
@@ -30,7 +31,7 @@ def sphere(shape=(256, 256, 256), radius=(1, 10), center=(128, 128, 128),
     # For radius range, theta range and phi range
     eqn_mag = x ** 2 + y ** 2 + z ** 2
     eqn_theta = np.arctan2(y, x)
-    eqn_theta = np.repeat(eqn_theta[:,:, np.newaxis], sz, axis=2).squeeze()
+    eqn_theta = np.repeat(eqn_theta[:, :, np.newaxis], sz, axis=2).squeeze()
 
     eqn_phi = np.arctan2(np.sqrt(x ** 2 + y ** 2), z)
 
@@ -104,8 +105,21 @@ def solid_cone(radius=(100, 110), center=(128, 128, 128)):
     return vol
 
 
-if __name__ == '__main__':
+def show_mri(vol, slice_xyz=(128, 128, 128)):
+    img_x = vol[:, :, slice_xyz[0]].reshape((256, 256))
+    img_y = vol[:, slice_xyz[1], :].reshape((256, 256))
+    img_z = vol[slice_xyz[2], :, :].reshape((256, 256))
 
+    plt.figure()
+    plt.subplot(1, 3, 1)
+    plt.imshow(img_x, cmap='gray')
+    plt.subplot(1, 3, 2)
+    plt.imshow(img_y, cmap='gray')
+    plt.subplot(1, 3, 3)
+    plt.imshow(img_z, cmap='gray')
+
+
+if __name__ == '__main__':
     vol = solid_cone(radius=(50, 60))
 
     # theta_r = pi/2
@@ -114,7 +128,23 @@ if __name__ == '__main__':
     #       [0, np.sin(theta_r), np.cos(theta_r)]]
     #
     # vol = vol * np.array([[0,1], [-1, 0]])
+    cos_gamma = np.cos(pi / 4)
+    sin_gamma = np.sin(pi / 4)
+    rot_affine = np.array([[1, 0, 0, 0],
+                           [0, cos_gamma, -sin_gamma, 0],
+                           [0, sin_gamma, cos_gamma, 0],
+                           [0, 0, 0, 1]])
 
-    nii = nb.Nifti1Image(vol, affine=np.eye(4))
-    nb.save(nii, '/home/sssilvar/Documents/tmp/test.mgz')
+    nii = nb.Nifti1Image(vol, affine=rot_affine)
 
+    file_output = '/home/sssilvar/Documents/tmp/test.mgz'
+    nb.save(nii, file_output)
+
+    p_mgz = os.path.join(os.path.dirname(file_output), 'p.mgz')
+    os.system('mri_convert %s %s -c' % (file_output, p_mgz))
+    mgz = nb.load('/home/sssilvar/Documents/tmp/p.mgz')
+    img = mgz.get_data()
+
+    show_mri(vol)
+    show_mri(img)
+    plt.show()
