@@ -48,7 +48,7 @@ def sphere(shape=(256, 256, 256), radius=(1, 10), center=(128, 128, 128),
 
 
 def sphere_to_plane(vol, shape=(256, 256, 256), radius_range=(), center=(128,128,128), step=1):
-    img_2d = np.zeros([180, 360])
+    img_2d = np.zeros([360, 180])
 
     for i, theta in enumerate(range(-180, 180, step)):
         for j, phi in enumerate(range(-90, 90, step)):
@@ -96,7 +96,7 @@ if __name__ == '__main__':
 
     img_2d = sphere_to_plane(img, shape=img.shape, radius_range=(r_min, r_max), step=1)
 
-    filename_output = os.path.join(root, 'output', 'sphere_to_map_scale_%d_to_%d.jpg') % (r_min, r_max)
+    filename_output = os.path.join(root, 'output', 'sphere_to_map_scale_%d_to_%d.png') % (r_min, r_max)
     plt.imsave(filename_output, img_2d, cmap='gray')
 
 
