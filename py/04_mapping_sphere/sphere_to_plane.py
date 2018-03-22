@@ -98,10 +98,3 @@ if __name__ == '__main__':
 
     filename_output = os.path.join(root, 'output', 'sphere_to_map_scale_%d_to_%d.png') % (r_min, r_max)
     plt.imsave(filename_output, img_2d, cmap='gray')
-
-
-
-
-
-
-

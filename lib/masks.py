@@ -90,7 +90,7 @@ def solid_cone(radius=(100, 110), center=(128, 128, 128)):
     cone_vol = cone(r=r_min)
     mask = sphere_vol * cone_vol
 
-    vol = mask.astype(np.int8)
-    vol[cx, cy, cz + r_max] = 2
+    # vol = mask.astype(np.int8)
+    # vol[cx, cy, cz + r_max] = 2
 
-    return vol
+    return mask
