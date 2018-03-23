@@ -38,3 +38,4 @@ if __name__ == '__main__':
 
     img_filename = os.path.join(root, 'output', '%d_to_%d_solid_angle_to_sphere.png' % (r_min, r_max))
     plt.imsave(img_filename, img_2d, cmap='gray')
+    img_filename.tofile(os.path.join(root, 'output', '%d_to_%d_solid_angle_to_sphere.raw' % (r_min, r_max)))
