@@ -6,9 +6,11 @@ import nibabel as nb
 import matplotlib.pyplot as plt
 import scipy.special as sp
 
+root = os.path.dirname(os.path.dirname(__file__))
+
 # Assign images directory
-# filename = os.path.join(os.getcwd(), 'test_data', 'fsaverage.mgz')
-filename = 'C:/Users/Smith/Downloads/temp/gradients/002_S_1070/phi.mgz'
+filename = os.path.join(os.getcwd(), 'test_data', 'fsaverage.mgz')
+# filename = 'C:/Users/Smith/Downloads/temp/gradients/002_S_1070/phi.mgz'
 slide = 117
 
 # Load image
