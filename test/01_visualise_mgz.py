@@ -5,6 +5,7 @@ import numpy as np
 import nibabel as nb
 import matplotlib.pyplot as plt
 import scipy.special as sp
+from lib.visualization import show_mri
 
 root = os.path.dirname(os.path.dirname(__file__))
 
@@ -21,8 +22,6 @@ print('[ OK ] Image shape:/t', img.shape)
 
 
 plt.style.use('ggplot')
-plt.figure()
-plt.title('MGZ slide %d view' %slide)
-plt.imshow(img[:, :, slide], cmap='gray')
-plt.axis('off')
+show_mri(img)
+plt.suptitle('MGZ slide %d view' %slide)
 plt.show()
