@@ -10,14 +10,15 @@ from lib.visualization import show_mri
 root = os.path.dirname(os.path.dirname(__file__))
 
 # Assign images directory
-filename = os.path.join(os.getcwd(), 'test_data', 'fsaverage.mgz')
-# filename = 'C:/Users/Smith/Downloads/temp/gradients/002_S_1070/phi.mgz'
+# filename = os.path.join(os.getcwd(), 'test_data', 'fsaverage.mgz')
+filename = "Z:/Users/Smith/Downloads/mni_icbm152_nlin_sym_09c_minc2/mni_icbm152_t1_tal_nlin_sym_09c.mnc"
 slide = 117
 
 # Load image
 mgz = nb.load(filename)
 img = mgz.get_data()
-
+print('MAX Intensity: %d' % img.max())
+print('Shape of the image: {}'.format(img.shape))
 print('[ OK ] Image shape:/t', img.shape)
 
 
