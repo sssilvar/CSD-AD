@@ -46,7 +46,7 @@ def rotate_vol(vol, angles=(0, 0, 0)):
     # Add offset
     sx, sy, sz = vol.shape
     sx, sy, sz = (int(sx / 2), int(sy / 2), int(sz / 2))
-    print(sx)
+
     offset = np.array([sx, sy, sz], dtype=np.float64)
     offset = np.dot(mat, offset)
     tmp = np.array([sx, sy, sz], dtype=np.float64)
