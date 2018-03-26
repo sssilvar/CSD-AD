@@ -3,7 +3,7 @@ import sys
 
 import pandas as pd
 
-root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 print('[  ROOT  ] {}'.format(root))
 
 sys.path.append(root)

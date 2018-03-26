@@ -2,7 +2,7 @@ import os
 
 import json
 
-root = os.path.dirname(os.path.dirname(__file__))
+root = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
 
 def load_params():
