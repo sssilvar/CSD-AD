@@ -29,7 +29,10 @@ if __name__ == '__main__':
         mapmov = os.path.join(workspace, folder, 'aseg.mgz')
 
         # Create a folder per each subject
-        os.mkdir(os.path.join(workspace, folder))
+        try:
+            os.mkdir(os.path.join(workspace, folder))
+        except OSError:
+            print('[  WARNING  ] Folder already exists.')
 
         # Build command
         command = 'mri_transform %s %s %s' \
