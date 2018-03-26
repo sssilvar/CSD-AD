@@ -42,10 +42,14 @@ def rotate_vol(vol, angles=(0, 0, 0)):
     ])
 
     mat = np.dot(np.dot(m_x, m_y), m_z)
+
     # Add offset
-    offset = np.array([128, 128, 128], dtype=np.float64)
+    sx, sy, sz = vol.shape
+    sx, sy, sz = (int(sx / 2), int(sy / 2), int(sz / 2))
+    print(sx)
+    offset = np.array([sx, sy, sz], dtype=np.float64)
     offset = np.dot(mat, offset)
-    tmp = np.array([128, 128, 128], dtype=np.float64)
+    tmp = np.array([sx, sy, sz], dtype=np.float64)
     offset = tmp - offset
 
     # Apply affine transform
