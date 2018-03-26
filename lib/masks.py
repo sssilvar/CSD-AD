@@ -3,7 +3,7 @@ from numpy import pi
 
 
 def sphere(shape=(256, 256, 256), radius=(1, 10), center=(128, 128, 128),
-           theta_range=(-pi, pi), phi_range=(-pi / 2, pi / 2)):
+           theta_range=(-pi, pi), phi_range=(-pi, pi)):
     # Create variables for simplicity
     sx, sy, sz = shape
     r_min, r_max = radius
@@ -87,7 +87,7 @@ def solid_cone(radius=(100, 110), center=(128, 128, 128)):
 
     # Create a Sphere and a cone
     sphere_vol = sphere(radius=(r_min, r_max), center=center)
-    cone_vol = cone(r=r_min)
+    cone_vol = cone(r=r_min, center=center)
     mask = sphere_vol * cone_vol
 
     # vol = mask.astype(np.int8)
