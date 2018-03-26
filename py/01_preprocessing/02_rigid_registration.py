@@ -29,9 +29,9 @@ if __name__ == '__main__':
         mapmov = os.path.join(workspace, folder, 'brainmask_reg.mgz')
 
         # Create a folder per each subject
-        # os.mkdir(os.path.join(workspace, folder))
+        os.mkdir(os.path.join(workspace, folder))
 
         # Build command
         command = 'mri_robust_register --mov %s --dst %s --lta %s --mapmov %s --satit' \
                   % (mov, dst, lta, mapmov)
-        print(command)
+        os.system(command)
