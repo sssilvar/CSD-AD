@@ -6,9 +6,10 @@ import nibabel as nb
 import numpy as np
 import matplotlib.pyplot as plt
 
-from lib.Parameters import Parameters
-
 root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+
+sys.path.append(root)
+from lib.param import load_params
 
 
 def save_mgz(x, filename):
@@ -24,14 +25,13 @@ def save_mgz(x, filename):
 
 if __name__ == '__main__':
     # Load Params
-    param = Parameters(os.path.join(root, 'param', 'params.json'))
-    data_file = os.path.normpath(root + param.data_file)
+    params = load_params()
 
     workspace = '/home/jullygh/sssilvar/Documents/workdir'
     output_folder = '/home/jullygh/sssilvar/Documents/workdir'
 
     # Load dataset file
-    df = pd.read_csv(data_file)
+    df = pd.read_csv(os.path.normpath(root + params['data_file']))
 
     for subject in df['folder']:
         # Set subject file path
