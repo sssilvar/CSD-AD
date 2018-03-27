@@ -29,7 +29,7 @@ if __name__ == '__main__':
     print('[  OK  ] Centroid = {}'.format(centroid))
 
     # Crete a solid angle from a scale: sa
-    r_min, r_max = (0, 33)
+    r_min, r_max = (66, 100)
     sa = solid_cone(radius=(r_min, r_max))
 
     # Start go over the whole sphere (x_angle: [0, pi] and z_angle [-pi, pi])
