@@ -28,24 +28,31 @@ if __name__ == '__main__':
     centroid = tuple(get_centroid(aseg > 0))
     print('[  OK  ] Centroid = {}'.format(centroid))
 
-    # Crete a solid angle from a scale: sa
-    r_min, r_max = (66, 90)
-    sa = solid_cone(radius=(r_min, r_max))
+    scales = [
+        (0, 30),
+        (30, 60),
+        (60, 90)
+    ]
 
-    # Start go over the whole sphere (x_angle: [0, pi] and z_angle [-pi, pi])
-    img_2d = np.zeros([360, 180])
+    for n_scale, scale in enumerate(scales):
+        # Crete a solid angle from a scale: sa
+        r_min, r_max = scale
+        sa = solid_cone(radius=(r_min, r_max))
 
-    mask_sub, center = extract_sub_volume(sa, radius=(r_min, r_max), centroid=centroid)
-    vol_sub, _ = extract_sub_volume(img, radius=(r_min, r_max), centroid=centroid)
+        # Start go over the whole sphere (x_angle: [0, pi] and z_angle [-pi, pi])
+        img_2d = np.zeros([360, 180])
 
-    for i, z_angle in enumerate(range(-180, 180)):
-        for j, x_angle in enumerate(range(0, 180)):
-            solid_ang_mask = rotate_vol(mask_sub, angles=(x_angle, 0, z_angle))
-            img_masked = vol_sub * solid_ang_mask
+        mask_sub, center = extract_sub_volume(sa, radius=(r_min, r_max), centroid=centroid)
+        vol_sub, _ = extract_sub_volume(img, radius=(r_min, r_max), centroid=centroid)
 
-            img_2d[i, j] = img_masked.sum() / solid_ang_mask.sum()
-            print('[ SA ] Point (%d, %d) of (360/180)' % (i, j))
+        for i, z_angle in enumerate(range(-180, 180)):
+            for j, x_angle in enumerate(range(0, 180)):
+                solid_ang_mask = rotate_vol(mask_sub, angles=(x_angle, 0, z_angle))
+                img_masked = vol_sub * solid_ang_mask
 
-    img_filename = os.path.join(root, 'output', '%d_to_%d_solid_angle_to_sphere.png' % (r_min, r_max))
-    plt.imsave(img_filename, img_2d, cmap='gray')
-    img_2d.tofile(os.path.join(root, 'output', '%d_to_%d_solid_angle_to_sphere.raw' % (r_min, r_max)))
+                img_2d[i, j] = np.nan_to_num(img_masked.sum() / solid_ang_mask.sum())
+                print('[ SA ] Scale: %d | Point (%d, %d) of (360/180) | Value: %f' % (n_scale + 1, i, j, img_2d[i, j]))
+
+        img_filename = os.path.join(root, 'output', '%d_to_%d_solid_angle_to_sphere.png' % (r_min, r_max))
+        plt.imsave(img_filename, img_2d, cmap='gray')
+        img_2d.tofile(os.path.join(root, 'output', '%d_to_%d_solid_angle_to_sphere.raw' % (r_min, r_max)))
