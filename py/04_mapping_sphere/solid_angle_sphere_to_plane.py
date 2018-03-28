@@ -29,9 +29,11 @@ if __name__ == '__main__':
     print('[  OK  ] Centroid = {}'.format(centroid))
 
     scales = [
-        (0, 30),
-        (30, 60),
-        (60, 90)
+        (0, 20),
+        (20, 40),
+        (40, 60),
+        (60, 80),
+        (80, 100),
     ]
 
     for n_scale, scale in enumerate(scales):
