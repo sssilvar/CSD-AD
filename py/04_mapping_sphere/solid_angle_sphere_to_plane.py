@@ -53,7 +53,7 @@ if __name__ == '__main__':
                 img_masked = vol_sub * solid_ang_mask
 
                 img_2d[i, j] = np.nan_to_num(img_masked.sum() / solid_ang_mask.sum())
-                print('[ SA ] Scale: %d | Point (%d, %d) of (360/180) | Value: %f' % (n_scale + 1, i, j, img_2d[i, j]))
+            print('[ SA ] Scale: %d | Point (%d, %d) of (360/180) | Value: %f' % (n_scale + 1, i, j, img_2d[i, j]))
 
         img_filename = os.path.join(root, 'output', '%d_to_%d_solid_angle_to_sphere.png' % (r_min, r_max))
         plt.imsave(img_filename, img_2d, cmap='gray')
