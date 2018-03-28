@@ -38,7 +38,7 @@ if __name__ == '__main__':
     for n_scale, scale in enumerate(scales):
         # Crete a solid angle from a scale: sa
         r_min, r_max = scale
-        sa = solid_cone(radius=(r_min, r_max))
+        sa = solid_cone(radius=(r_min, r_max), center=centroid)
 
         # Start go over the whole sphere (x_angle: [0, pi] and z_angle [-pi, pi])
         img_2d = np.zeros([360, 180])
@@ -52,7 +52,8 @@ if __name__ == '__main__':
                 img_masked = vol_sub * solid_ang_mask
 
                 img_2d[i, j] = np.nan_to_num(img_masked.sum() / solid_ang_mask.sum())
-            print('[ SA ] Scale: %d %s | Point (%d, %d) of (360/180) | Value: %f' % (n_scale + 1, scale, i, j, img_2d[i, j]))
+                print('[ SA ] Scale: %d %s Ang: %s | Point (%d, %d) of (360/180) | Value: %f' %
+                      (n_scale + 1, scale, (x_angle, z_angle), i, j, img_2d[i, j]))
 
         img_filename = os.path.join(root, 'output', '%d_to_%d_solid_angle_to_sphere.png' % (r_min, r_max))
         plt.imsave(img_filename, img_2d, cmap='gray')
