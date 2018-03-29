@@ -32,6 +32,9 @@ def process_image(folders):
         aseg_file = os.path.join(subject_dir, 'aseg.mgz')
         subject_output_dir = os.path.join(results_folder, folder)
 
+        # Print info message
+        print('[  INFO  ] Processing subject %s located in %s' % (folder, subject_dir))
+
         # Try creating a folder for each subject
         try:
             os.mkdir(subject_output_dir)
@@ -101,8 +104,8 @@ def process_image(folders):
 
             # RAW output for gradients
             grad_filename = os.path.join(subject_output_dir, 'gradient_%d_to_%d_solid_angle_to_sphere' % (r_min, r_max))
-            plt.imsave(grad_filename + '.png', img_2d, cmap='gray')
-            img_2d.tofile(grad_filename + '.raw')
+            plt.imsave(grad_filename + '.png', img_grad_2d, cmap='gray')
+            img_grad_2d.tofile(grad_filename + '.raw')
 
 
 if __name__ == '__main__':
