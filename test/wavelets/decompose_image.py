@@ -12,7 +12,6 @@ if __name__ == '__main__':
     img_filename = os.path.join(root, 'test', 'test_data', 'sphere_mapped', '30_to_60_solid_angle_to_sphere.raw')
     img = np.fromfile(img_filename, dtype=np.float).reshape([360, 180]).T
 
-
     # Decompose image
     wp = pywt.WaveletPacket2D(data=img, wavelet='haar', mode='symmetric')
     print(wp.data)
@@ -20,7 +19,7 @@ if __name__ == '__main__':
     print(wp.level)
     print(wp.maxlevel)
 
-    # PLot resutls
+    # PLot results
     plt.figure()
     plt.subplot(221)
     plt.imshow(wp['a'].data, cmap='gray')
