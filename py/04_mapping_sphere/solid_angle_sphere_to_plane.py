@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import nibabel as nb
 import matplotlib.pyplot as plt
+from multiprocessing import Pool
 from scipy.ndimage import affine_transform
 
 # Set root folder
@@ -19,19 +20,12 @@ from lib.transformations import rotate_vol
 from lib.geometry import extract_sub_volume, get_centroid
 
 
-if __name__ == '__main__':
-    # Load database
-    params = load_params()
-    dataset_csv_file = os.path.normpath(root + params['data_file'])
+def process_image(folders):
     dataset_registered_folder = '/home/jullygh/sssilvar/Documents/workdir/'
     results_folder = '/home/jullygh/sssilvar/Documents/results'
 
-    # Load the list of subjects and order by subject_id: df
-    df = pd.read_csv(dataset_csv_file)
-    df = df.sort_values('folder')
-
     # Start processing the whole dataset
-    for folder in df['folder']:
+    for folder in [folders]:
         # Set of folders important in the processing pipeline
         subject_dir = os.path.join(dataset_registered_folder, folder)
         brainmask_file = os.path.join(subject_dir, 'brainmask_reg.mgz')
@@ -45,10 +39,10 @@ if __name__ == '__main__':
         except OSError:
             print('[  WARNING  ] Folder already exists.')
 
-        # # Load MRI image and aseg file
-        # mgz = nb.load(brainmask_file)
-        # img = mgz.get_data().astype(np.float)
-        #
+        # Load MRI image and aseg file
+        mgz = nb.load(brainmask_file)
+        img = mgz.get_data().astype(np.float)
+
         # # Calculate the gradient: img_grad
         # gx, gy, gz = np.gradient(img)
         # img_grad = np.sqrt(gx ** 2 + gy ** 2 + gz ** 2)
@@ -91,3 +85,20 @@ if __name__ == '__main__':
         #     img_filename = os.path.join(root, 'output', 'gradient_%d_to_%d_solid_angle_to_sphere.png' % (r_min, r_max))
         #     plt.imsave(img_filename, img_2d, cmap='gray')
         #     img_2d.tofile(os.path.join(root, 'output', 'gradient_%d_to_%d_solid_angle_to_sphere.raw' % (r_min, r_max)))
+
+
+
+if __name__ == '__main__':
+    # Load database
+    params = load_params()
+    dataset_csv_file = os.path.normpath(root + params['data_file'])
+
+    # Load the list of subjects and order by subject_id: df
+    df = pd.read_csv(dataset_csv_file)
+    df = df.sort_values('folder')
+
+    # Pool the process
+    pool = Pool(2)
+    pool.map(process_image, df['folder'])
+    pool.close()
+    pool.join()
