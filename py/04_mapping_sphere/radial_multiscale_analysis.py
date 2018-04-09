@@ -48,6 +48,8 @@ def process_image(folders):
         # Try creating a folder for each subject
         try:
             os.mkdir(subject_output_dir)
+            os.mkdir(os.path.join(subject_output_dir, 'png'))
+            os.mkdir(os.path.join(subject_output_dir, 'raw'))
             print('[  OK  ] Folder created at: ' + subject_output_dir)
         except OSError:
             print('[  WARNING  ] Folder already exists.')
@@ -105,15 +107,24 @@ def process_image(folders):
             # Create results:
             # 2 png files / 2 raw files
 
-            # PNG output for intensities
-            img_filename = os.path.join(subject_output_dir, 'intensity_%d_to_%d_solid_angle_to_sphere' % (r_min, r_max))
-            plt.imsave(img_filename + '.png', img_2d, cmap='gray')
-            img_2d.tofile(img_filename + '.raw')
+            # Output filenames for intensity and gradients
+            png_intensity_fn = os.path.join(subject_output_dir, 'png',
+                                            'intensity_%d_to_%d_solid_angle_to_sphere.png' % (r_min, r_max))
+            raw_intensity_fn = os.path.join(subject_output_dir, 'raw',
+                                            'intensity_%d_to_%d_solid_angle_to_sphere.raw' % (r_min, r_max))
+
+            png_gradient_fn = os.path.join(subject_output_dir, 'png',
+                                           'gradient_%d_to_%d_solid_angle_to_sphere.png' % (r_min, r_max))
+            raw_gradient_fn = os.path.join(subject_output_dir, 'raw',
+                                           'gradient_%d_to_%d_solid_angle_to_sphere.raw' % (r_min, r_max))
+
+            # Save results (Intensity and gradients)
+            plt.imsave(png_intensity_fn, img_2d, cmap='gray')
+            img_2d.tofile(raw_intensity_fn)
 
             # RAW output for gradients
-            grad_filename = os.path.join(subject_output_dir, 'gradient_%d_to_%d_solid_angle_to_sphere' % (r_min, r_max))
-            plt.imsave(grad_filename + '.png', img_grad_2d, cmap='gray')
-            img_grad_2d.tofile(grad_filename + '.raw')
+            plt.imsave(png_gradient_fn, img_grad_2d, cmap='gray')
+            img_grad_2d.tofile(raw_gradient_fn)
 
 
 if __name__ == '__main__':
