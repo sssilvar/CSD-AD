@@ -65,7 +65,7 @@ def process_image(folders):
         # aseg = mgz.get_data()
         # centroid = tuple(get_centroid(aseg > 0))
 
-        scales = [()]
+        scales = []
         for i in range(smin, smax):
             scales.append((i, i + step))
 
