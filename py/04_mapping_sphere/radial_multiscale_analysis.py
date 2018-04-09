@@ -137,7 +137,7 @@ if __name__ == '__main__':
     df = df.sort_values('folder')
 
     # Pool the process
-    pool = Pool(1)
-    pool.map(process_image, [df['folder'][0:6]])
+    pool = Pool(6)
+    pool.map(process_image, [df['folder'][0:5]])
     pool.close()
     pool.join()
