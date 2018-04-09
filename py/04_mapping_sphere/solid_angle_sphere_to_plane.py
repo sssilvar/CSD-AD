@@ -26,7 +26,7 @@ def process_image(folders):
     mni_dir = os.path.join(root, 'lib', 'templates', 'MNI152', 'aseg.mgz')
 
     # Get template centroid
-    mni_aseg = nb.load(mni_dir).getdata()
+    mni_aseg = nb.load(mni_dir).get_data()
     centroid = tuple(get_centroid(mni_aseg > 0))
     print('[  OK  ] Centroid = {}'.format(centroid))
 
