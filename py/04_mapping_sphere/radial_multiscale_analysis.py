@@ -112,14 +112,14 @@ def process_image(folders):
 
             # Output filenames for intensity and gradients
             png_intensity_fn = os.path.join(subject_output_dir, 'png',
-                                            'intensity_%d_to_%d_solid_angle_to_sphere.png' % (r_min, r_max))
+                                            'intensity_%03d_to_%03d_solid_angle_to_sphere.png' % (r_min, r_max))
             raw_intensity_fn = os.path.join(subject_output_dir, 'raw',
-                                            'intensity_%d_to_%d_solid_angle_to_sphere.raw' % (r_min, r_max))
+                                            'intensity_%03d_to_%03d_solid_angle_to_sphere.raw' % (r_min, r_max))
 
             png_gradient_fn = os.path.join(subject_output_dir, 'png',
-                                           'gradient_%d_to_%d_solid_angle_to_sphere.png' % (r_min, r_max))
+                                           'gradient_%03d_to_%03d_solid_angle_to_sphere.png' % (r_min, r_max))
             raw_gradient_fn = os.path.join(subject_output_dir, 'raw',
-                                           'gradient_%d_to_%d_solid_angle_to_sphere.raw' % (r_min, r_max))
+                                           'gradient_%03d_to_%03d_solid_angle_to_sphere.raw' % (r_min, r_max))
 
             # Save results (Intensity and gradients)
             plt.imsave(png_intensity_fn, img_2d, cmap='gray')
