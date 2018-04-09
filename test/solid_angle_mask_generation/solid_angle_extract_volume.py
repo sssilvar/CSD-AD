@@ -54,5 +54,5 @@ if __name__ == '__main__':
         image_out_filename = os.path.join(root, 'output', 'intensity_%d_to_%d_three_views.png' % radius)
 
         show_mri(vol_masked_sub, slice_xyz=center)
-        plt.savefig(image_out_filename, cmap='gray', bbox_inches='tight')
-        # plt.show()
+        # plt.savefig(image_out_filename, cmap='gray', bbox_inches='tight')
+        plt.show()
