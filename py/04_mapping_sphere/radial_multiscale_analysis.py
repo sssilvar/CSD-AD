@@ -67,9 +67,10 @@ def process_image(folders):
 
         scales = []
         for i in range(smin, smax):
-            scales.append((i, i + step))
+            if i <= smax - step:
+                scales.append((i, i + step))
 
-        print('Scales to be analysed: '.format(scales))
+        print('Scales to be analysed (%d scales):' % len(scales))
         print(scales)
 
         for n_scale, scale in enumerate(scales):
