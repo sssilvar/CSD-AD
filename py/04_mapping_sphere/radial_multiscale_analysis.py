@@ -34,6 +34,15 @@ def process_image(folders):
     centroid = tuple(get_centroid(mni_aseg > 0))
     print('[  OK  ] Centroid = {}'.format(centroid))
 
+    # Define scales (radial analysis)
+    scales = []
+    for i in range(smin, smax):
+        if i <= smax - step:
+            scales.append((i, i + step))
+
+    print('Scales to be analysed (%d scales):' % len(scales))
+    print(scales)
+
     # Start processing the whole dataset
     for folder in [folders]:
         # Set of folders important in the processing pipeline
@@ -67,13 +76,6 @@ def process_image(folders):
         # aseg = mgz.get_data()
         # centroid = tuple(get_centroid(aseg > 0))
 
-        scales = []
-        for i in range(smin, smax):
-            if i <= smax - step:
-                scales.append((i, i + step))
-
-        print('Scales to be analysed (%d scales):' % len(scales))
-        print(scales)
 
         for n_scale, scale in enumerate(scales):
             # Crete a solid angle from a scale: sa
