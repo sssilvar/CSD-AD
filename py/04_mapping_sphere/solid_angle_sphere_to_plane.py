@@ -23,13 +23,19 @@ from lib.geometry import extract_sub_volume, get_centroid
 def process_image(folders):
     dataset_registered_folder = '/home/jullygh/sssilvar/Documents/workdir/'
     results_folder = '/home/jullygh/sssilvar/Documents/results'
+    mni_dir = os.path.join(root, 'lib', 'templates', 'MNI152', 'aseg.mgz')
+
+    # Get template centroid
+    mni_aseg = nb.load(mni_dir).getdata()
+    centroid = tuple(get_centroid(mni_aseg > 0))
+    print('[  OK  ] Centroid = {}'.format(centroid))
 
     # Start processing the whole dataset
     for folder in [folders]:
         # Set of folders important in the processing pipeline
+        # aseg_file = os.path.join(subject_dir, 'aseg.mgz') # Segmentation volume per subject
         subject_dir = os.path.join(dataset_registered_folder, folder)
         brainmask_file = os.path.join(subject_dir, 'brainmask_reg.mgz')
-        aseg_file = os.path.join(subject_dir, 'aseg.mgz')
         subject_output_dir = os.path.join(results_folder, folder)
 
         # Print info message
@@ -50,13 +56,10 @@ def process_image(folders):
         gx, gy, gz = np.gradient(img)
         img_grad = np.sqrt(gx ** 2 + gy ** 2 + gz ** 2)
 
-        # Load aseg.mgz file: aseg
-        mgz = nb.load(aseg_file)
-        aseg = mgz.get_data()
-
-        # Get volume centroid
-        centroid = tuple(get_centroid(aseg > 0))
-        print('[  OK  ] Centroid = {}'.format(centroid))
+        # # Load aseg.mgz file: aseg, and centroid calculation: centroid
+        # mgz = nb.load(aseg_file)
+        # aseg = mgz.get_data()
+        # centroid = tuple(get_centroid(aseg > 0))
 
         scales = [
             (0, 25),
