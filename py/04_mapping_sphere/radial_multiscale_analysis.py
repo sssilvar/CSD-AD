@@ -67,7 +67,7 @@ def process_image(folders):
 
         scales = []
         for i in range(smin, smax):
-            scales.append((i, i + step))
+            scales = scales.append((i, i + step))
             if (i + step) >= smax:
                 break
 
