@@ -101,8 +101,8 @@ def process_image(folders):
                     img_2d[i, j] = np.nan_to_num(img_masked.sum() / n)
                     img_grad_2d[i, j] = np.nan_to_num(grad_masked.sum() / n)
 
-                print('[ SA ] Scale: %d %s Ang: %s | Point (%d, %d) of (360/180) | Value: %f' %
-                      (n_scale + 1, scale, (x_angle, z_angle), i, j, img_2d[i, j]))
+                print('[ SA ] Scale: %d of %d %s Ang: %s | Point (%d, %d) of (360/180) | Value: %f' %
+                      (n_scale + 1, len(scales), scale, (x_angle, z_angle), i, j, img_2d[i, j]))
 
             # Create results:
             # 2 png files / 2 raw files
@@ -138,6 +138,6 @@ if __name__ == '__main__':
 
     # Pool the process
     pool = Pool(1)
-    pool.map(process_image, [df['folder'][1]])
+    pool.map(process_image, [df['folder'][0:6]])
     pool.close()
     pool.join()
