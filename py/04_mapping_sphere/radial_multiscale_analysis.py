@@ -67,9 +67,10 @@ def process_image(folders):
 
         scales = []
         for i in range(smin, smax):
-            scales.append(tuple([i, i + step]))
+            scales = scales.append(tuple([i, i + step]))
 
         print('Scales to be analysed: '.format(scales))
+        print(scales)
 
         for n_scale, scale in enumerate(scales):
             # Crete a solid angle from a scale: sa
