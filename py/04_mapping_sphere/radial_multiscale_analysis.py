@@ -76,7 +76,6 @@ def process_image(folders):
         # aseg = mgz.get_data()
         # centroid = tuple(get_centroid(aseg > 0))
 
-
         for n_scale, scale in enumerate(scales):
             # Crete a solid angle from a scale: sa
             r_min, r_max = scale
@@ -97,14 +96,16 @@ def process_image(folders):
                     grad_masked = grad_sub * solid_ang_mask
 
                     # Number of voxels analyzed
-                    n= solid_ang_mask.sum()
+                    n = solid_ang_mask.sum()
 
                     # Set pixel in plane as the mean of the voxels analyzed
                     img_2d[i, j] = np.nan_to_num(img_masked.sum() / n)
                     img_grad_2d[i, j] = np.nan_to_num(grad_masked.sum() / n)
 
-                print('[ SA ] Scale: %d of %d %s Ang: %s | Point (%d, %d) of (360/180) | Value: %f' %
-                      (n_scale + 1, len(scales), scale, (x_angle, z_angle), i, j, img_2d[i, j]))
+                # print('[ SA ] Scale: %d of %d %s Ang: %s | Point (%d, %d) of (360/180) | Value: %f' %
+                #       (n_scale + 1, len(scales), scale, (x_angle, z_angle), i, j, img_2d[i, j]))
+
+            print('Scale %d of %d' % (n_scale, len(scales)))
 
             # Create results:
             # 2 png files / 2 raw files
