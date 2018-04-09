@@ -26,7 +26,7 @@ def process_image(folders):
 
     # Work directories
     dataset_registered_folder = '/home/jullygh/sssilvar/Documents/workdir/'
-    results_folder = '/home/jullygh/sssilvar/Documents/results_same_centroid'
+    results_folder = '/home/jullygh/sssilvar/Documents/results_radial_vid'
     mni_dir = os.path.join(root, 'lib', 'templates', 'MNI152', 'aseg.mgz')
 
     # Get template centroid
