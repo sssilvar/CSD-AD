@@ -22,7 +22,7 @@ from lib.geometry import extract_sub_volume, get_centroid
 
 def process_image(folders):
     dataset_registered_folder = '/home/jullygh/sssilvar/Documents/workdir/'
-    results_folder = '/home/jullygh/sssilvar/Documents/results'
+    results_folder = '/home/jullygh/sssilvar/Documents/results_same_centroid'
     mni_dir = os.path.join(root, 'lib', 'templates', 'MNI152', 'aseg.mgz')
 
     # Get template centroid
