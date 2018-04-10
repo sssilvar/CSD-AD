@@ -21,8 +21,12 @@ if __name__ == '__main__':
     aseg_filename = os.path.join(root, 'test', 'test_data', 'mri', 'aseg.mgz')
 
     # Load images
-    vol = nb.load(vol_filename).get_data()
+    vol = nb.load(vol_filename).get_data().astype(np.float)
     aseg = nb.load(aseg_filename).get_data()
+
+    # Calculate gradients and replace vol
+    x, y, z = np.gradient(vol)
+    vol = np.sqrt(x ** 2 + y ** 2 + z ** 2)
 
     # Define radius and center
     # radius = (0, 25)
@@ -54,5 +58,5 @@ if __name__ == '__main__':
         image_out_filename = os.path.join(root, 'output', 'intensity_%d_to_%d_three_views.png' % radius)
 
         show_mri(vol_masked_sub, slice_xyz=center)
-        # plt.savefig(image_out_filename, cmap='gray', bbox_inches='tight')
-        plt.show()
+        plt.savefig(image_out_filename, cmap='gray', bbox_inches='tight')
+        # plt.show()
