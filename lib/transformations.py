@@ -32,7 +32,6 @@ def rotate_vol(vol, angles=(0, 0, 0)):
     #     [0, 1, 0],
     #     [-sin_y, 0, cos_y]
     # ])
-    m_y = np.eye(3)
     # END ROTATION ON Y-AXIS
 
     sin_z = np.sin(az)
@@ -44,7 +43,7 @@ def rotate_vol(vol, angles=(0, 0, 0)):
         [0, 0, 1]
     ])
 
-    mat = np.dot(np.dot(m_x, m_y), m_z)
+    mat = np.dot(m_x, m_z)
 
     # Add offset
     sx, sy, sz = vol.shape
