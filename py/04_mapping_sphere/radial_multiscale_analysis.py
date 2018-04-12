@@ -26,7 +26,7 @@ def process_image(folders):
 
     # Work directories
     dataset_registered_folder = '/home/jullygh/sssilvar/Documents/workdir/'
-    results_folder = '/home/jullygh/sssilvar/Documents/results_radial_vid_test'
+    results_folder = '/home/jullygh/sssilvar/Documents/results_radial_vid_optimized'
     mni_dir = os.path.join(root, 'lib', 'templates', 'MNI152', 'aseg.mgz')
 
     # Get template centroid
@@ -65,7 +65,7 @@ def process_image(folders):
 
         # Load MRI image and aseg file
         mgz = nb.load(brainmask_file)
-        img = mgz.get_data().astype(np.float)
+        img = mgz.get_data().astype(np.float32)
 
         # Calculate the gradient: img_grad
         gx, gy, gz = np.gradient(img)
