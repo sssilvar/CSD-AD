@@ -11,7 +11,7 @@ def rotate_vol(vol, angles=(0, 0, 0)):
     """
     # Define angles in radians
     ax, ay, az = (np.deg2rad(angles[0]),
-                  np.deg2rad(angles[1]),
+                  0,  # np.deg2rad(angles[1]),
                   np.deg2rad(angles[2]))
     # Create a transformation matrix
     sin_x = np.sin(ax)
@@ -23,14 +23,17 @@ def rotate_vol(vol, angles=(0, 0, 0)):
         [0, sin_x, cos_x]
     ])
 
-    sin_y = np.sin(ay)
-    cos_y = np.cos(ay)
-
-    m_y = np.array([
-        [cos_y, 0, sin_y],
-        [0, 1, 0],
-        [-sin_y, 0, cos_y]
-    ])
+    # THERE IS NO ROTATION ON Y-AXIS!!
+    # sin_y = np.sin(ay)
+    # cos_y = np.cos(ay)
+    #
+    # m_y = np.array([
+    #     [cos_y, 0, sin_y],
+    #     [0, 1, 0],
+    #     [-sin_y, 0, cos_y]
+    # ])
+    m_y = np.eye(3)
+    # END ROTATION ON Y-AXIS
 
     sin_z = np.sin(az)
     cos_z = np.cos(az)
