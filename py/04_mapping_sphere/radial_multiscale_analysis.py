@@ -91,12 +91,18 @@ def process_image(folders):
 
             for i, z_angle in enumerate(range(-180, 180)):
                 for j, x_angle in enumerate(range(0, 180)):
+                    # Create cone
                     solid_ang_mask = rotate_vol(mask_sub, angles=(x_angle, 0, z_angle))
-                    img_masked = vol_sub * solid_ang_mask
-                    grad_masked = grad_sub * solid_ang_mask
+
+                    # Get indexes where mask is 1
+                    ix = np.where(solid_ang_mask == 1)
+
+                    # Mask images
+                    img_masked = vol_sub[ix]
+                    grad_masked = grad_sub[ix]
 
                     # Number of voxels analyzed
-                    n = solid_ang_mask.sum()
+                    n = np.sum(solid_ang_mask[ix])
 
                     # Set pixel in plane as the mean of the voxels analyzed
                     img_2d[i, j] = np.nan_to_num(img_masked.sum() / n)
@@ -140,7 +146,7 @@ if __name__ == '__main__':
     df = df.sort_values('folder')
 
     # Pool the process
-    pool = Pool(32)
+    pool = Pool(1)
     pool.map(process_image, df['folder'])
     pool.close()
     pool.join()
