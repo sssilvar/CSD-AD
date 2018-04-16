@@ -23,7 +23,6 @@ if __name__ == '__main__':
     # Get a Curvelet decomposition
     A = ct.fdct2(img.shape, nbs=n_scales, nba=n_angles, ac=True, norm=False, vec=True, cpx=False)
     f = A.fwd(img)
-    f = np.abs(f) / np.max(np.abs(f))
 
     # Convert data to dict
     f_dict = clarray_to_mean_dict(A, f, n_scales, n_angles)
