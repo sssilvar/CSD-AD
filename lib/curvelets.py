@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 def curvelet_plot(scales, angles, values):
     # Create colors
-    gr = plt.cm.Greys
+    gr = plt.cm.Reds
 
     # Set up plot
     fig, ax = plt.subplots()

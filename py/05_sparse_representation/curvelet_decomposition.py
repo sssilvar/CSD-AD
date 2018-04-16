@@ -32,7 +32,6 @@ if __name__ == '__main__':
     #     print('Scale %s: ' % key)
     #     print('Values:\n\t {}'.format(val))
 
-
     n_scales = 2
     n_angles = 4
     test = {
