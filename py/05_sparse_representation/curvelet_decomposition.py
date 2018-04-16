@@ -1,7 +1,7 @@
 import os
 import sys
 
-import json
+import pickle
 import pyct as ct
 import numpy as np
 import nibabel as nb
@@ -32,9 +32,9 @@ if __name__ == '__main__':
         print('Scale %s: ' % key)
         print('Values:\n\t {}'.format(val))
 
-    file_results = os.path.join(root, 'output', 'curve_dec_test.txt')
-    with open(file_results, 'w') as fp:
-        json.dump(f_dict, fp, sort_keys=True, indent=4)
+    file_results = os.path.join(root, 'output', 'curve_dec_test.pkl')
+    with open(file_results, 'wb') as fp:
+        pickle.dump(f_dict, fp, pickle.HIGHEST_PROTOCOL)
 
     # script = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'plot_results_python3.py')
     # os.system('python %s %s %d %d' % (script, file_results, n_scales, n_angles))

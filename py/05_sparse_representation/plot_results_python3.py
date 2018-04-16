@@ -1,7 +1,7 @@
 import os
 import sys
 
-import json
+import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -16,8 +16,8 @@ if __name__ == '__main__':
     n_angles = sys.argv[3]
 
     print('Loading %s...' % filename)
-    with open(filename, 'r') as fp:
-        data = json.load(fp)
+    with open(filename, 'rb') as fp:
+        data = pickle.load(fp)
 
     curvelet_plot(n_scales, n_angles, data)
     plt.show()
