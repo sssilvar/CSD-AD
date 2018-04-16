@@ -33,7 +33,7 @@ if __name__ == '__main__':
         print('Values:\n\t {}'.format(val))
 
     file_results = os.path.join(root, 'output', 'curve_dec_test.json')
-    with open(file_results) as fp:
+    with open(file_results, 'w') as fp:
         json.dump(f_dict, fp)
 
     script = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'plot_results_python3.py')

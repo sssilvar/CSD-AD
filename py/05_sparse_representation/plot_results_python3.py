@@ -16,7 +16,7 @@ if __name__ == '__main__':
     n_angles = sys.argv[3]
 
     print('Loading %s...' % filename)
-    with open(filename) as fp:
+    with open(filename, 'r') as fp:
         data = json.load(fp)
 
     curvelet_plot(n_scales, n_angles, data)
