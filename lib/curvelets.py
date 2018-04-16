@@ -64,6 +64,7 @@ def clarray_to_mean_dict(A, f, scales, n_angles):
         # Go over all the angles in the scale
         for angle in angles:
             ix = A.index(scale, angle)
+            print('Indexes: ', ix)
             scale_data.append(np.mean(f[ix]))
         curve_data[str(scale)] = scale_data
 
