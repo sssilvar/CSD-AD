@@ -32,7 +32,7 @@ if __name__ == '__main__':
         print('Scale %s: ' % key)
         print('Values:\n\t {}'.format(val))
 
-    file_results = os.path.join(root, 'output', 'curve_dec_test.json')
+    file_results = os.path.join(root, 'output', 'curve_dec_test.txt')
     with open(file_results, 'w') as fp:
         json.dump(f_dict, fp, sort_keys=True, indent=4)
 
