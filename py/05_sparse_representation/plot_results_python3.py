@@ -20,6 +20,6 @@ if __name__ == '__main__':
     # with open(filename, 'rb') as fp:
     #     data = pickle.load(fp)
 
-    print(data)
+    print(type(data['0'][0]))
     curvelet_plot(n_scales, n_angles, data)
     # plt.show()
