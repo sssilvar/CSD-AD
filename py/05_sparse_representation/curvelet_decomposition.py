@@ -36,5 +36,5 @@ if __name__ == '__main__':
     with open(file_results, 'w') as fp:
         json.dump(f_dict, fp, sort_keys=True, indent=4)
 
-    script = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'plot_results_python3.py')
-    os.system('python %s %s %d %d' % (script, file_results, n_scales, n_angles))
+    # script = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'plot_results_python3.py')
+    # os.system('python %s %s %d %d' % (script, file_results, n_scales, n_angles))
