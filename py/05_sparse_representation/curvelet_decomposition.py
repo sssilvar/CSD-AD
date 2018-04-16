@@ -21,12 +21,17 @@ if __name__ == '__main__':
     n_angles = 4
 
     # Get a Curvelet decomposition
-    A = ct.fdct2(img.shape, nbs=n_scales, nba=n_angles, ac=True, norm=False, vec=False, cpx=False)
+    A = ct.fdct2(img.shape, nbs=n_scales, nba=n_angles, ac=True, norm=False, vec=True, cpx=False)
     f = A.fwd(img)
     f = np.abs(f) / np.max(np.abs(f))
 
     # Convert data to dict
     f_dict = clarray_to_mean_dict(A, f, n_scales, n_angles)
+
+    # Print the dictionary
+    for key, val in f_dict.items():
+        print('Scale %s: ' % key)
+        print('Values:\n\t {}'.format(val))
 
     curvelet_plot(n_scales, n_angles, f_dict)
     plt.show()
