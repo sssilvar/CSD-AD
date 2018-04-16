@@ -23,7 +23,7 @@ if __name__ == '__main__':
     for key, value in data.items():
         print('Key: %s' % key)
         for el in value:
-            print(el)
+            print(float(el))
 
     # curvelet_plot(n_scales, n_angles, data)
     # plt.show()
