@@ -11,8 +11,6 @@ def curvelet_plot(scales, angles, values):
     ax.axis('equal')
 
     for scale in range(0, scales):
-        print('Scale: ', scale)
-
         val = values[str(scale)]
 
         sub_bands = []
@@ -34,9 +32,6 @@ def curvelet_plot(scales, angles, values):
         else:
             sub_bands = group_size = None
             raise ValueError('There is no angles inside the scale')
-
-        print(sub_bands)
-        print(group_size)
 
         # First Ring (outside)
         mypie, _ = ax.pie(group_size, radius=(scale + 1) * 1 / scales, colors=sub_bands)
