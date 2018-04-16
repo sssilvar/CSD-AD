@@ -21,7 +21,7 @@ if __name__ == '__main__':
     n_angles = 4
 
     # Get a Curvelet decomposition
-    A = ct.fdct2(img.shape, nbs=n_scales, nba=n_angles, ac=True, norm=False, vec=True, cpx=False)
+    A = ct.fdct2(img.shape, nbs=n_scales, nba=n_angles, ac=True, norm=False, vec=False, cpx=False)
     f = A.fwd(img)
     f = np.abs(f) / np.max(np.abs(f))
 
