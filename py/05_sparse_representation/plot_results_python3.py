@@ -21,7 +21,7 @@ if __name__ == '__main__':
     #     data = pickle.load(fp)
 
     for key, value in data.items():
-        print('Key: %s' % value)
+        print('Key: %s' % key)
         for el in value:
             print(el)
 
