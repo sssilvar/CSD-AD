@@ -4,12 +4,11 @@ import sys
 import pyct as ct
 import numpy as np
 import nibabel as nb
-import matplotlib.pyplot as plt
 
 root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 sys.path.append(os.path.join(root))
 
-from lib.curvelets import curvelet_plot, clarray_to_mean_dict
+from lib.curvelets import clarray_to_mean_dict
 
 if __name__ == '__main__':
     # Load test image
@@ -32,5 +31,7 @@ if __name__ == '__main__':
         print('Scale %s: ' % key)
         print('Values:\n\t {}'.format(val))
 
-    file_results = os.path.join(root, 'output', 'curve_dec_test')
+    file_results = os.path.join(root, 'output', 'curve_dec_test.npy')
     np.save(file_results, f_dict)
+
+    os.system('python %s %d %d' % (file_results, n_scales, n_angles))
