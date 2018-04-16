@@ -27,7 +27,5 @@ if __name__ == '__main__':
     # Convert data to dict
     f_dict = clarray_to_mean_dict(A, f, n_scales, n_angles)
 
-    print(f_dict)
-
-    # curvelet_plot(4, n_scales, values)
-    # plt.show()
+    curvelet_plot(n_scales, n_angles, f_dict)
+    plt.show()
