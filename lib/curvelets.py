@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -60,7 +62,7 @@ def clarray_to_mean_dict(A, f, scales, n_angles):
         for angle in angles:
             ix_min, ix_max = A.index(scale, angle)
             scale_data.append(np.mean(f[ix_min:ix_max]))
-        curve_data[str(scale)] = np.abs(scale_data) / np.max(np.abs(scale_data))
+        curve_data[str(scale)] = Decimal(np.abs(scale_data) / np.max(np.abs(scale_data)))
 
     # Return data converted to dictionary
     return curve_data
