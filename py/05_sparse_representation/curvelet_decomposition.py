@@ -34,7 +34,7 @@ if __name__ == '__main__':
 
     file_results = os.path.join(root, 'output', 'curve_dec_test.pkl')
     with open(file_results, 'wb') as fp:
-        pickle.dump(f_dict, fp, pickle.HIGHEST_PROTOCOL)
+        pickle.dump(f_dict, fp)
 
     script = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'plot_results_python3.py')
     os.system('python %s %s %d %d' % (script, file_results, n_scales, n_angles))
