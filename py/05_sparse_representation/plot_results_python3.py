@@ -21,7 +21,9 @@ if __name__ == '__main__':
     #     data = pickle.load(fp)
 
     for key, value in data.items():
-        print('Key: %s | Value %s' % (key, value))
+        print('Key: %s' % value)
+        for el in value:
+            print(el)
 
     # curvelet_plot(n_scales, n_angles, data)
     # plt.show()
