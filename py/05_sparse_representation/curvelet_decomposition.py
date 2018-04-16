@@ -2,6 +2,7 @@ import os
 import sys
 
 import pyct as ct
+import numpy as np
 import nibabel as nb
 import matplotlib.pyplot as plt
 
@@ -13,7 +14,7 @@ from lib.curvelets import curvelet_plot, clarray_to_mean_dict
 if __name__ == '__main__':
     # Load test image
     filename = os.path.join(root, 'test', 'test_data', '941_S_1363.mgz')
-    img = nb.load(filename).get_data[:, : , 128]
+    img = nb.load(filename).get_data().astype(np.float)[:, : , 128]
 
     # Define number of scales and angles
     n_scales = 4
