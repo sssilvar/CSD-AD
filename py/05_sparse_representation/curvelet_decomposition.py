@@ -17,8 +17,8 @@ if __name__ == '__main__':
     img = nb.load(filename).get_data().astype(np.float)[:, : , 128]
 
     # Define number of scales and angles
-    n_scales = 4
-    n_angles = 4
+    n_scales = int(sys.argv[1])
+    n_angles = int(sys.argv[2])
 
     # Get a Curvelet decomposition
     A = ct.fdct2(img.shape, nbs=n_scales, nba=n_angles, ac=True, norm=False, vec=True, cpx=False)
