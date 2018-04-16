@@ -32,5 +32,10 @@ if __name__ == '__main__':
         print('Scale %s: ' % key)
         print('Values:\n\t {}'.format(val))
 
-    curvelet_plot(n_scales, n_angles, f_dict)
+    test = {
+        '0': [1.0],
+        '1': [0.8, 0.6, 0.8, 0.6],
+    }
+
+    curvelet_plot(n_scales, n_angles, test)
     plt.show()
