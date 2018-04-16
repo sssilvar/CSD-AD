@@ -11,7 +11,8 @@ def curvelet_plot(scales, angles, values):
     ax.axis('equal')
 
     for scale in range(0, scales):
-        val = float(values[str(scale)])
+        val = values[str(scale)]
+        val = map(float, val)
 
         sub_bands = []
         if scale == 0:
