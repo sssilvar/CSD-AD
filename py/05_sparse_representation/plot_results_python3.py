@@ -16,8 +16,9 @@ if __name__ == '__main__':
     n_angles = sys.argv[3]
 
     print('Loading %s...' % filename)
-    with open(filename, 'rb') as fp:
-        data = pickle.load(fp)
+    data = np.load(filename).item()
+    # with open(filename, 'rb') as fp:
+    #     data = pickle.load(fp)
 
     curvelet_plot(n_scales, n_angles, data)
     plt.show()
