@@ -12,8 +12,8 @@ from lib.curvelets import curvelet_plot
 
 if __name__ == '__main__':
     filename = sys.argv[1]
-    n_scales = sys.argv[2]
-    n_angles = sys.argv[3]
+    n_scales = int(sys.argv[2])
+    n_angles = int(sys.argv[3])
 
     print('Loading %s...' % filename)
     data = np.load(filename).item()
