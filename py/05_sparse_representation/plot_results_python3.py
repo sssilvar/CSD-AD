@@ -20,7 +20,7 @@ if __name__ == '__main__':
     # with open(filename, 'rb') as fp:
     #     data = pickle.load(fp)
 
-    for key, value in data.item():
+    for key, value in data.items():
         print('Key: %s | Value %s' % (key, value))
 
     # curvelet_plot(n_scales, n_angles, data)
