@@ -1,6 +1,7 @@
 import os
 import sys
 
+import json
 import pyct as ct
 import numpy as np
 import nibabel as nb
@@ -31,8 +32,9 @@ if __name__ == '__main__':
         print('Scale %s: ' % key)
         print('Values:\n\t {}'.format(val))
 
-    file_results = os.path.join(root, 'output', 'curve_dec_test.npy')
-    np.save(file_results, f_dict)
+    file_results = os.path.join(root, 'output', 'curve_dec_test.json')
+    with open(file_results) as fp:
+        json.dump(f_dict, fp)
 
     script = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'plot_results_python3.py')
     os.system('python %s %s %d %d' % (script, file_results, n_scales, n_angles))

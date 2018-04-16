@@ -1,6 +1,7 @@
 import os
 import sys
 
+import json
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -14,7 +15,9 @@ if __name__ == '__main__':
     n_scales = sys.argv[2]
     n_angles = sys.argv[3]
 
-    data = np.load(filename)
+    print('Loading %s...' % filename)
+    with open(filename) as fp:
+        data = json.load(fp)
 
     curvelet_plot(n_scales, n_angles, data)
     plt.show()
