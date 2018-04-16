@@ -21,5 +21,5 @@ if __name__ == '__main__':
     #     data = pickle.load(fp)
 
     print(data)
-    # curvelet_plot(n_scales, n_angles, data)
+    curvelet_plot(n_scales, n_angles, data)
     # plt.show()
