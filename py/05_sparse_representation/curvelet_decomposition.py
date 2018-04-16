@@ -34,4 +34,4 @@ if __name__ == '__main__':
     file_results = os.path.join(root, 'output', 'curve_dec_test.npy')
     np.save(file_results, f_dict)
 
-    os.system('python %s %d %d' % (file_results, n_scales, n_angles))
+    # os.system('python %s %d %d' % (file_results, n_scales, n_angles))
