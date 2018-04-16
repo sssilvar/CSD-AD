@@ -60,7 +60,7 @@ def clarray_to_mean_dict(A, f, scales, n_angles):
         for angle in angles:
             ix_min, ix_max = A.index(scale, angle)
             scale_data.append(np.mean(f[ix_min:ix_max]))
-        scale_data = np.abs(scale_data) / np.max(np.abs(scale_data))
+        scale_data = np.abs(scale_data)  # / np.max(np.abs(scale_data))
         curve_data[str(scale)] = map(str, scale_data)
 
     # Return data converted to dictionary
