@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 def curvelet_plot(scales, angles, values):
     # Create colors
-    gr = plt.cm.Reds
+    gr = plt.cm.Greys
 
     # Set up plot
     fig, ax = plt.subplots()
@@ -16,22 +16,21 @@ def curvelet_plot(scales, angles, values):
         sub_bands = []
         if scale == 0:
             sub_bands.append(gr(float(val[0])))
-            group_size = [1]
+            angles_scale = [1]
         elif scale == 1:
-            for angle in range(0, angles):
-                sub_bands.append(gr(float(val[angle])))
-            group_size = list(np.ones(angles))
+            angles_scale = range(0, angles)
         elif scale % 2 == 0:
-            for angle in range(0, int(scale * angles)):
-                sub_bands.append(gr(float(val[angle])))
-            group_size = list(np.ones(angles))
+            angles_scale = range(0, int(scale * angles))
         elif scale % 2 != 0:
-            for angle in range(0, int((scale - 1) * angles)):
-                sub_bands.append(gr(float(val[angle])))
-            group_size = list(np.ones(angles))
+            angles_scale = range(0, int((scale - 1) * angles))
         else:
+            angles_scale = []
             sub_bands = group_size = None
             raise ValueError('There is no angles inside the scale')
+
+        for angle in angles_scale:
+            sub_bands.append(gr(float(val[angle])))
+        group_size = list(np.ones(len(angles_scale)))
 
         # First Ring (outside)
         mypie, _ = ax.pie(group_size, radius=(scale + 1) * 1 / scales, colors=sub_bands)
