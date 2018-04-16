@@ -25,5 +25,5 @@ if __name__ == '__main__':
         for el in value:
             print(float(el))
 
-    # curvelet_plot(n_scales, n_angles, data)
-    # plt.show()
+    curvelet_plot(n_scales, n_angles, data)
+    plt.show()
