@@ -16,7 +16,7 @@ def curvelet_plot(scales, angles, values):
         sub_bands = []
         if scale == 0:
             sub_bands.append(gr(float(val[0])))
-            angles_scale = [1]
+            angles_scale = [0]
         elif scale == 1:
             angles_scale = range(0, angles)
         elif scale % 2 == 0:
