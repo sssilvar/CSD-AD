@@ -16,7 +16,7 @@ if __name__ == '__main__':
     # filename = os.path.join(root, 'test', 'test_data', '941_S_1363.mgz')
     # img = nb.load(filename).get_data().astype(np.float)[:, : , 128]
     filename = '/home/sssilvar/Documents/dataset/results_radial_vid_optimized/002_S_0729/raw/' \
-               'gradient_000_to_005_solid_angle_to_sphere.raw'
+               'gradient_019_to_024_solid_angle_to_sphere.raw'
     img = np.fromfile(filename, dtype=np.float).reshape([360, 180]).T
 
     # Define number of scales and angles
