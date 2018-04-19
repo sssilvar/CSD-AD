@@ -33,11 +33,11 @@ if __name__ == '__main__':
 
         for filename in filenames:
             filename_path = os.path.join(results_folder, subject, 'raw', filename)
-            print('Processing: {}'.format(filename))
+            print('Processing: {}'.format(filename_path))
 
             file_output = os.path.join(output_folder, filename[:-4] + '.npy')
             print(file_output)
-            img = np.fromfile(filename, dtype=np.float).reshape([360, 180]).T
+            img = np.fromfile(filename_path, dtype=np.float).reshape([360, 180]).T
 
             # Define number of scales and angles
             n_scales = int(sys.argv[1])
