@@ -24,7 +24,7 @@ if __name__ == '__main__':
     # Get filenames
     for subject in subjects:
         filenames = get_file_list(os.path.join(results_folder, subject, 'raw'), ext='.raw')
-        filenames = [filenames[0]]
+        # filenames = [filenames[0]]
 
         # Create folder for curvelet data
         output_folder = os.path.join(results_folder, subject, 'curvelet')
