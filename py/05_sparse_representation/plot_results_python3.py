@@ -24,6 +24,7 @@ if __name__ == '__main__':
     data = np.load(filename).item()
 
     print('Saving figure at: ' + filename_output)
+    plt.style.use('ggplot')
     curvelet_plot(n_scales, n_angles, data)
-    plt.savefig(filename_output, bbox_inches='tight', dpi=300)
+    plt.savefig(filename_output, bbox_inches='tight', dpi=600)
     # plt.show()
