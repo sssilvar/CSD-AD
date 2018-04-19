@@ -37,28 +37,26 @@ if __name__ == '__main__':
 
             file_output = os.path.join(output_folder, filename[:-4] + '.npy')
             print(file_output)
-        #     img = np.fromfile(filename, dtype=np.float).reshape([360, 180]).T
-        #
-        #     # Define number of scales and angles
-        #     n_scales = int(sys.argv[1])
-        #     n_angles = int(sys.argv[2])
-        #
-        #     # Get a Curvelet decomposition
-        #     A = ct.fdct2(img.shape, nbs=n_scales, nba=n_angles, ac=True, norm=False, vec=True, cpx=False)
-        #     f = A.fwd(img)
-        #
-        #     # Convert data to dict
-        #     f_dict = clarray_to_mean_dict(A, f, n_scales, n_angles)
-        #
-        #     # Print the dictionary
-        #     for key, val in f_dict.items():
-        #         print('Scale %s: ' % key)
-        #         print('Values:\n\t {}'.format(val))
-        #
-        #     file_results = os.path.join(root, 'output', 'curve_dec_test.npy')
-        #     np.save(file_results, f_dict)
-        #     # with open(file_results, 'wb') as fp:
-        #     #     pickle.dump(f_dict, fp)
+            img = np.fromfile(filename, dtype=np.float).reshape([360, 180]).T
+
+            # Define number of scales and angles
+            n_scales = int(sys.argv[1])
+            n_angles = int(sys.argv[2])
+
+            # Get a Curvelet decomposition
+            A = ct.fdct2(img.shape, nbs=n_scales, nba=n_angles, ac=True, norm=False, vec=True, cpx=False)
+            f = A.fwd(img)
+
+            # Convert data to dict
+            f_dict = clarray_to_mean_dict(A, f, n_scales, n_angles)
+
+            # Print the dictionary
+            for key, val in f_dict.items():
+                print('Scale %s: ' % key)
+                print('Values:\n\t {}'.format(val))
+
+            np.save(file_output, f_dict)
+
         #
         #     script = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'plot_results_python3.py')
         #     os.system('python %s %s %d %d' % (script, file_results, n_scales, n_angles))
