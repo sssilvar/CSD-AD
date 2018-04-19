@@ -1,5 +1,6 @@
 import os
 
+
 def get_file_list(path, ext):
     """
     :param path: Dataset path
@@ -12,3 +13,16 @@ def get_file_list(path, ext):
             files.append(dirs)
 
     return files
+
+
+def mkdir(dir):
+    """
+    Creates a folder
+    :param dir: complete path to the folder to be created.
+    :return: None
+    """
+    if not os.path.isdir(dir):
+        try:
+            os.mkdir(dir)
+        except IOError:
+            print('[  WARNING  ] Folder could not be created')
