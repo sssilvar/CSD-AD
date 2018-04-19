@@ -10,14 +10,14 @@ root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__
 sys.path.append(os.path.join(root))
 
 from lib.curvelets import clarray_to_mean_dict
-from lib.path import get_file_list
+from lib.path import get_file_list, mkdir
 
 if __name__ == '__main__':
     # Set results folder and subjects to be processed
     results_folder = '/home/sssilvar/Documents/dataset/results_radial_vid_optimized/'
 
     subjects = [
-        '002_S_0729',
+        # '002_S_0729',
         '002_S_1155'
     ]
 
@@ -29,6 +29,11 @@ if __name__ == '__main__':
         for filename in filenames:
             filename = os.path.join(results_folder, subject, 'raw', filename)
             print('Processing: {}'.format(filename))
+
+            # Create folder for curvelet data
+            output_folder = os.path.join(results_folder, 'curvelet')
+            print(output_folder)
+            # mkdir(output_folder)
         #     img = np.fromfile(filename, dtype=np.float).reshape([360, 180]).T
         #
         #     # Define number of scales and angles
