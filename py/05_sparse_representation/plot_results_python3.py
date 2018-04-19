@@ -18,10 +18,11 @@ if __name__ == '__main__':
     # Set output folder [curvelets/png]
     # Here, the visual results will be saved
     output_folder = os.path.join(os.path.dirname(filename), 'png')
-    print('[  OK  ] Visual folder output')
+    filename_output = os.path.join(output_folder, os.path.basename(filename)[:-4] + '.png')
 
-    print('Loading %s...' % filename)
+    print('Loading %s...\n\n' % filename)
     data = np.load(filename).item()
 
+    print('Saving figure at: ' + filename_output)
     curvelet_plot(n_scales, n_angles, data)
     plt.show()
