@@ -1,10 +1,8 @@
 import os
 import sys
 
-import pickle
 import pyct as ct
 import numpy as np
-import nibabel as nb
 
 root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 sys.path.append(os.path.join(root))
@@ -24,12 +22,15 @@ if __name__ == '__main__':
     # Get filenames
     for subject in subjects:
         filenames = get_file_list(os.path.join(results_folder, subject, 'raw'), ext='.raw')
-        # filenames = [filenames[0]]
+
+        # Just use for testing (one observation - scale)
+        filenames = [filenames[0]]
 
         # Create folder for curvelet data
         output_folder = os.path.join(results_folder, subject, 'curvelet')
         print('[  OK  ] Saving results in: ' + output_folder)
         mkdir(output_folder)
+        mkdir(os.path.join(output_folder, 'png'))
 
         for filename in filenames:
             filename_path = os.path.join(results_folder, subject, 'raw', filename)
@@ -51,12 +52,14 @@ if __name__ == '__main__':
             f_dict = clarray_to_mean_dict(A, f, n_scales, n_angles)
 
             # Print the dictionary
-            for key, val in f_dict.items():
-                print('Scale %s: ' % key)
-                print('Values:\n\t {}'.format(val))
+            # for key, val in f_dict.items():
+            #     print('Scale %s: ' % key)
+            #     print('Values:\n\t {}'.format(val))
 
+            # Save curvelet decomposition in a *.npy file
             np.save(file_output, f_dict)
+            print('[  OK  ] Curvelet decomposition saved at: ' + file_output)
 
-        #
-        #     script = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'plot_results_python3.py')
-        #     os.system('python %s %s %d %d' % (script, file_results, n_scales, n_angles))
+            # Execute a script for plotting the results (Only works on Python 3.x)
+            script = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'plot_results_python3.py')
+            os.system('python %s %s %d %d' % (script, file_output, n_scales, n_angles))
