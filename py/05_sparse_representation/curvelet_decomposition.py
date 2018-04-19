@@ -31,7 +31,7 @@ if __name__ == '__main__':
             print('Processing: {}'.format(filename))
 
             # Create folder for curvelet data
-            output_folder = os.path.join(results_folder, 'curvelet')
+            output_folder = os.path.join(results_folder, subject, 'curvelet')
             print(output_folder)
             # mkdir(output_folder)
         #     img = np.fromfile(filename, dtype=np.float).reshape([360, 180]).T
