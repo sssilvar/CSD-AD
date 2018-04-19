@@ -33,7 +33,7 @@ if __name__ == '__main__':
             # Create folder for curvelet data
             output_folder = os.path.join(results_folder, subject, 'curvelet')
             print(output_folder)
-            # mkdir(output_folder)
+            mkdir(output_folder)
         #     img = np.fromfile(filename, dtype=np.float).reshape([360, 180]).T
         #
         #     # Define number of scales and angles
