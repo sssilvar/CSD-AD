@@ -15,7 +15,7 @@ if __name__ == '__main__':
     results_folder = '/home/sssilvar/Documents/dataset/results_radial_vid_optimized/'
 
     subjects = [
-        # '002_S_0729',
+        '002_S_0729',
         '002_S_1155'
     ]
 
@@ -24,7 +24,7 @@ if __name__ == '__main__':
         filenames = get_file_list(os.path.join(results_folder, subject, 'raw'), ext='.raw')
 
         # Just use for testing (one observation - scale)
-        filenames = [filenames[0]]
+        # filenames = [filenames[0]]
 
         # Create folder for curvelet data
         output_folder = os.path.join(results_folder, subject, 'curvelet')
