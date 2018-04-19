@@ -26,14 +26,17 @@ if __name__ == '__main__':
         filenames = get_file_list(os.path.join(results_folder, subject, 'raw'), ext='.raw')
         filenames = [filenames[0]]
 
+        # Create folder for curvelet data
+        output_folder = os.path.join(results_folder, subject, 'curvelet')
+        print('[  OK  ] Saving results in: ' + output_folder)
+        mkdir(output_folder)
+
         for filename in filenames:
-            filename = os.path.join(results_folder, subject, 'raw', filename)
+            filename_path = os.path.join(results_folder, subject, 'raw', filename)
             print('Processing: {}'.format(filename))
 
-            # Create folder for curvelet data
-            output_folder = os.path.join(results_folder, subject, 'curvelet')
-            print(output_folder)
-            mkdir(output_folder)
+            file_output = os.path.join(output_folder, filename[:-4] + '.npy')
+            print(file_output)
         #     img = np.fromfile(filename, dtype=np.float).reshape([360, 180]).T
         #
         #     # Define number of scales and angles
