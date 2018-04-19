@@ -25,4 +25,5 @@ if __name__ == '__main__':
 
     print('Saving figure at: ' + filename_output)
     curvelet_plot(n_scales, n_angles, data)
-    plt.show()
+    plt.savefig(filename_output, bbox_inches='tight')
+    # plt.show()
