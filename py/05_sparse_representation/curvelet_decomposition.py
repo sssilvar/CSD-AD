@@ -24,9 +24,9 @@ if __name__ == '__main__':
     # Get filenames
     for subject in subjects:
         filenames = get_file_list(os.path.join(results_folder, subject, 'raw'), ext='.raw')
-        print('Files to be prcessed \n\t{}'.format(filenames))
 
-        # for filename in filenames:
+        for filename in filenames:
+            print('Processing: {}'.format(filename))
         #     img = np.fromfile(filename, dtype=np.float).reshape([360, 180]).T
         #
         #     # Define number of scales and angles
