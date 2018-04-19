@@ -26,6 +26,7 @@ if __name__ == '__main__':
         filenames = get_file_list(os.path.join(results_folder, subject, 'raw'), ext='.raw')
 
         for filename in filenames:
+            filename = os.path.join(results_folder, subject, 'raw', filename)
             print('Processing: {}'.format(filename))
         #     img = np.fromfile(filename, dtype=np.float).reshape([360, 180]).T
         #
