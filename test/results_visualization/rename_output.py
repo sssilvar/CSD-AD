@@ -2,8 +2,8 @@ import os
 
 if __name__ == '__main__':
     folders = [
-        'C:/Users/sssilvar/Documents/LaTeX/report-thesis/results/diff_center/MCInc/',
-        'C:/Users/sssilvar/Documents/LaTeX/report-thesis/results/diff_center/MCIc/'
+        'C:/Users/sssilvar/Documents/LaTeX/report-thesis/results/curvelets_4s_8a/MCIc/',
+        'C:/Users/sssilvar/Documents/LaTeX/report-thesis/results/curvelets_4s_8a/MCInc/'
     ]
     ext = '.png'
 
