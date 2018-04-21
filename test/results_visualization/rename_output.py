@@ -2,10 +2,10 @@ import os
 
 if __name__ == '__main__':
     folders = [
-        'C:/Users/sssilvar/Documents/LaTeX/report-thesis/results/curvelets_4s_8a/MCIc/',
-        'C:/Users/sssilvar/Documents/LaTeX/report-thesis/results/curvelets_4s_8a/MCInc/'
+        'C:/Users/sssilvar/Documents/LaTeX/slides-seminar/results/curvelet/MCIc',
+        'C:/Users/sssilvar/Documents/LaTeX/slides-seminar/results/curvelet/MCInc'
     ]
-    ext = '.png'
+    ext = '.eps'
 
     for folder in folders:
         for root, dirs, files in os.walk(folder):
