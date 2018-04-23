@@ -5,7 +5,7 @@ if __name__ == '__main__':
         'C:/Users/sssilvar/Documents/LaTeX/slides-seminar/results/curvelet/MCIc',
         'C:/Users/sssilvar/Documents/LaTeX/slides-seminar/results/curvelet/MCInc'
     ]
-    ext = '.eps'
+    ext = '.pdf'
 
     for folder in folders:
         for root, dirs, files in os.walk(folder):
