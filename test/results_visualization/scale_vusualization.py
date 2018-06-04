@@ -25,8 +25,8 @@ def show_4slices(vol, slice_xyz=(128, 128, 128), axis='off', grid='off', render=
     fontsize = 18
     color = (0.09, 0.11, 0.18)
 
-    img_x = vol[:, :, slice_xyz[0]]
-    img_y = vol[:, slice_xyz[1], :]
+    img_x = vol[:, :, slice_xyz[0]].T
+    img_y = vol[:, slice_xyz[1], :].T
     img_z = vol[slice_xyz[2], :, :]
 
     plt.figure()
@@ -65,7 +65,7 @@ def show_4slices(vol, slice_xyz=(128, 128, 128), axis='off', grid='off', render=
 
 if __name__ == '__main__':
     # Define file names
-    vol_filename = os.path.join(root, 'test', 'test_data', '941_S_1363.mgz')
+    vol_filename = os.path.join(root, 'test', 'test_data', 'brainmask.mgz')
     aseg_filename = os.path.join(root, 'test', 'test_data', 'mri', 'aseg.mgz')
     render_dir = os.path.join(root, 'output', 'render')
 
@@ -103,7 +103,8 @@ if __name__ == '__main__':
         image_out_filename = os.path.join(root, 'output', 'intensity_%d_to_%d_three_views.png' % radius)
 
         # Load render
-        img = imread(os.path.join(render_dir, '%d.png' % (i + 3)))
+        # img = imread(os.path.join(render_dir, '%d.png' % (i + 3)))
+        img = vol[:, :, 128].T
 
         # Plot them all
         show_4slices(vol_masked_sub, slice_xyz=center, render=img)
