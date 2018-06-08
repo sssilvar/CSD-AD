@@ -1,3 +1,4 @@
 # Ignore Virtual environment
+.idea/
 venv/
 output/
