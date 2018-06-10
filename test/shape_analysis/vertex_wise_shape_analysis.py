@@ -12,7 +12,7 @@ plt.style.use('ggplot')
 
 if __name__ == '__main__':
     csv_data = os.path.join(root, 'param', 'data_df.csv')
-    csv_features = '/home/sssilvar/Documents/data/cortical_shape_analysis/groupfile_thick_2e-4.csv'
+    csv_features = '/home/sssilvar/Documents/results/cortical_shape_analysis/groupfile_thick_2e-4.csv'
     # csv_features = '/home/sssilvar/Documents/data/cortical_shape_analysis/output/groupfile_thick.csv'
 
     # Load data
@@ -34,9 +34,22 @@ if __name__ == '__main__':
         t_stat.append(t)
         p_val.append(p)
 
+    lh_index = np.array(df_thickness.columns.str.find('lh')).astype(bool)
+    rh_index = np.array(df_thickness.columns.str.find('rh')).astype(bool)
+
+    # Save results
+    lh_t_stat = np.array(t_stat)[lh_index]
+    lh_p_val = np.array(p_val)[lh_index]
+
+    rh_t_stat = np.array(t_stat)[rh_index]
+    rh_p_val = np.array(p_val)[rh_index]
+
     print('[  INFO  ] Saving results in ./output')
-    np.array(t_stat).tofile(os.path.join(root, 'output', 't_stat_' + os.path.basename(csv_features[:-4]) + '.raw'))
-    np.array(p_val).tofile(os.path.join(root, 'output', 'p_value_' + os.path.basename(csv_features[:-4]) + '.raw'))
+    np.array(lh_t_stat).tofile(os.path.join(root, 'output', 'lh_t_stat_' + os.path.basename(csv_features[:-4]) + '.raw'))
+    np.array(lh_p_val).tofile(os.path.join(root, 'output', 'lh_p_value_' + os.path.basename(csv_features[:-4]) + '.raw'))
+
+    np.array(rh_t_stat).tofile(os.path.join(root, 'output', 'rh_t_stat_' + os.path.basename(csv_features[:-4]) + '.raw'))
+    np.array(rh_p_val).tofile(os.path.join(root, 'output', 'rh_p_value_' + os.path.basename(csv_features[:-4]) + '.raw'))
 
     print('DONE!')
 
