@@ -15,13 +15,14 @@ if __name__ == '__main__':
     df = df.sort_values(by=['folder'])
 
     # Load dataset folder
-    dataset_folder = params['dataset_folder']
+    # dataset_folder = params['dataset_folder']
+    dataset_folder = r"/run/media/ssilvari/HDD Data/Universidad/MSc/Thesis/Dataset/FreeSurferSD"
 
     # Set template to register to
-    dst = os.path.join(root, 'param', 'fsaverage.mgz')
+    dst = os.path.join(root, 'param', 'FSL_MNI152_FreeSurferConformed_1mm.nii')
 
     # Set an work directory
-    workspace = '/home/jullygh/sssilvar/Documents/workdir'
+    workspace = r"/run/media/ssilvari/HDD Data/Universidad/MSc/Thesis/Dataset/registered"
 
     for folder in df['folder']:
         mov = os.path.join(dataset_folder, folder, 'mri', 'brainmask.mgz')
@@ -29,9 +30,12 @@ if __name__ == '__main__':
         mapmov = os.path.join(workspace, folder, 'brainmask_reg.mgz')
 
         # Create a folder per each subject
-        os.mkdir(os.path.join(workspace, folder))
+        try:
+            os.mkdir(os.path.join(workspace, folder))
+        except FileExistsError:
+            pass
 
         # Build command
-        command = 'mri_robust_register --mov %s --dst %s --lta %s --mapmov %s --satit' \
+        command = 'mri_robust_register --mov "%s" --dst %s --lta "%s" --mapmov "%s" --satit' \
                   % (mov, dst, lta, mapmov)
         os.system(command)
