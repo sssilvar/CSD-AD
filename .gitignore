@@ -2,3 +2,6 @@
 .idea/
 venv/
 output/
+
+gmm_features.csv
+gmm_features_intensities.csv
