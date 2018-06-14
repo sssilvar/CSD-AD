@@ -14,7 +14,8 @@ root = up(up(up(os.path.realpath(__file__))))
 
 if __name__ == '__main__':
     print('Starting analysis')
-    dataset_folder = '/run/media/ssilvari/HDD Data/Universidad/MSc/Thesis/Dataset/FreeSurferSD'
+    # dataset_folder = '/run/media/ssilvari/HDD Data/Universidad/MSc/Thesis/Dataset/FreeSurferSD'
+    dataset_folder = '/home/jullygh/sssilvar/Documents/Dataset/FreeSurferSD'
     csv_data = os.path.join(root, 'param', 'data_df.csv')
     regions = os.path.join(root, 'param', 'FreeSurferColorLUT.csv')
 
