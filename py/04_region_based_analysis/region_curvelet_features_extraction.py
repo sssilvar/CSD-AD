@@ -28,7 +28,8 @@ def get_cl_info(f, scale, angle):
 if __name__ == '__main__':
     print('Starting analysis')
     # dataset_folder = '/run/media/ssilvari/HDD Data/Universidad/MSc/Thesis/Dataset/FreeSurferSD'
-    dataset_folder = '/media/sssilvar/HDD Data/Universidad/MSc/Thesis/Dataset/FreeSurferSD'
+    # dataset_folder = '/media/sssilvar/HDD Data/Universidad/MSc/Thesis/Dataset/FreeSurferSD'
+    dataset_folder = '/disk/Data/dataset/'
     # dataset_folder = '/disk/Data/center_simulation/center_2/input'
     csv_data = os.path.join(root, 'param', 'data_df.csv')
     regions = os.path.join(root, 'param', 'FreeSurferColorLUT.csv')
