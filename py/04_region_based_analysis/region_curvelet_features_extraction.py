@@ -147,6 +147,26 @@ if __name__ == '__main__':
                                           roi_name)
                     else:
                         print('[  INFO  ] ROI not found')
+                        # Save null results
+                        for scale in range(number_of_scales):
+                            if scale == 0:
+                                angles = [0]
+                            elif scale == 1:
+                                angles = range(0, number_of_angles)
+                            elif scale % 2 == 0:
+                                angles = range(0, int(scale * number_of_angles))
+                            elif scale % 2 != 0:
+                                angles = range(0, int((scale - 1) * number_of_angles))
+                            else:
+                                angles = []
+                                raise ValueError('There is no angles inside the scale')
+
+                            for angle in angles:
+                                # Save Null data
+                                key = 'sca_%d_ang_%d' % (scale, angle)
+                                for i in range(n_comp):
+                                    features_subj[key + 'mean_' + roi_name + '_' + str(i)] = np.nan
+                                    features_subj[key + 'cov_' + roi_name + '_' + str(i)] = np.nan
                 feature_list.append(features_subj)
             except IOError as e:
                 print('[  ERROR  ] ' + str(e))
