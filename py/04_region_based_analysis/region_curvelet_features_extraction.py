@@ -172,5 +172,7 @@ if __name__ == '__main__':
                 print('[  ERROR  ] ' + str(e))
 
         # Create a DataFrame
+        print('[  INFO  ] Saving file...')
         df_features = pd.DataFrame(feature_list)
         df_features.to_csv(os.path.join(root, 'features', 'curvelet_gmm_features_%d_comp.csv' % n_comp))
+        print('[  DONE!  ]')
