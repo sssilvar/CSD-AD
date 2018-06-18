@@ -5,7 +5,6 @@ import pyct as ct
 import numpy as np
 import pandas as pd
 import nibabel as nb
-from scipy.misc import imresize
 from sklearn.mixture import GaussianMixture
 
 import matplotlib.pyplot as plt
@@ -29,7 +28,8 @@ def get_cl_info(f, scale, angle):
 if __name__ == '__main__':
     print('Starting analysis')
     # dataset_folder = '/run/media/ssilvari/HDD Data/Universidad/MSc/Thesis/Dataset/FreeSurferSD'
-    dataset_folder = '/disk/Data/center_simulation/center_2/input'
+    dataset_folder = '/media/sssilvar/HDD Data/Universidad/MSc/Thesis/Dataset/FreeSurferSD'
+    # dataset_folder = '/disk/Data/center_simulation/center_2/input'
     csv_data = os.path.join(root, 'param', 'data_df.csv')
     regions = os.path.join(root, 'param', 'FreeSurferColorLUT.csv')
 
@@ -37,13 +37,12 @@ if __name__ == '__main__':
     number_of_scales = 5
     number_of_angles = 4
 
+    # Number of components for GMM
+    n_components = [3, 5, 7]
+
     # Read datas into pandas DataFrame
     df = pd.read_csv(csv_data)
     df_regions = pd.read_csv(regions, index_col=['region_id'])
-
-    # Number of components for GMM
-    # n_components = range(3, 12)
-    n_components = [3, 5, 7]
 
     for n_comp in n_components:
         feature_list = []
@@ -60,16 +59,16 @@ if __name__ == '__main__':
             aseg = os.path.join(dataset_folder, subject, 'mri', 'aseg.mgz')
 
             # Template files
-            mni_brainmask = os.path.join(root, 'param', 'fsaverage', 'brainmask.mgz')
-            mni_aseg = os.path.join(root, 'param', 'fsaverage', 'aseg.mgz')
+            # mni_brainmask = os.path.join(root, 'param', 'fsaverage', 'brainmask.mgz')
+            # mni_aseg = os.path.join(root, 'param', 'fsaverage', 'aseg.mgz')
 
             try:
                 # Load images
                 brainmask = nb.load(brainmask).get_data()
                 aseg = nb.load(aseg).get_data()
 
-                mni_brainmask = nb.load(mni_brainmask).get_data()
-                mni_aseg = nb.load(mni_aseg).get_data()
+                # mni_brainmask = nb.load(mni_brainmask).get_data()
+                # mni_aseg = nb.load(mni_aseg).get_data()
 
                 # Calculate gradients
                 gx, gy, gz = np.gradient(brainmask)
@@ -85,7 +84,7 @@ if __name__ == '__main__':
                 for region in df_regions.index:
                     roi_name = df_regions['label_name'].loc[region]
 
-                    if np.any(aseg == region) and np.any(mni_aseg == region) and region is not 0:
+                    if np.any(aseg == region) and region is not 0:
                         # Print region name
                         print('[  INFO  ] Processing ROI: ' + roi_name)
 
@@ -96,17 +95,17 @@ if __name__ == '__main__':
                         print("\t - Subject's ROI shape: \t\t", roi.shape)
 
                         # Load template's ROI
-                        ix, iy, iz = np.where(mni_aseg == region)
-                        mni_roi = np.array(mni_aseg[min(ix): max(ix), min(iy): max(iy), min(iz): max(iz)])
-                        print("\t - Template's ROI shape: \t\t", mni_roi.shape)
+                        # ix, iy, iz = np.where(mni_aseg == region)
+                        # mni_roi = np.array(mni_aseg[min(ix): max(ix), min(iy): max(iy), min(iz): max(iz)])
+                        # print("\t - Template's ROI shape: \t\t", mni_roi.shape)
 
                         # print(' ROI shape: ', np.shape(roi))
                         # plt.imshow(roi[:, :, int((max(iz) - min(iz)) / 2)])
                         # plt.show()
 
                         # Reshape it to template's
-                        roi = np.resize(roi, mni_roi.shape)
-                        print("\t - Subject's NEW ROI shape: \t", roi.shape)
+                        # roi = np.resize(roi, mni_roi.shape)
+                        # print("\t - Subject's NEW ROI shape: \t", roi.shape)
 
                         # === CURVELET CALCULATION ===
                         A = ct.fdct3(roi.shape, nbs=number_of_scales, nba=number_of_angles, ac=True, norm=False,
@@ -134,20 +133,21 @@ if __name__ == '__main__':
                                 key = 'sca_%d_ang_%d' % (scale, angle)
                                 try:
                                     # print('Getting scale %d | angle %d' % (scale, angle))
+                                    data = np.ravel(f[ix[0]:ix[1]])
                                     # Fit GMM
                                     gmm = GaussianMixture(n_components=n_comp)
-                                    gmm = gmm.fit(X=np.expand_dims(np.ravel(f[ix[0]:ix[1]]), 1))
+                                    gmm = gmm.fit(X=np.expand_dims(data, 1))
 
                                     for i in range(n_comp):
                                         features_subj[key + '_mean_' + roi_name + '_' + str(i)] = gmm.means_[i, 0]
                                         features_subj[key + '_cov_' + roi_name + '_' + str(i)] = gmm.covariances_[i, 0, 0]
                                 except ValueError as e:
-                                    print('[  ERROR  ] ', e, ' | ROI voxels: ', len(roi[key]), ' | ROI : ',
+                                    print('[  ERROR  ] ', e, ' | ROI voxels: ', len(data), ' | ROI : ',
                                           roi_name)
                     else:
                         print('[  INFO  ] ROI not found')
                 feature_list.append(features_subj)
-            except Exception as e:
+            except IOError as e:
                 print('[  ERROR  ] ' + str(e))
 
         # Create a DataFrame
