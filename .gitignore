@@ -2,6 +2,7 @@
 .idea/
 venv/
 output/
+__pycache__/
 
-gmm_features.csv
+*gmm_features_*
 gmm_features_intensities.csv
