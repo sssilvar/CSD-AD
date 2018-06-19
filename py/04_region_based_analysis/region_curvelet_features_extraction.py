@@ -94,7 +94,7 @@ if __name__ == '__main__':
                         roi = np.array(brainmask[min(ix): max(ix), min(iy): max(iy), min(iz): max(iz)] * \
                                        mask[min(ix): max(ix), min(iy): max(iy), min(iz): max(iz)])
                         print("\t - Subject's ROI shape: \t\t", roi.shape)
-                        print("\t - index: \t\t", (ix, iy, iz))
+                        # print("\t - index: \t\t", (ix, iy, iz))
 
                         # Load template's ROI
                         # ix, iy, iz = np.where(mni_aseg == region)
