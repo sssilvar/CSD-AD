@@ -8,7 +8,6 @@ import nibabel as nb
 from sklearn.mixture import GaussianMixture
 
 import matplotlib.pyplot as plt
-
 plt.style.use('ggplot')
 
 up = os.path.dirname
@@ -39,7 +38,7 @@ if __name__ == '__main__':
     number_of_angles = 4
 
     # Number of components for GMM
-    n_components = [3, 5, 7]
+    n_components = [3, 7, 11]
 
     # Read datas into pandas DataFrame
     df = pd.read_csv(csv_data)
@@ -84,16 +83,18 @@ if __name__ == '__main__':
 
                 for region in df_regions.index:
                     roi_name = df_regions['label_name'].loc[region]
+                    mask = aseg == region
 
-                    if np.any(aseg == region) and region is not 0:
+                    if np.sum(mask) > 1 and region is not 0:
                         # Print region name
                         print('[  INFO  ] Processing ROI: ' + roi_name)
 
                         # Load subject's ROI
-                        ix, iy, iz = np.where(aseg == region)
+                        ix, iy, iz = np.where(mask)
                         roi = np.array(brainmask[min(ix): max(ix), min(iy): max(iy), min(iz): max(iz)] * \
-                                       (aseg == region)[min(ix): max(ix), min(iy): max(iy), min(iz): max(iz)])
+                                       mask[min(ix): max(ix), min(iy): max(iy), min(iz): max(iz)])
                         print("\t - Subject's ROI shape: \t\t", roi.shape)
+                        print("\t - index: \t\t", (ix, iy, iz))
 
                         # Load template's ROI
                         # ix, iy, iz = np.where(mni_aseg == region)
@@ -136,8 +137,17 @@ if __name__ == '__main__':
                                     # print('Getting scale %d | angle %d' % (scale, angle))
                                     data = np.ravel(f[ix[0]:ix[1]])
                                     # Fit GMM
-                                    gmm = GaussianMixture(n_components=n_comp)
+                                    gmm = GaussianMixture(n_components=n_comp, random_state=42)
                                     gmm = gmm.fit(X=np.expand_dims(data, 1))
+
+                                    # Evaluate and visualize GMM
+                                    gmm_x = np.linspace(0, 253, 256)
+                                    gmm_y = np.exp(gmm.score_samples(gmm_x.reshape(-1, 1)))
+
+                                    # plt.hist(data, 255, [2, 256], normed=True, color='b')
+                                    # plt.plot(gmm_x, gmm_y, color="crimson", lw=4, label="GMM")
+                                    # plt.title('ROI (' + key + '): ' + roi_name)
+                                    # plt.show()
 
                                     for i in range(n_comp):
                                         features_subj[key + '_mean_' + roi_name + '_' + str(i)] = gmm.means_[i, 0]
