@@ -24,6 +24,19 @@ def get_cl_info(f, scale, angle):
         print('[  ERROR  ] Index (%d, %d) out of range' % (scale, angle))
 
 
+def get_n_angles(scale):
+    if scale == 0:
+        return [0]
+    elif scale == 1:
+        return range(0, number_of_angles)
+    elif scale % 2 == 0:
+        return range(0, int(scale * number_of_angles))
+    elif scale % 2 != 0:
+        return range(0, int((scale - 1) * number_of_angles))
+    else:
+        raise ValueError('There is no angles inside the scale')
+
+
 if __name__ == '__main__':
     print('Starting analysis')
     # dataset_folder = '/run/media/ssilvari/HDD Data/Universidad/MSc/Thesis/Dataset/FreeSurferSD'
@@ -45,8 +58,6 @@ if __name__ == '__main__':
     df_regions = pd.read_csv(regions, index_col=['region_id'])
 
     for n_comp in n_components:
-        feature_list = []
-
         # Start feature extraction
         for subject in df['folder']:
             print('\n\n[  INFO  ] Processing subject: ', subject)
@@ -85,104 +96,91 @@ if __name__ == '__main__':
                     roi_name = df_regions['label_name'].loc[region]
                     mask = aseg == region
 
-                    if np.sum(mask) > 1 and region is not 0:
-                        # Print region name
-                        print('[  INFO  ] Processing ROI: ' + roi_name)
-
+                    if np.any(mask) and region is not 0:
                         # Load subject's ROI
                         ix, iy, iz = np.where(mask)
                         roi = np.array(brainmask[min(ix): max(ix), min(iy): max(iy), min(iz): max(iz)] * \
-                                       mask[min(ix): max(ix), min(iy): max(iy), min(iz): max(iz)])
+                                        mask[min(ix): max(ix), min(iy): max(iy), min(iz): max(iz)])
                         print("\t - Subject's ROI shape: \t\t", roi.shape)
-                        # print("\t - index: \t\t", (ix, iy, iz))
+                        sx, sy, sz = roi.shape
 
-                        # Load template's ROI
-                        # ix, iy, iz = np.where(mni_aseg == region)
-                        # mni_roi = np.array(mni_aseg[min(ix): max(ix), min(iy): max(iy), min(iz): max(iz)])
-                        # print("\t - Template's ROI shape: \t\t", mni_roi.shape)
+                        if sx > 3 and sy > 3 and sz > 3:
+                            # Print region name
+                            print('[  INFO  ] Processing ROI: ' + roi_name)
 
-                        # print(' ROI shape: ', np.shape(roi))
-                        # plt.imshow(roi[:, :, int((max(iz) - min(iz)) / 2)])
-                        # plt.show()
+                            # === CURVELET CALCULATION ===
+                            A = ct.fdct3(roi.shape, nbs=number_of_scales, nba=number_of_angles, ac=True, norm=False,
+                                        vec=True, cpx=False)
 
-                        # Reshape it to template's
-                        # roi = np.resize(roi, mni_roi.shape)
-                        # print("\t - Subject's NEW ROI shape: \t", roi.shape)
+                            # Apply curvelet to the image
+                            f = A.fwd(roi)
 
-                        # === CURVELET CALCULATION ===
-                        A = ct.fdct3(roi.shape, nbs=number_of_scales, nba=number_of_angles, ac=True, norm=False,
-                                     vec=True, cpx=False)
+                            for scale in range(number_of_scales):
+                                for angle in get_n_angles(scale):
+                                    # Get index and generate a key name.
+                                    ix = A.index(scale, angle)
+                                    key = 'sca_%d_ang_%d' % (scale, angle)
+                                    try:
+                                        # print('Getting scale %d | angle %d' % (scale, angle))
+                                        data = np.ravel(f[ix[0]:ix[1]])
+                                        # Fit GMM
+                                        gmm = GaussianMixture(n_components=n_comp, random_state=42)
+                                        gmm = gmm.fit(X=np.expand_dims(data, 1))
 
-                        # Apply curvelet to the image
-                        f = A.fwd(roi)
+                                        # Evaluate and visualize GMM
+                                        gmm_x = np.linspace(0, 253, 256)
+                                        gmm_y = np.exp(gmm.score_samples(gmm_x.reshape(-1, 1)))
 
-                        for scale in range(number_of_scales):
-                            if scale == 0:
-                                angles = [0]
-                            elif scale == 1:
-                                angles = range(0, number_of_angles)
-                            elif scale % 2 == 0:
-                                angles = range(0, int(scale * number_of_angles))
-                            elif scale % 2 != 0:
-                                angles = range(0, int((scale - 1) * number_of_angles))
-                            else:
-                                angles = []
-                                raise ValueError('There is no angles inside the scale')
+                                        # plt.hist(data, 255, [2, 256], normed=True, color='b')
+                                        # plt.plot(gmm_x, gmm_y, color="crimson", lw=4, label="GMM")
+                                        # plt.title('ROI (' + key + '): ' + roi_name)
+                                        # plt.show()
 
-                            for angle in angles:
-                                # Get index and generate a key name.
-                                ix = A.index(scale, angle)
-                                key = 'sca_%d_ang_%d' % (scale, angle)
-                                try:
-                                    # print('Getting scale %d | angle %d' % (scale, angle))
-                                    data = np.ravel(f[ix[0]:ix[1]])
-                                    # Fit GMM
-                                    gmm = GaussianMixture(n_components=n_comp, random_state=42)
-                                    gmm = gmm.fit(X=np.expand_dims(data, 1))
-
-                                    # Evaluate and visualize GMM
-                                    gmm_x = np.linspace(0, 253, 256)
-                                    gmm_y = np.exp(gmm.score_samples(gmm_x.reshape(-1, 1)))
-
-                                    # plt.hist(data, 255, [2, 256], normed=True, color='b')
-                                    # plt.plot(gmm_x, gmm_y, color="crimson", lw=4, label="GMM")
-                                    # plt.title('ROI (' + key + '): ' + roi_name)
-                                    # plt.show()
-
+                                        for i in range(n_comp):
+                                            features_subj[key + '_mean_' + roi_name + '_' + str(i)] = gmm.means_[i, 0]
+                                            features_subj[key + '_cov_' + roi_name + '_' + str(i)] = gmm.covariances_[i, 0, 0]
+                                    except ValueError as e:
+                                        print('[  ERROR  ] ', e, ' | ROI voxels: ', len(data), ' | ROI : ', roi_name)
+                                        for i in range(n_comp):
+                                            features_subj[key + '_mean_' + roi_name + '_' + str(i)] = np.nan
+                                            features_subj[key + '_cov_' + roi_name + '_' + str(i)] = np.nan
+                        else:
+                            print('[  WARNING  ] Shape is not enough')
+                            """If ROI shape not enough"""
+                            # Save null results
+                            for scale in range(number_of_scales):
+                                for angle in get_n_angles(scale):
+                                    # Save Null data
+                                    key = 'sca_%d_ang_%d' % (scale, angle)
                                     for i in range(n_comp):
-                                        features_subj[key + '_mean_' + roi_name + '_' + str(i)] = gmm.means_[i, 0]
-                                        features_subj[key + '_cov_' + roi_name + '_' + str(i)] = gmm.covariances_[i, 0, 0]
-                                except ValueError as e:
-                                    print('[  ERROR  ] ', e, ' | ROI voxels: ', len(data), ' | ROI : ',
-                                          roi_name)
+                                        features_subj[key + '_mean_' + roi_name + '_' + str(i)] = np.nan
+                                        features_subj[key + '_cov_' + roi_name + '_' + str(i)] = np.nan
                     else:
-                        print('[  INFO  ] ROI not found')
+                        print('[  WARNING  ] ROI not found')
                         # Save null results
                         for scale in range(number_of_scales):
-                            if scale == 0:
-                                angles = [0]
-                            elif scale == 1:
-                                angles = range(0, number_of_angles)
-                            elif scale % 2 == 0:
-                                angles = range(0, int(scale * number_of_angles))
-                            elif scale % 2 != 0:
-                                angles = range(0, int((scale - 1) * number_of_angles))
-                            else:
-                                angles = []
-                                raise ValueError('There is no angles inside the scale')
-
-                            for angle in angles:
+                            for angle in get_n_angles(scale):
                                 # Save Null data
                                 key = 'sca_%d_ang_%d' % (scale, angle)
                                 for i in range(n_comp):
-                                    features_subj[key + 'mean_' + roi_name + '_' + str(i)] = np.nan
-                                    features_subj[key + 'cov_' + roi_name + '_' + str(i)] = np.nan
-                feature_list.append(features_subj)
+                                    features_subj[key + '_mean_' + roi_name + '_' + str(i)] = np.nan
+                                    features_subj[key + '_cov_' + roi_name + '_' + str(i)] = np.nan
+
+                # SAVE RESULTS
+                subject_output_dir = os.path.join(root, 'features', 'curvelets', subject)
+
+                try:
+                    os.mkdir(subject_output_dir)
+                except OSError:
+                    pass
+
+                np.save(os.path.join(subject_output_dir, 'curvelet_gmm_%d_comp' % n_comp), features_subj)
+
             except IOError as e:
                 print('[  ERROR  ] ' + str(e))
 
-        # Create a DataFrame
-        print('[  INFO  ] Saving file...')
-        df_features = pd.DataFrame(feature_list)
-        df_features.to_csv(os.path.join(root, 'features', 'curvelet_gmm_features_%d_comp.csv' % n_comp))
-        print('[  DONE!  ]')
+        # # Create a DataFrame
+        # print('[  INFO  ] Saving file...')
+        # df_features = pd.DataFrame(feature_list)
+        # df_features.to_csv(os.path.join(root, 'features', 'curvelet_gmm_features_%d_comp_part1.csv' % n_comp))
+        # print('[  DONE!  ]')
