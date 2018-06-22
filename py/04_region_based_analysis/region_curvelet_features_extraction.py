@@ -109,6 +109,10 @@ if __name__ == '__main__':
                             print('[  INFO  ] Processing ROI: ' + roi_name)
 
                             # === CURVELET CALCULATION ===
+                            # Clean vars
+                            A = None
+                            f = None
+
                             A = ct.fdct3(roi.shape, nbs=number_of_scales, nba=number_of_angles, ac=True, norm=False,
                                         vec=True, cpx=False)
 
@@ -156,7 +160,7 @@ if __name__ == '__main__':
                                         features_subj[key + '_mean_' + roi_name + '_' + str(i)] = np.nan
                                         features_subj[key + '_cov_' + roi_name + '_' + str(i)] = np.nan
                     else:
-                        print('[  WARNING  ] ROI not found')
+                        # print('[  WARNING  ] ROI not found')
                         # Save null results
                         for scale in range(number_of_scales):
                             for angle in get_n_angles(scale):

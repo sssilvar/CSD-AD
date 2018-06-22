@@ -8,5 +8,6 @@ __pycache__/
 
 # Curvelet feature output
 curvelet_gmm_*.npy
+curvelet_gmm_*_comp.csv
 
 gmm_features_intensities.csv

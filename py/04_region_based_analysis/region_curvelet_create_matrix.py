@@ -14,7 +14,7 @@ if __name__ == '__main__':
     csv_data = os.path.join(root, 'param', 'data_df.csv')
     regions = os.path.join(root, 'param', 'FreeSurferColorLUT.csv')
 
-    n_comp = [3]
+    n_comp = [3, 7, 11]
 
     # Read datas into pandas DataFrame
     df = pd.read_csv(csv_data)
@@ -22,16 +22,16 @@ if __name__ == '__main__':
 
     rois = []
     for comp in n_comp:
-        for subject in df['folder'][:2]:
-            feature_file = os.path.join(features_folder, subject, 'curvelet_gmm_%d_comp.csv.npy' % comp)
-            subject_features = np.load(feature_file).item()
-            rois.append(subject_features.keys())
+        for i, subject in enumerate(df['folder']):
+            print('[  INFO  ] Processing subject: ', subject)
+            feature_file = os.path.join(features_folder, subject, 'curvelet_gmm_%d_comp.npy' % comp)
 
-    print(len(rois[0]))
-    print(len(rois[1]))
+            if i == 0:
+                print('[  INFO  ] Creating dataframe')
+                df_features = pd.DataFrame(np.load(feature_file).item(), index=[0])
+            else:
+                subject_features = pd.DataFrame(np.load(feature_file).item(), index=[0])
+                df_features = df_features.append(subject_features)
 
-    matchingA = list(set(rois[0]) - set(rois[1]))
-    matchingB = list(set(rois[1]) - set(rois[0]))
-
-    print(matchingA)
-    print(matchingB)
+        # Save csv
+        df_features.to_csv(os.path.join(features_folder, 'curvelet_gmm_%d_comp.csv' % comp))
