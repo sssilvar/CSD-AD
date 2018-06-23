@@ -138,7 +138,7 @@ if __name__ == '__main__':
                         param_grid,
                         scoring='accuracy',
                         cv=20,
-                        n_jobs=4)
+                        n_jobs=-1)
 
         # Fit model
         logger.info('Fitting model ...')
