@@ -1,6 +1,7 @@
 from __future__ import print_function
 import os
 import time
+import logging
 
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import Lasso
@@ -18,19 +19,34 @@ import pandas as pd
 # from tabulate import tabulate
 import matplotlib.pyplot as plt
 
+# Matplotlib setup
 plt.switch_backend('agg')
 plt.style.use('ggplot')
 
+# Logging setup
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 # Set root folder
 up = os.path.dirname
 root = up(up(up(os.path.realpath(__file__))))
 
+# create a file handler
+handler = logging.FileHandler(os.path.join(root, 'output', 'classification.log'))
+handler.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.info = print
+
+
 if __name__ == '__main__':
     # Load data
-    print('[  INFO  ] Loading file ...')
+    logger.info('[  INFO  ] Loading file ...')
     csv_file = os.path.join(root, 'features', 'curvelets', 'curvelet_gmm_3_comp.csv')
     df = pd.read_csv(csv_file, index_col=0)
+    logger.info('[  INFO  ] Done!')
+
     df = df.fillna(0)
     df = df.reset_index(drop=True)
 
@@ -60,7 +76,7 @@ if __name__ == '__main__':
         #     test = ttest_ind(col[y_train == 1], col[y_train == 0])
         #
         #     if test.pvalue < 0.05:
-        #         # print('SIGNIFICANT ROI:', feature_names[i])
+        #         # logger.info('SIGNIFICANT ROI:', feature_names[i])
         #         ix.append(i)
         #         # plt.figure()
         #         # # plt.boxplot([col[y_train == 1], col[y_train == 0]])
@@ -83,15 +99,15 @@ if __name__ == '__main__':
 
         # Update features selected
         X_train, X_test = X_train[:, ix], X_test[:, ix]
-        print(X_train.shape, X_test.shape)
+        logger.info(X_train.shape, X_test.shape)
 
         # Print relevant ROIs
-        # print('[  OK  ] Relevant features:\n')
-        # print(tabulate(zip(features_selected, coefs), headers=['ROI', 'Alpha'], tablefmt='grid'))
+        # logger.info('[  OK  ] Relevant features:\n')
+        # logger.info(tabulate(zip(features_selected, coefs), headers=['ROI', 'Alpha'], tablefmt='grid'))
         regions.append(features_selected)
 
         # ================ CLASSIFICATION ================
-        print('\n\n[  INFO  ] Starting Classification')
+        logger.info('\n\n[  INFO  ] Starting Classification')
         # Set pipeline
         pipeline = Pipeline([
             # ('scaler', StandardScaler()),
@@ -102,13 +118,10 @@ if __name__ == '__main__':
         ])
 
         # Set grid of parameters: grid_param
-        param_grid = {
-            # 'svm__kernel': ['linear', 'poly', 'rbf'],
-            # 'svm__degree': range(5),
-            'svm__gamma': np.logspace(-9, 3, 13),
-            # 'svm__coef0': np.logspace(0.1, 10, 4),
-            'svm__C': np.logspace(-2, 10, 13)
-        }
+        param_grid = [
+            {'svm__C': [1, 10, 100, 1000], 'svm__kernel': ['linear']},
+            {'svm__C': [1, 10, 100, 1000], 'svm__gamma': [0.001, 0.0001], 'svm__kernel': ['rbf']},
+        ]
         # param_grid = {
         #     'knn__n_neighbors': range(3, 10),
         #     'knn__weights': ['uniform', 'distance'],
@@ -120,6 +133,7 @@ if __name__ == '__main__':
                         pipeline,
                         param_grid,
                         scoring='accuracy',
+                        cv=20,
                         n_jobs=4)
 
         # Fit model
@@ -127,17 +141,17 @@ if __name__ == '__main__':
         y_pred = pipeline.predict(X_test)
         y_pred_proba = pipeline.predict_proba(X_test)[:, 1]
 
-        print('Classification report: \n {}'.format(classification_report(y_test, y_pred)))
-        print('Score: {}'.format(pipeline.score(X_test, y_test)))
-        print('Best Params: {}'.format(pipeline.best_params_))
+        logger.info('Classification report: \n {}'.format(classification_report(y_test, y_pred)))
+        logger.info('Score: {}'.format(pipeline.score(X_test, y_test)))
+        logger.info('Best Params: {}'.format(pipeline.best_params_))
 
         accuracy.append(y_pred_proba)
         y_tests.append(y_test)
         precisions.append(y_pred == y_test)
 
-    print('\n\n[  OK  ] FINAL REPORT')
-    print('\t - Mean accuracy: ', np.mean(accuracy))
-    print('\t - Precision: %d/%d' % (np.sum(precisions), len(precisions)))
+    logger.info('\n\n[  OK  ] FINAL REPORT')
+    logger.info('\t - Mean accuracy: ', np.mean(accuracy))
+    logger.info('\t - Precision: %d/%d' % (np.sum(precisions), len(precisions)))
 
     # Compute AUC
     fpr, tpr, thresholds = roc_curve(y_tests, accuracy)
@@ -151,6 +165,6 @@ if __name__ == '__main__':
     plt.ylabel('True positive rate')
     plt.title('Classification ROC curve')
     plt.savefig(os.path.join(root, 'output', os.path.basename(csv_file) + '.png'))
-    plt.show()
+    # plt.show()
 
-    print('[  DONE  ]')
+    logger.info('[  DONE  ]')
