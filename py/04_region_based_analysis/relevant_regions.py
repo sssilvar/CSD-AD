@@ -71,26 +71,26 @@ if __name__ == '__main__':
         X_train, X_test = X[train_index], X[test_index]
         y_train, y_test = y[train_index], y[test_index]
 
-        logger.info('\n[  INFO  ] Feature selection ...')
+        # logger.info('\n[  INFO  ] Feature selection ...')
 
-        from scipy.stats import ttest_ind
-        ix = []
-        for i, col in enumerate(X_train.T):
-            test = ttest_ind(col[y_train == 1], col[y_train == 0])
-
-            if test.pvalue < 0.05:
-                # logger.info('SIGNIFICANT ROI:', feature_names[i])
-                ix.append(i)
-                # plt.figure()
-                # # plt.boxplot([col[y_train == 1], col[y_train == 0]])
-                # plt.hist(col[y_train == 1], alpha=0.7, bins=30)
-                # plt.hist(col[y_train == 0], alpha=0.7, bins=30)
-                # plt.legend(['MCIc', 'MCInc'])
-                # plt.title(feature_names[i])
-                # plt.savefig(os.path.join(
-                #     '/user/ssilvari/home/Documents/output/feature-behavior/11/', feature_names[i] + '.png'))
-                # plt.close()
-                # # plt.show()
+        # from scipy.stats import ttest_ind
+        # ix = []
+        # for i, col in enumerate(X_train.T):
+        #     test = ttest_ind(col[y_train == 1], col[y_train == 0])
+        #
+        #     if test.pvalue < 0.05:
+        #         # logger.info('SIGNIFICANT ROI:', feature_names[i])
+        #         ix.append(i)
+        #         # plt.figure()
+        #         # # plt.boxplot([col[y_train == 1], col[y_train == 0]])
+        #         # plt.hist(col[y_train == 1], alpha=0.7, bins=30)
+        #         # plt.hist(col[y_train == 0], alpha=0.7, bins=30)
+        #         # plt.legend(['MCIc', 'MCInc'])
+        #         # plt.title(feature_names[i])
+        #         # plt.savefig(os.path.join(
+        #         #     '/user/ssilvari/home/Documents/output/feature-behavior/11/', feature_names[i] + '.png'))
+        #         # plt.close()
+        #         # # plt.show()
 
         # Feature selection
         # lasso = Lasso()
@@ -98,17 +98,17 @@ if __name__ == '__main__':
         #
         # ix = lasso.coef_ != 0
         # coefs = lasso.coef_[ix]
-        features_selected = feature_names[ix]
-
-        # Update features selected
-        X_train, X_test = X_train[:, ix], X_test[:, ix]
-        logger.info(X_train.shape, X_test.shape)
+        # features_selected = feature_names[ix]
+        #
+        # # Update features selected
+        # X_train, X_test = X_train[:, ix], X_test[:, ix]
+        # logger.info(X_train.shape, X_test.shape)
 
         # Print relevant ROIs
         # logger.info('[  OK  ] Relevant features:\n')
         # logger.info(tabulate(zip(features_selected, coefs), headers=['ROI', 'Alpha'], tablefmt='grid'))
-        regions.append(features_selected)
-        logger.info('[  OK  ] Feature selection done!')
+        # regions.append(features_selected)
+        # logger.info('[  OK  ] Feature selection done!')
 
         # ================ CLASSIFICATION ================
         logger.info('\n\n[  INFO  ] Starting Classification')
