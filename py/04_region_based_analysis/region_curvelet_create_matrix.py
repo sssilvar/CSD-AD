@@ -24,16 +24,27 @@ if __name__ == '__main__':
 
     rois = []
     for comp in n_comp:
-        for i, subject in enumerate(df['folder']):
-            print('[  INFO  ] Processing subject: ', subject)
-            feature_file = os.path.join(features_folder, subject, 'curvelet_gmm_%d_comp.npy' % comp)
+        csv_output = os.path.join(features_folder, 'curvelet_gmm_%d_comp.csv' % comp)
+        if not os.path.exists(csv_output):
+            for i, subject in enumerate(df['folder']):
+                print('[  INFO  ] Processing subject: ', subject)
+                feature_file = os.path.join(features_folder, subject, 'curvelet_gmm_%d_comp.npy' % comp)
 
-            if i == 0:
-                print('[  INFO  ] Creating dataframe')
-                df_features = pd.DataFrame(np.load(feature_file).item(), index=[0])
-            else:
-                subject_features = pd.DataFrame(np.load(feature_file).item(), index=[0])
-                df_features = df_features.append(subject_features)
+                if i == 0:
+                    print('[  INFO  ] Creating dataframe')
+                    df_features = pd.DataFrame(np.load(feature_file).item(), index=[0])
+                else:
+                    subject_features = pd.DataFrame(np.load(feature_file).item(), index=[0])
+                    df_features = df_features.append(subject_features)
+            # Save csv
+            df_features.to_csv(csv_output)
+        else:
+            print('Reading CSV ...')
+            df = pd.read_csv(csv_output, index_col=0)
 
-        # Save csv
-        df_features.to_csv(os.path.join(features_folder, 'curvelet_gmm_%d_comp.csv' % comp))
+            print('Droping useless columns...')
+            df = df.dropna(axis=1)
+            df.to_csv(csv_output)
+            print('Done!')
+
+    print('DONE!\n\n')

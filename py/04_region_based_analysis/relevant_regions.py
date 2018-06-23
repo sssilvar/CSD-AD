@@ -71,6 +71,8 @@ if __name__ == '__main__':
         X_train, X_test = X[train_index], X[test_index]
         y_train, y_test = y[train_index], y[test_index]
 
+        logger.info('\n[  INFO  ] Feature selection ...')
+
         # from scipy.stats import ttest_ind
         # ix = []
         # for i, col in enumerate(X_train.T):
@@ -106,16 +108,17 @@ if __name__ == '__main__':
         # logger.info('[  OK  ] Relevant features:\n')
         # logger.info(tabulate(zip(features_selected, coefs), headers=['ROI', 'Alpha'], tablefmt='grid'))
         regions.append(features_selected)
+        logger.info('[  OK  ] Feature selection done!')
 
         # ================ CLASSIFICATION ================
         logger.info('\n\n[  INFO  ] Starting Classification')
         # Set pipeline
         pipeline = Pipeline([
-            # ('scaler', StandardScaler()),
+            ('scaler', StandardScaler()),
             # ('scaler', StandardScaler(with_mean=False)),
             # ('mutual_info', SelectKBest(mutual_info_classif, k=10)),
-            # ('knn', KNeighborsClassifier(n_neighbors=9, algorithm='ball_tree', weights='uniform', p=1, n_jobs=3)),
-            ('svm', SVC(kernel='rbf', gamma=0.001, C=1, probability=True))
+            ('knn', KNeighborsClassifier(n_neighbors=9, algorithm='ball_tree', weights='uniform', p=1, n_jobs=3)),
+            # ('svm', SVC(kernel='rbf', gamma=0.001, C=1, probability=True))
         ])
 
         # Set grid of parameters: grid_param
@@ -123,12 +126,12 @@ if __name__ == '__main__':
         #     {'svm__C': [1, 10, 100, 1000], 'svm__kernel': ['linear']},
         #     {'svm__C': [1, 10, 100, 1000], 'svm__gamma': [0.001, 0.0001], 'svm__kernel': ['rbf']},
         # ]
-        # param_grid = {
-        #     'knn__n_neighbors': range(3, 10),
-        #     'knn__weights': ['uniform', 'distance'],
-        #     'knn__algorithm': ['ball_tree', 'kd_tree', 'brute'],
-        #     'knn__p': [1, 2],
-        # }
+        param_grid = {
+            'knn__n_neighbors': range(3, 10),
+            'knn__weights': ['uniform', 'distance'],
+            'knn__algorithm': ['ball_tree', 'kd_tree', 'brute'],
+            'knn__p': [1, 2],
+        }
         #
         # pipeline = GridSearchCV(
         #                 pipeline,
