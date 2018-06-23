@@ -118,7 +118,7 @@ if __name__ == '__main__':
             # ('scaler', StandardScaler(with_mean=False)),
             # ('mutual_info', SelectKBest(mutual_info_classif, k=10)),
             # ('knn', KNeighborsClassifier()),
-            ('knn', KNeighborsClassifier(n_neighbors=9, algorithm='ball_tree', weights='uniform', p=2, n_jobs=-1)),
+            ('knn', KNeighborsClassifier(n_neighbors=8, algorithm='ball_tree', weights='uniform', p=2, n_jobs=-1)),
             # ('svm', SVC(kernel='rbf', gamma=0.001, C=1, probability=True))
         ])
 
