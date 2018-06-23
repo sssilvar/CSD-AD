@@ -15,8 +15,10 @@ from sklearn.metrics import classification_report, roc_auc_score, roc_curve
 
 import numpy as np
 import pandas as pd
-from tabulate import tabulate
+# from tabulate import tabulate
 import matplotlib.pyplot as plt
+
+plt.switch_backend('agg')
 plt.style.use('ggplot')
 
 
@@ -27,8 +29,11 @@ root = up(up(up(os.path.realpath(__file__))))
 if __name__ == '__main__':
     # Load data
     print('[  INFO  ] Loading file ...')
-    df = pd.read_csv(os.path.join(root, 'features', 'gmm_features_7_comp.csv'), index_col=0)
+    csv_file = os.path.join(root, 'features', 'curvelets', 'curvelet_gmm_3_comp.csv')
+    df = pd.read_csv(csv_file, index_col=0)
     df = df.fillna(0)
+    df = df.reset_index(drop=True)
+
     feature_names = df.drop(['target', 'sid'], axis=1).columns
 
     # # Split features and labels
@@ -92,18 +97,18 @@ if __name__ == '__main__':
             # ('scaler', StandardScaler()),
             # ('scaler', StandardScaler(with_mean=False)),
             # ('mutual_info', SelectKBest(mutual_info_classif, k=10)),
-            ('knn', KNeighborsClassifier(n_neighbors=9, algorithm='ball_tree', weights='uniform', p=1, n_jobs=3)),
-            # ('svm', SVC(kernel='rbf', probability=True))
+            # ('knn', KNeighborsClassifier(n_neighbors=9, algorithm='ball_tree', weights='uniform', p=1, n_jobs=3)),
+            ('svm', SVC(kernel='rbf', probability=True))
         ])
 
         # Set grid of parameters: grid_param
-        # param_grid = {
-        #     # 'svm__kernel': ['linear', 'poly', 'rbf'],
-        #     # 'svm__degree': range(5),
-        #     'svm__gamma': np.logspace(-9, 3, 13),
-        #     # 'svm__coef0': np.logspace(0.1, 10, 4),
-        #     'svm__C': np.logspace(-2, 10, 13)
-        # }
+        param_grid = {
+            # 'svm__kernel': ['linear', 'poly', 'rbf'],
+            # 'svm__degree': range(5),
+            'svm__gamma': np.logspace(-9, 3, 13),
+            # 'svm__coef0': np.logspace(0.1, 10, 4),
+            'svm__C': np.logspace(-2, 10, 13)
+        }
         # param_grid = {
         #     'knn__n_neighbors': range(3, 10),
         #     'knn__weights': ['uniform', 'distance'],
@@ -111,11 +116,11 @@ if __name__ == '__main__':
         #     'knn__p': [1, 2],
         # }
 
-        # pipeline = GridSearchCV(
-        #                 pipeline,
-        #                 param_grid,
-        #                 scoring='accuracy',
-        #                 n_jobs=4)
+        pipeline = GridSearchCV(
+                        pipeline,
+                        param_grid,
+                        scoring='accuracy',
+                        n_jobs=4)
 
         # Fit model
         pipeline.fit(X_train, y_train)
@@ -123,8 +128,8 @@ if __name__ == '__main__':
         y_pred_proba = pipeline.predict_proba(X_test)[:, 1]
 
         print('Classification report: \n {}'.format(classification_report(y_test, y_pred)))
-        # print('Score: {}'.format(pipeline.score(X_test, y_test)))
-        # print('Best Params: {}'.format(pipeline.best_params_))
+        print('Score: {}'.format(pipeline.score(X_test, y_test)))
+        print('Best Params: {}'.format(pipeline.best_params_))
 
         accuracy.append(y_pred_proba)
         y_tests.append(y_test)
@@ -138,13 +143,14 @@ if __name__ == '__main__':
     fpr, tpr, thresholds = roc_curve(y_tests, accuracy)
     auc = roc_auc_score(y_tests, accuracy)
 
-    plt.figure()
+    plt.figure(figsize=(19.2, 10.8), dpi=150)
     plt.plot([0, 1], [0, 1], 'k--')
     plt.plot(fpr, tpr)
     plt.legend(['AUC = ' + str(auc)])
     plt.xlabel('False positive rate')
     plt.ylabel('True positive rate')
     plt.title('Classification ROC curve')
+    plt.savefig(os.path.join(root, 'output', os.path.basename(csv_file) + '.png'))
     plt.show()
 
     print('[  DONE  ]')
