@@ -42,8 +42,9 @@ logger.info = print
 
 if __name__ == '__main__':
     # Load data
-    logger.info('[  INFO  ] Loading file ...')
     csv_file = os.path.join(root, 'features', 'curvelets', 'curvelet_gmm_3_comp.csv')
+    logger.info('[  INFO  ] Datafile located at: ')
+    logger.info('[  INFO  ] Loading file ...')
     df = pd.read_csv(csv_file, index_col=0)
     logger.info('[  INFO  ] Done!')
 
@@ -114,36 +115,37 @@ if __name__ == '__main__':
             # ('scaler', StandardScaler(with_mean=False)),
             # ('mutual_info', SelectKBest(mutual_info_classif, k=10)),
             # ('knn', KNeighborsClassifier(n_neighbors=9, algorithm='ball_tree', weights='uniform', p=1, n_jobs=3)),
-            ('svm', SVC(kernel='rbf', probability=True))
+            ('svm', SVC(kernel='rbf', gamma=0.001, C=1, probability=True))
         ])
 
         # Set grid of parameters: grid_param
-        param_grid = [
-            {'svm__C': [1, 10, 100, 1000], 'svm__kernel': ['linear']},
-            {'svm__C': [1, 10, 100, 1000], 'svm__gamma': [0.001, 0.0001], 'svm__kernel': ['rbf']},
-        ]
+        # param_grid = [
+        #     {'svm__C': [1, 10, 100, 1000], 'svm__kernel': ['linear']},
+        #     {'svm__C': [1, 10, 100, 1000], 'svm__gamma': [0.001, 0.0001], 'svm__kernel': ['rbf']},
+        # ]
         # param_grid = {
         #     'knn__n_neighbors': range(3, 10),
         #     'knn__weights': ['uniform', 'distance'],
         #     'knn__algorithm': ['ball_tree', 'kd_tree', 'brute'],
         #     'knn__p': [1, 2],
         # }
-
-        pipeline = GridSearchCV(
-                        pipeline,
-                        param_grid,
-                        scoring='accuracy',
-                        cv=20,
-                        n_jobs=4)
+        #
+        # pipeline = GridSearchCV(
+        #                 pipeline,
+        #                 param_grid,
+        #                 scoring='accuracy',
+        #                 cv=20,
+        #                 n_jobs=4)
 
         # Fit model
+        logger.info('Fitting model ...')
         pipeline.fit(X_train, y_train)
         y_pred = pipeline.predict(X_test)
         y_pred_proba = pipeline.predict_proba(X_test)[:, 1]
 
         logger.info('Classification report: \n {}'.format(classification_report(y_test, y_pred)))
-        logger.info('Score: {}'.format(pipeline.score(X_test, y_test)))
-        logger.info('Best Params: {}'.format(pipeline.best_params_))
+        # logger.info('Score: {}'.format(pipeline.score(X_test, y_test)))
+        # logger.info('Best Params: {}'.format(pipeline.best_params_))
 
         accuracy.append(y_pred_proba)
         y_tests.append(y_test)
