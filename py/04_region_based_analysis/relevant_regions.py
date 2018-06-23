@@ -73,31 +73,31 @@ if __name__ == '__main__':
 
         logger.info('\n[  INFO  ] Feature selection ...')
 
-        # from scipy.stats import ttest_ind
-        # ix = []
-        # for i, col in enumerate(X_train.T):
-        #     test = ttest_ind(col[y_train == 1], col[y_train == 0])
-        #
-        #     if test.pvalue < 0.05:
-        #         # logger.info('SIGNIFICANT ROI:', feature_names[i])
-        #         ix.append(i)
-        #         # plt.figure()
-        #         # # plt.boxplot([col[y_train == 1], col[y_train == 0]])
-        #         # plt.hist(col[y_train == 1], alpha=0.7, bins=30)
-        #         # plt.hist(col[y_train == 0], alpha=0.7, bins=30)
-        #         # plt.legend(['MCIc', 'MCInc'])
-        #         # plt.title(feature_names[i])
-        #         # plt.savefig(os.path.join(
-        #         #     '/user/ssilvari/home/Documents/output/feature-behavior/11/', feature_names[i] + '.png'))
-        #         # plt.close()
-        #         # # plt.show()
+        from scipy.stats import ttest_ind
+        ix = []
+        for i, col in enumerate(X_train.T):
+            test = ttest_ind(col[y_train == 1], col[y_train == 0])
+
+            if test.pvalue < 0.05:
+                # logger.info('SIGNIFICANT ROI:', feature_names[i])
+                ix.append(i)
+                # plt.figure()
+                # # plt.boxplot([col[y_train == 1], col[y_train == 0]])
+                # plt.hist(col[y_train == 1], alpha=0.7, bins=30)
+                # plt.hist(col[y_train == 0], alpha=0.7, bins=30)
+                # plt.legend(['MCIc', 'MCInc'])
+                # plt.title(feature_names[i])
+                # plt.savefig(os.path.join(
+                #     '/user/ssilvari/home/Documents/output/feature-behavior/11/', feature_names[i] + '.png'))
+                # plt.close()
+                # # plt.show()
 
         # Feature selection
-        lasso = Lasso(alpha=0.01)
-        lasso.fit(X_train, y_train)
-
-        ix = lasso.coef_ != 0
-        coefs = lasso.coef_[ix]
+        # lasso = Lasso()
+        # lasso.fit(X_train, y_train)
+        #
+        # ix = lasso.coef_ != 0
+        # coefs = lasso.coef_[ix]
         features_selected = feature_names[ix]
 
         # Update features selected
