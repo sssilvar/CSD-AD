@@ -117,8 +117,8 @@ if __name__ == '__main__':
             ('scaler', StandardScaler()),
             # ('scaler', StandardScaler(with_mean=False)),
             # ('mutual_info', SelectKBest(mutual_info_classif, k=10)),
-            # ('knn', KNeighborsClassifier()),
-            ('knn', KNeighborsClassifier(n_neighbors=8, algorithm='ball_tree', weights='uniform', p=2, n_jobs=-1)),
+            ('knn', KNeighborsClassifier()),
+            # ('knn', KNeighborsClassifier(n_neighbors=8, algorithm='ball_tree', weights='uniform', p=2, n_jobs=-1)),
             # ('svm', SVC(kernel='rbf', gamma=0.001, C=1, probability=True))
         ])
 
@@ -127,19 +127,19 @@ if __name__ == '__main__':
         #     {'svm__C': [1, 10, 100, 1000], 'svm__kernel': ['linear']},
         #     {'svm__C': [1, 10, 100, 1000], 'svm__gamma': [0.001, 0.0001], 'svm__kernel': ['rbf']},
         # ]
-        # param_grid = {
-        #     'knn__n_neighbors': range(3, 10),
-        #     'knn__weights': ['uniform', 'distance'],
-        #     'knn__algorithm': ['ball_tree', 'kd_tree', 'brute'],
-        #     'knn__p': [1, 2],
-        # }
+        param_grid = {
+            'knn__n_neighbors': range(3, 10),
+            'knn__weights': ['uniform', 'distance'],
+            'knn__algorithm': ['ball_tree', 'kd_tree', 'brute'],
+            'knn__p': [1, 2],
+        }
 
-        # pipeline = GridSearchCV(
-        #                 pipeline,
-        #                 param_grid,
-        #                 scoring='accuracy',
-        #                 cv=20,
-        #                 n_jobs=-1)
+        pipeline = GridSearchCV(
+                        pipeline,
+                        param_grid,
+                        scoring='roc_auc',
+                        cv=20,
+                        n_jobs=-1)
 
         # Fit model
         logger.info('Fitting model ...')
