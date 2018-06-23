@@ -6,6 +6,7 @@ import logging
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import Lasso
 from sklearn.svm import SVC
+from sklearn.model_selection import LeaveOneOut
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_selection import SelectKBest, mutual_info_classif
 
@@ -42,7 +43,7 @@ logger.info = print
 
 if __name__ == '__main__':
     # Load data
-    csv_file = os.path.join(root, 'features', 'curvelets', 'curvelet_gmm_7_comp.csv')
+    csv_file = os.path.join(root, 'features', 'curvelets', 'curvelet_gmm_11_comp.csv')
     logger.info('[  INFO  ] Datafile located at: ', csv_file)
     logger.info('[  INFO  ] Loading file ...')
     df = pd.read_csv(csv_file, index_col=0)
@@ -66,7 +67,6 @@ if __name__ == '__main__':
     y_tests = []
     precisions = []
 
-    from sklearn.model_selection import LeaveOneOut
     for train_index, test_index in LeaveOneOut().split(X):
         X_train, X_test = X[train_index], X[test_index]
         y_train, y_test = y[train_index], y[test_index]
