@@ -40,11 +40,11 @@ if __name__ == '__main__':
             df_features.to_csv(csv_output)
         else:
             print('Reading CSV ...')
-            df = pd.read_csv(csv_output, index_col=0)
+            df_features = pd.read_csv(csv_output, index_col=0)
 
             print('Droping useless columns...')
-            df = df.dropna(axis=1)
-            df.to_csv(csv_output)
+            df_features = df_features.dropna(axis=1)
+            df_features.to_csv(csv_output)
             print('Done!')
 
     print('DONE!\n\n')

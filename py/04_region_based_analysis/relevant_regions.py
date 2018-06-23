@@ -42,7 +42,7 @@ logger.info = print
 
 if __name__ == '__main__':
     # Load data
-    csv_file = os.path.join(root, 'features', 'curvelets', 'curvelet_gmm_3_comp.csv')
+    csv_file = os.path.join(root, 'features', 'curvelets', 'curvelet_gmm_11_comp.csv')
     logger.info('[  INFO  ] Datafile located at: ', csv_file)
     logger.info('[  INFO  ] Loading file ...')
     df = pd.read_csv(csv_file, index_col=0)
@@ -93,22 +93,22 @@ if __name__ == '__main__':
         #         # # plt.show()
 
         # Feature selection
-        # lasso = Lasso()
-        # lasso.fit(X_train, y_train)
-        #
-        # ix = lasso.coef_ != 0
-        # coefs = lasso.coef_[ix]
-        # features_selected = feature_names[ix]
-        #
-        # # Update features selected
-        # X_train, X_test = X_train[:, ix], X_test[:, ix]
-        # logger.info(X_train.shape, X_test.shape)
+        lasso = Lasso()
+        lasso.fit(X_train, y_train)
+
+        ix = lasso.coef_ != 0
+        coefs = lasso.coef_[ix]
+        features_selected = feature_names[ix]
+
+        # Update features selected
+        X_train, X_test = X_train[:, ix], X_test[:, ix]
+        logger.info(X_train.shape, X_test.shape)
 
         # Print relevant ROIs
-        # logger.info('[  OK  ] Relevant features:\n')
+        logger.info('[  OK  ] Relevant features:\n')
         # logger.info(tabulate(zip(features_selected, coefs), headers=['ROI', 'Alpha'], tablefmt='grid'))
-        # regions.append(features_selected)
-        # logger.info('[  OK  ] Feature selection done!')
+        regions.append(features_selected)
+        logger.info('[  OK  ] Feature selection done!')
 
         # ================ CLASSIFICATION ================
         logger.info('\n\n[  INFO  ] Starting Classification')
