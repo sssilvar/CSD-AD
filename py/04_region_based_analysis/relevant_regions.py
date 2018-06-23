@@ -170,7 +170,7 @@ if __name__ == '__main__':
     plt.xlabel('False positive rate')
     plt.ylabel('True positive rate')
     plt.title('Classification ROC curve')
-    plt.savefig(os.path.join(root, 'output', os.path.basename(csv_file) + '.png'))
+    plt.savefig(os.path.join(root, 'output', os.path.basename(csv_file[:-4]) + '.png'))
     # plt.show()
 
     logger.info('[  DONE  ]')
