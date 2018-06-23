@@ -93,7 +93,7 @@ if __name__ == '__main__':
         #         # # plt.show()
 
         # Feature selection
-        lasso = Lasso()
+        lasso = Lasso(alpha=0.01)
         lasso.fit(X_train, y_train)
 
         ix = lasso.coef_ != 0
@@ -149,7 +149,7 @@ if __name__ == '__main__':
 
         logger.info('Classification report: \n {}'.format(classification_report(y_test, y_pred)))
         # logger.info('Score: {}'.format(pipeline.score(X_test, y_test)))
-        logger.info('Best Params: {}'.format(pipeline.best_params_))
+        # logger.info('Best Params: {}'.format(pipeline.best_params_))
 
         accuracy.append(y_pred_proba)
         y_tests.append(y_test)
