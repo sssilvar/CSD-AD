@@ -43,7 +43,7 @@ logger.info = print
 if __name__ == '__main__':
     # Load data
     csv_file = os.path.join(root, 'features', 'curvelets', 'curvelet_gmm_3_comp.csv')
-    logger.info('[  INFO  ] Datafile located at: ')
+    logger.info('[  INFO  ] Datafile located at: ', csv_file)
     logger.info('[  INFO  ] Loading file ...')
     df = pd.read_csv(csv_file, index_col=0)
     logger.info('[  INFO  ] Done!')
