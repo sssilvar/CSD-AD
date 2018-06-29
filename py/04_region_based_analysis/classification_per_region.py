@@ -148,7 +148,7 @@ if __name__ == '__main__':
             plt.ylabel('True positive rate')
             plt.title('ROC curve: %s' % region)
 
-            roc_plot_file = os.path.join(root, 'output', 'reg_class', '%d_roc_%s_%d.png' %
+            roc_plot_file = os.path.join(root, 'output', 'reg_class', '%04d_roc_%s_%d.png' %
                                          (rid, str(region).replace('-', '_').lower(), n_comp))
             plt.savefig(roc_plot_file)
             # plt.show()
