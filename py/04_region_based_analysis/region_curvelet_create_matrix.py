@@ -12,7 +12,7 @@ root = up(up(up(os.path.realpath(__file__))))
 
 if __name__ == '__main__':
     print('Starting analysis')
-    features_folder = os.path.join(root, 'features', 'curvelets')
+    features_folder = os.path.join(root, 'features', 'curvelets_light')
     csv_data = os.path.join(root, 'param', 'data_df.csv')
     regions = os.path.join(root, 'param', 'FreeSurferColorLUT.csv')
 
@@ -39,12 +39,13 @@ if __name__ == '__main__':
             # Save csv
             df_features.to_csv(csv_output)
         else:
-            print('Reading CSV ...')
+            print('Reading CSV %s ...' % csv_output)
             df_features = pd.read_csv(csv_output, index_col=0)
 
             print('Droping useless columns...')
-            df_features = df_features.dropna(axis=1)
-            df_features.to_csv(csv_output)
+            # df_features = df_features.dropna(axis=1)
+            # df_features.to_csv(csv_output)
+            df_features.to_hdf(csv_output[:-4] + '.h5', 'features', table=True, mode='w')
             print('Done!')
 
     print('DONE!\n\n')
