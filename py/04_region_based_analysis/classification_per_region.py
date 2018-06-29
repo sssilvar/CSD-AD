@@ -54,10 +54,13 @@ if __name__ == '__main__':
     logger.info('Done!')
 
     # Get regions in feature matrix
-    accuracy = []
-    y_tests = []
-    precisions = []
-    for region in df_regions['label_name']:
+    for rid, region in zip(df_regions.index, df_regions['label_name']):
+        # Reset statistics
+        accuracy = []
+        y_tests = []
+        precisions = []
+
+        # Look for the features corresponding to the current region
         region_feats_found = [feat for feat in df_features.columns if region in feat]
 
         if region_feats_found:
@@ -70,6 +73,9 @@ if __name__ == '__main__':
             for train_index, test_index in LeaveOneOut().split(X):
                 X_train, X_test = X[train_index], X[test_index]
                 y_train, y_test = y[train_index], y[test_index]
+
+                print(X_train.shape)
+                print(y_train.shape)
 
                 # ============ FEATURE SELECTION ============
                 lasso = Lasso()
@@ -130,7 +136,7 @@ if __name__ == '__main__':
 
             # Report after classifying each region
             logger.info('\n\n[  OK  ] FINAL REPORT')
-            logger.info('\t - Mean accuracy: ', np.mean(accuracy))
+            logger.info('\t - Mean accuracy: %f ' % np.mean(accuracy))
             logger.info('\t - Precision: %d/%d' % (np.sum(precisions), len(precisions)))
 
             # Compute AUC
@@ -145,8 +151,8 @@ if __name__ == '__main__':
             plt.ylabel('True positive rate')
             plt.title('ROC curve: %s' % region)
 
-            roc_plot_file = os.path.join(root, 'output', 'roc_%s_%d.png' % (str(region).replace('-', '_'),
-                                                                            n_comp))
+            roc_plot_file = os.path.join(root, 'output', 'reg_class', '%d_roc_%s_%d.png' %
+                                         (rid, str(region).replace('-', '_').lower(), n_comp))
             plt.savefig(roc_plot_file)
             # plt.show()
 
