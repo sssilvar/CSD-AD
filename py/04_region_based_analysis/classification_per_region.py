@@ -74,9 +74,6 @@ if __name__ == '__main__':
                 X_train, X_test = X[train_index], X[test_index]
                 y_train, y_test = y[train_index], y[test_index]
 
-                print(X_train.shape)
-                print(y_train.shape)
-
                 # ============ FEATURE SELECTION ============
                 lasso = Lasso()
                 lasso.fit(X_train, y_train)
