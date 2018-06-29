@@ -95,7 +95,7 @@ if __name__ == '__main__':
                                 pipeline,
                                 param_grid,
                                 scoring='accuracy',
-                                cv=20,
+                                cv=5,
                                 n_jobs=-1)
 
                 # Fit model
