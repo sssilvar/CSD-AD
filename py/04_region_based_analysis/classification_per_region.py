@@ -134,7 +134,7 @@ if __name__ == '__main__':
                     # Get Score
                     pipeline_score = pipeline.score(X_test, y_test)
 
-                    logger.info('Classification report: \n {}'.format(classification_report(y_test, y_pred)))
+                    # logger.info('Classification report: \n {}'.format(classification_report(y_test, y_pred)))
                     logger.info('Score: {}'.format(pipeline_score))
                     logger.info('Best params: {}'.format(pipeline.best_params_))
 
