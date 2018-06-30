@@ -88,7 +88,7 @@ if __name__ == '__main__':
                     # logger.info('\n\n[  INFO  ] Starting Classification')
                     # Set pipeline
                     pipeline = Pipeline([
-                        # ('scaler', StandardScaler()),
+                        ('scaler', StandardScaler()),
                         # ('scaler', StandardScaler(with_mean=False)),
                         # ('mutual_info', SelectKBest(mutual_info_classif, k=10)),
                         # ('knn', KNeighborsClassifier()),
