@@ -12,6 +12,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.linear_model import Lasso
 from sklearn.model_selection import LeaveOneOut
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import classification_report, roc_auc_score, roc_curve
@@ -95,7 +96,8 @@ if __name__ == '__main__':
                         # ('knn',
                         #  KNeighborsClassifier(n_neighbors=8, algorithm='ball_tree', weights='uniform', p=1, n_jobs=-1)),
                         # ('svm', SVC(probability=True)),
-                        ('svm', SVC(C=1, gamma=0.001, kernel='rbf', probability=True)),
+                        # ('svm', SVC(C=1, gamma=0.001, kernel='rbf', probability=True)),
+                        RandomForestClassifier(random_state=42)
                     ])
 
                     # Set grid of parameters: grid_param
@@ -109,13 +111,19 @@ if __name__ == '__main__':
                     #     'knn__algorithm': ['ball_tree', 'kd_tree', 'brute'],
                     #     'knn__p': [1, 2],
                     # }
+                    param_grid = {
+                        'n_estimators': [200, 500],
+                        'max_features': ['auto', 'sqrt', 'log2'],
+                        'max_depth': [4, 5, 6, 7, 8],
+                        'criterion': ['gini', 'entropy']
+                    }
 
-                    # pipeline = GridSearchCV(
-                    #                 pipeline,
-                    #                 param_grid,
-                    #                 scoring='accuracy',
-                    #                 cv=10,
-                    #                 n_jobs=-1)
+                    pipeline = GridSearchCV(
+                                    pipeline,
+                                    param_grid,
+                                    scoring='accuracy',
+                                    cv=10,
+                                    n_jobs=-1)
 
                     # Fit model
                     # logger.info('Fitting model ...')
@@ -126,9 +134,9 @@ if __name__ == '__main__':
                     # Get Score
                     pipeline_score = pipeline.score(X_test, y_test)
 
-                    # logger.info('Classification report: \n {}'.format(classification_report(y_test, y_pred)))
-                    # logger.info('Score: {}'.format(pipeline_score))
-                    # logger.info('Best params: {}'.format(pipeline.best_params_))
+                    logger.info('Classification report: \n {}'.format(classification_report(y_test, y_pred)))
+                    logger.info('Score: {}'.format(pipeline_score))
+                    logger.info('Best params: {}'.format(pipeline.best_params_))
 
                     accuracy.append(y_pred_proba)
                     y_tests.append(y_test)
