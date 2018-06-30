@@ -7,6 +7,7 @@ from tabulate import tabulate
 import numpy as np
 import pandas as pd
 
+from sklearn.svm import SVC
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import Lasso
 from sklearn.model_selection import LeaveOneOut
@@ -75,7 +76,7 @@ if __name__ == '__main__':
                     y_train, y_test = y[train_index], y[test_index]
 
                     # ============ FEATURE SELECTION ============
-                    lasso = Lasso(max_iter=1000)
+                    lasso = Lasso(max_iter=100000, tol=0.001)
                     lasso.fit(X_train, y_train)
 
                     ix = lasso.coef_ != 0
@@ -87,33 +88,33 @@ if __name__ == '__main__':
                     # logger.info('\n\n[  INFO  ] Starting Classification')
                     # Set pipeline
                     pipeline = Pipeline([
-                        ('scaler', StandardScaler()),
+                        # ('scaler', StandardScaler()),
                         # ('scaler', StandardScaler(with_mean=False)),
                         # ('mutual_info', SelectKBest(mutual_info_classif, k=10)),
                         # ('knn', KNeighborsClassifier()),
-                        ('knn',
-                         KNeighborsClassifier(n_neighbors=8, algorithm='ball_tree', weights='uniform', p=1, n_jobs=-1)),
-                        # ('svm', SVC(kernel='rbf', gamma=0.001, C=1, probability=True))
+                        # ('knn',
+                        #  KNeighborsClassifier(n_neighbors=8, algorithm='ball_tree', weights='uniform', p=1, n_jobs=-1)),
+                        ('svm', SVC(probability=True))
                     ])
 
                     # Set grid of parameters: grid_param
-                    # param_grid = [
-                    #     {'svm__C': [1, 10, 100, 1000], 'svm__kernel': ['linear']},
-                    #     {'svm__C': [1, 10, 100, 1000], 'svm__gamma': [0.001, 0.0001], 'svm__kernel': ['rbf']},
-                    # ]
+                    param_grid = [
+                        {'svm__C': [1, 10, 100, 1000], 'svm__kernel': ['linear']},
+                        {'svm__C': [1, 10, 100, 1000], 'svm__gamma': [0.001, 0.0001], 'svm__kernel': ['rbf']},
+                    ]
                     # param_grid = {
                     #     'knn__n_neighbors': range(3, 10),
                     #     'knn__weights': ['uniform', 'distance'],
                     #     'knn__algorithm': ['ball_tree', 'kd_tree', 'brute'],
                     #     'knn__p': [1, 2],
                     # }
-                    #
-                    # pipeline = GridSearchCV(
-                    #                 pipeline,
-                    #                 param_grid,
-                    #                 scoring='accuracy',
-                    #                 cv=5,
-                    #                 n_jobs=-1)
+
+                    pipeline = GridSearchCV(
+                                    pipeline,
+                                    param_grid,
+                                    scoring='accuracy',
+                                    cv=10,
+                                    n_jobs=-1)
 
                     # Fit model
                     # logger.info('Fitting model ...')
@@ -125,7 +126,8 @@ if __name__ == '__main__':
                     pipeline_score = pipeline.score(X_test, y_test)
 
                     # logger.info('Classification report: \n {}'.format(classification_report(y_test, y_pred)))
-                    # logger.info('Score: {}'.format(pipeline_score))
+                    logger.info('Score: {}'.format(pipeline_score))
+                    logger.info('Best params: {}'.format(pipeline.best_params_))
 
                     accuracy.append(y_pred_proba)
                     y_tests.append(y_test)
@@ -151,7 +153,7 @@ if __name__ == '__main__':
                 ext = '.png'
                 roc_plot_file = os.path.join(root, 'output', 'reg_class', '%04d_roc_%s_%d_comp' %
                                              (rid, str(region).replace('-', '_').lower(), n_comp))
-                plt.savefig(roc_plot_file + ext)
+                plt.savefig(roc_plot_file + ext, bbox_inches='tight')
                 # plt.show()
 
                 # Save results
