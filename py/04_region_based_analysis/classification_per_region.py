@@ -94,14 +94,15 @@ if __name__ == '__main__':
                         # ('knn', KNeighborsClassifier()),
                         # ('knn',
                         #  KNeighborsClassifier(n_neighbors=8, algorithm='ball_tree', weights='uniform', p=1, n_jobs=-1)),
-                        ('svm', SVC(probability=True))
+                        # ('svm', SVC(probability=True)),
+                        ('svm', SVC(C=1, gamma=0.001, kernel='rbf', probability=True)),
                     ])
 
                     # Set grid of parameters: grid_param
-                    param_grid = [
-                        {'svm__C': [1, 10, 100, 1000], 'svm__kernel': ['linear']},
-                        {'svm__C': [1, 10, 100, 1000], 'svm__gamma': [0.001, 0.0001], 'svm__kernel': ['rbf']},
-                    ]
+                    # param_grid = [
+                    #     {'svm__C': [1, 10, 100, 1000], 'svm__kernel': ['linear']},
+                    #     {'svm__C': [1, 10, 100, 1000], 'svm__gamma': [0.001, 0.0001], 'svm__kernel': ['rbf']},
+                    # ]
                     # param_grid = {
                     #     'knn__n_neighbors': range(3, 10),
                     #     'knn__weights': ['uniform', 'distance'],
@@ -109,12 +110,12 @@ if __name__ == '__main__':
                     #     'knn__p': [1, 2],
                     # }
 
-                    pipeline = GridSearchCV(
-                                    pipeline,
-                                    param_grid,
-                                    scoring='accuracy',
-                                    cv=10,
-                                    n_jobs=-1)
+                    # pipeline = GridSearchCV(
+                    #                 pipeline,
+                    #                 param_grid,
+                    #                 scoring='accuracy',
+                    #                 cv=10,
+                    #                 n_jobs=-1)
 
                     # Fit model
                     # logger.info('Fitting model ...')
@@ -126,8 +127,8 @@ if __name__ == '__main__':
                     pipeline_score = pipeline.score(X_test, y_test)
 
                     # logger.info('Classification report: \n {}'.format(classification_report(y_test, y_pred)))
-                    logger.info('Score: {}'.format(pipeline_score))
-                    logger.info('Best params: {}'.format(pipeline.best_params_))
+                    # logger.info('Score: {}'.format(pipeline_score))
+                    # logger.info('Best params: {}'.format(pipeline.best_params_))
 
                     accuracy.append(y_pred_proba)
                     y_tests.append(y_test)
