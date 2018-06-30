@@ -97,7 +97,7 @@ if __name__ == '__main__':
                         #  KNeighborsClassifier(n_neighbors=8, algorithm='ball_tree', weights='uniform', p=1, n_jobs=-1)),
                         # ('svm', SVC(probability=True)),
                         # ('svm', SVC(C=1, gamma=0.001, kernel='rbf', probability=True)),
-                        RandomForestClassifier(random_state=42)
+                        ('rfc', RandomForestClassifier(random_state=42))
                     ])
 
                     # Set grid of parameters: grid_param
@@ -112,10 +112,10 @@ if __name__ == '__main__':
                     #     'knn__p': [1, 2],
                     # }
                     param_grid = {
-                        'n_estimators': [200, 500],
-                        'max_features': ['auto', 'sqrt', 'log2'],
-                        'max_depth': [4, 5, 6, 7, 8],
-                        'criterion': ['gini', 'entropy']
+                        'rfc__n_estimators': [200, 500],
+                        'rfc__max_features': ['auto', 'sqrt', 'log2'],
+                        'rfc__max_depth': [4, 5, 6, 7, 8],
+                        'rfc__criterion': ['gini', 'entropy']
                     }
 
                     pipeline = GridSearchCV(
