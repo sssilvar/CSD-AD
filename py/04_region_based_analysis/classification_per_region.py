@@ -133,9 +133,11 @@ if __name__ == '__main__':
 
                         # Fit model
                         # logger.info('Fitting model ...')
-                        score = pipeline.fit(X_train, y_train).decision_function(X_test)
+                        pipeline.fit(X_train, y_train)
                         y_pred = pipeline.predict(X_test)
-                        y_pred_proba = pipeline.predict_proba(X_test)[:, 1]
+                        score = pipeline.predict_proba(X_test)
+                        y_pred_proba = score[:, 1]
+
 
                         # Get Score
                         pipeline_score = pipeline.score(X_test, y_test)
