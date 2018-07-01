@@ -138,7 +138,7 @@ if __name__ == '__main__':
                     # logger.info('Score: {}'.format(pipeline_score))
                     # logger.info('Best params: {}'.format(pipeline.best_params_))
                     if pipeline_score > 0.5:
-                        logger.info('Score: %.2f | Predicted probability: ' % (pipeline_score, y_pred_proba))
+                        logger.info('Score: %.2f | Predicted probability: %.2f' % (pipeline_score, y_pred_proba))
                         logger.info('Best params: {}'.format(pipeline.best_params_))
 
                     accuracy.append(y_pred_proba)
