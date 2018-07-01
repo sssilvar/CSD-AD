@@ -65,7 +65,7 @@ if __name__ == '__main__':
             # Look for the features corresponding to the current region
             region_feats_found = [feat for feat in df_features.columns if region in feat]
 
-            if region_feats_found:
+            if region_feats_found and rid in [10, 11, 12, 13, 17, 18, 26, 49, 50, 51, 52, 53, 54, 58,]:
                 logger.info('Processing region: ' + region)
 
                 # Create X and y
@@ -96,8 +96,8 @@ if __name__ == '__main__':
                         # ('knn', KNeighborsClassifier(n_neighbors=8, algorithm='ball_tree', weights='uniform', p=1, n_jobs=-1)),
                         # ('svm', SVC(probability=True)),
                         # ('svm', SVC(C=1, gamma=0.001, kernel='rbf', probability=True)),
-                        # ('rfc', RandomForestClassifier(random_state=42)),
-                        ('rfc', RandomForestClassifier(criterion='gini', max_depth=8, max_features='auto', n_estimators=200, n_jobs=-1)),
+                        ('rfc', RandomForestClassifier(random_state=42)),
+                        # ('rfc', RandomForestClassifier(criterion='gini', max_depth=8, max_features='auto', n_estimators=200, n_jobs=-1)),
                     ])
 
                     # Set grid of parameters: grid_param
@@ -111,19 +111,19 @@ if __name__ == '__main__':
                     #     'knn__algorithm': ['ball_tree', 'kd_tree', 'brute'],
                     #     'knn__p': [1, 2],
                     # }
-                    # param_grid = {
-                    #     'rfc__n_estimators': [200, 500],
-                    #     'rfc__max_features': ['auto', 'sqrt', 'log2'],
-                    #     'rfc__max_depth': [4, 5, 6, 7, 8],
-                    #     'rfc__criterion': ['gini', 'entropy']
-                    # }
+                    param_grid = {
+                        'rfc__n_estimators': [200, 500],
+                        'rfc__max_features': ['auto', 'sqrt', 'log2'],
+                        'rfc__max_depth': [4, 5, 6, 7, 8],
+                        'rfc__criterion': ['gini', 'entropy']
+                    }
 
-                    # pipeline = GridSearchCV(
-                    #                 pipeline,
-                    #                 param_grid,
-                    #                 scoring='accuracy',
-                    #                 cv=10,
-                    #                 n_jobs=-1)
+                    pipeline = GridSearchCV(
+                                    pipeline,
+                                    param_grid,
+                                    scoring='accuracy',
+                                    cv=10,
+                                    n_jobs=-1)
 
                     # Fit model
                     # logger.info('Fitting model ...')
@@ -137,6 +137,9 @@ if __name__ == '__main__':
                     # logger.info('Classification report: \n {}'.format(classification_report(y_test, y_pred)))
                     # logger.info('Score: {}'.format(pipeline_score))
                     # logger.info('Best params: {}'.format(pipeline.best_params_))
+                    if pipeline_score > 0.5:
+                        logger.info('Score: %.2f | Predicted probability: ' % (pipeline_score, y_pred_proba))
+                        logger.info('Best params: {}'.format(pipeline.best_params_))
 
                     accuracy.append(y_pred_proba)
                     y_tests.append(y_test)
