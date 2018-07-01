@@ -97,7 +97,7 @@ if __name__ == '__main__':
                         # ('svm', SVC(probability=True)),
                         # ('svm', SVC(C=1, gamma=0.001, kernel='rbf', probability=True)),
                         # ('rfc', RandomForestClassifier(random_state=42)),
-                        ('rfc', RandomForestClassifier(criterion='gini', max_depth=8, max_features='auto', n_estimators=200)),
+                        ('rfc', RandomForestClassifier(criterion='gini', max_depth=8, max_features='auto', n_estimators=200, n_jobs=-1)),
                     ])
 
                     # Set grid of parameters: grid_param
