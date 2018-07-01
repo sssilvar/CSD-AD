@@ -158,28 +158,28 @@ if __name__ == '__main__':
                 logger.info('\t - Mean accuracy: %f ' % np.mean(accuracy))
                 logger.info('\t - Precision: %d/%d' % (np.sum(precisions), len(precisions)))
 
-                # Compute AUC
-                fpr, tpr, thresholds = roc_curve(y_tests, accuracy)
-                auc = roc_auc_score(y_tests, accuracy)
-
-                plt.figure(figsize=(19.2 * 0.75, 10.8 * 0.75), dpi=150)
-                plt.plot([0, 1], [0, 1], 'k--')
-                plt.plot(fpr, tpr)
-                plt.legend(['AUC = ' + str(auc)])
-                plt.xlabel('False positive rate')
-                plt.ylabel('True positive rate')
-                plt.title('ROC curve: %s' % region)
-
-                ext = '.png'
-                roc_plot_file = os.path.join(root, 'output', 'reg_class', '%04d_roc_%s_%d_comp' %
-                                             (rid, str(region).replace('-', '_').lower(), n_comp))
-                plt.savefig(roc_plot_file + ext, bbox_inches='tight')
-                # plt.show()
-
-                # Save results
-                np.savez(roc_plot_file + '.npz', accuracy, precisions, y_tests)
-
-                logger.info('Region %s is done!\nROC curve plot save at: %s' % (region, roc_plot_file + ext))
-                print('Region %s is done!\nROC curve plot save at: %s' % (region, roc_plot_file + ext))
+                # # Compute AUC
+                # fpr, tpr, thresholds = roc_curve(y_tests, accuracy)
+                # auc = roc_auc_score(y_tests, accuracy)
+                #
+                # plt.figure(figsize=(19.2 * 0.75, 10.8 * 0.75), dpi=150)
+                # plt.plot([0, 1], [0, 1], 'k--')
+                # plt.plot(fpr, tpr)
+                # plt.legend(['AUC = ' + str(auc)])
+                # plt.xlabel('False positive rate')
+                # plt.ylabel('True positive rate')
+                # plt.title('ROC curve: %s' % region)
+                #
+                # ext = '.png'
+                # roc_plot_file = os.path.join(root, 'output', 'reg_class', '%04d_roc_%s_%d_comp' %
+                #                              (rid, str(region).replace('-', '_').lower(), n_comp))
+                # plt.savefig(roc_plot_file + ext, bbox_inches='tight')
+                # # plt.show()
+                #
+                # # Save results
+                # np.savez(roc_plot_file + '.npz', accuracy, precisions, y_tests)
+                #
+                # logger.info('Region %s is done!\nROC curve plot save at: %s' % (region, roc_plot_file + ext))
+                # print('Region %s is done!\nROC curve plot save at: %s' % (region, roc_plot_file + ext))
 
 
