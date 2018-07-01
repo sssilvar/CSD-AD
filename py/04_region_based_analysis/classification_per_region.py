@@ -143,9 +143,8 @@ if __name__ == '__main__':
                         # logger.info('Classification report: \n {}'.format(classification_report(y_test, y_pred)))
                         # logger.info('Score: {}'.format(pipeline_score))
                         # logger.info('Best params: {}'.format(pipeline.best_params_))
-                        if pipeline_score > 0.5:
-                            logger.info('Score: %.2f | Predicted probability: %.2f | Class %d' % (pipeline_score, y_pred_proba, y_test))
-                            logger.info('Best params: {}'.format(pipeline.best_params_))
+                        logger.info('Score: %.2f | Predicted probability: %.2f | Class %d' % (pipeline_score, y_pred_proba, y_test))
+                        logger.info('Best params: {}'.format(pipeline.best_params_))
 
                         accuracy.append(y_pred_proba)
                         y_tests.append(y_test)
