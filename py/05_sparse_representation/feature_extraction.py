@@ -8,6 +8,7 @@ Curvelet feature extraction. USAGE:
 import os
 import sys
 import argparse
+from tqdm import tqdm
 
 try:
     import pyct as ct
@@ -20,13 +21,11 @@ import pandas as pd
 root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 sys.path.append(os.path.join(root))
 
-from lib.curvelets import clarray_to_mean_dict
+from lib.curvelets import clarray_to_gen_gaussian_dict
 from lib.path import get_file_list, mkdir
 
 def main():
     # Set results folder and csv with subjects
-    # results_folder = '/home/sssilvar/Documents/dataset/results_radial_vid_optimized/'
-    results_folder = r'C:\Users\sssilvar\Documents\code\data_test'
     output_folder = os.path.join(root, 'output')
     dataset_csv = os.path.join(root, 'param', 'data_df.csv')
     
@@ -40,19 +39,23 @@ def main():
     df = pd.read_csv(dataset_csv)
     mkdir(output_folder)
 
-    # Start feature extraction
-    columns = []
-
-    for subject in df['folder']:
+    for i, (subject, label) in enumerate(zip(df['folder'][:2], df['target'][:2])):
+        print('Processing subject ' + subject)
+        
         # Set filename(s)
         raw_folder = os.path.join(results_folder, subject, 'raw')
         
-        for r in sphere_radius:
+        # Initialize a feature dictionary per subject
+        f_dict = {}
+        f_dict['subject'] = subject
+        f_dict['target'] = label
+        
+        for r in tqdm(sphere_radius, desc='Sphere scale'):
             # Get type of image and sphere params
             raw_file = os.path.join(
                 raw_folder,
                 '%s_%03d_to_%03d_solid_angle_to_sphere.raw' % (
-                    img_type, r, (r + step)
+                    img_type, r, (r + delta)
                 ))
             
             # Load and do the magic!
@@ -68,13 +71,29 @@ def main():
                 vec=True, 
                 cpx=False)
             f = A.fwd(img)
+
+            # Convert data to dict
+            buff = clarray_to_gen_gaussian_dict(A, f, n_scales, n_angles, r)
+            f_dict.update(buff)
+
+        if i is 0:
+            df_features = pd.DataFrame(f_dict, index=[0])
+        else:
+            df_subject = pd.DataFrame(f_dict, index=[0])
+            df_features = df_features.append(df_subject)
     
     # Save results
-    df.to_hdf(os.path.join(output_folder, 'test.h5'), key='features', mode='w')
+    filename_features =os.path.join(output_folder, 'spherical_curvelet_features.h5') 
+    df_features.to_hdf(filename_features, key='features', mode='w')
+    os.system('chmod 766 ' + filename_features)
+
 
 if __name__ == '__main__':
     # --- ARG PARSING ---
     parser = argparse.ArgumentParser(description=__description__)
+    parser.add_argument('-f', metavar='--folder',
+                        help='Subjects\' folder.',
+                        default='/user/ssilvari/home/Documents/temp/sphere_mapped')
     parser.add_argument('-s', metavar='--scales',
                         help='Number of scales.',
                         default=6)
@@ -91,9 +110,13 @@ if __name__ == '__main__':
     n_scales = args.s
     n_angles = args.a
     img_type = args.t
+    results_folder = args.f
+    # results_folder = '/home/sssilvar/Documents/dataset/results_radial_vid_optimized/'
 
-    step = 5
-    sphere_radius = [i for i in range(0, 21, step)]
+    step = 1 # Propagation step
+    delta = 5 # Sphere thickness
+    sphere_radius = [i for i in range(0, 3, step)]
 
     # Start main
+    os.system('clear')
     main()

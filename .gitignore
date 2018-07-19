@@ -5,6 +5,8 @@ output/
 __pycache__/
 
 *gmm_features_*
+*.pyc
+*~
 
 # Curvelet feature output
 curvelet_gmm_*.npy
