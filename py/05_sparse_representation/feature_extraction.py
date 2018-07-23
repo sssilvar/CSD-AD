@@ -9,6 +9,7 @@ import os
 import sys
 import argparse
 from tqdm import tqdm
+from multiprocessing import Pool
 
 try:
     import pyct as ct
@@ -24,23 +25,8 @@ sys.path.append(os.path.join(root))
 from lib.curvelets import clarray_to_gen_gaussian_dict
 from lib.path import get_file_list, mkdir
 
-def main():
-    # Set results folder and csv with subjects
-    output_folder = os.path.join(root, 'output')
-    dataset_csv = os.path.join(root, 'param', 'data_df.csv')
-    
-    # Print some shit (info)
-    print('[  INFO  ] ===== CURVELET FEATURE EXTRACTION ====')
-    print('\t- Data to be processed at: %s' % results_folder)
-    print('\t- Scales: %d: | Angles: %d' % (n_scales, n_angles))
-    print('\t- Output folder: %s' % output_folder)
-
-    # Load dataset and create output folder
-    df = pd.read_csv(dataset_csv)
-    mkdir(output_folder)
-
-    up_to = 203
-    for i, (subject, label) in enumerate(zip(df['folder'][:up_to], df['target'][:up_to])):
+def process_subject(subjects):
+    for i, subject in enumerate(subjects):
         print('Processing subject ' + subject)
         
         # Set filename(s)
@@ -49,7 +35,6 @@ def main():
         # Initialize a feature dictionary per subject
         f_dict = {}
         f_dict['subject'] = subject
-        f_dict['target'] = label
         
         for r in tqdm(sphere_radius, desc='Sphere scale'):
             # Get type of image and sphere params
@@ -77,16 +62,17 @@ def main():
             buff = clarray_to_gen_gaussian_dict(A, f, n_scales, n_angles, r)
             f_dict.update(buff)
 
-        if i is 0:
-            df_features = pd.DataFrame(f_dict, index=[0])
-        else:
-            df_subject = pd.DataFrame(f_dict, index=[0])
-            df_features = df_features.append(df_subject)
+        # if i is 0:
+        #     df_features = pd.DataFrame(f_dict, index=[0])
+        # else:
+        #     df_subject = pd.DataFrame(f_dict, index=[0])
+        #     df_features = df_features.append(df_subject)
+        np.savez_compressed(os.path.join(output_folder, subject + '_curvelets.npz'), **f_dict)
     
-    # Save results
-    filename_features =os.path.join(output_folder, 'spherical_curvelet_features.h5') 
-    df_features.to_hdf(filename_features, key='features', mode='w')
-    os.system('chmod 766 ' + filename_features)
+    # # Save results
+    # filename_features =os.path.join(output_folder, 'spherical_curvelet_features.h5') 
+    # df_features.to_hdf(filename_features, key='features', mode='w')
+    # os.system('chmod 766 ' + filename_features)
 
 
 if __name__ == '__main__':
@@ -118,6 +104,28 @@ if __name__ == '__main__':
     delta = 5 # Sphere thickness
     sphere_radius = [i for i in range(0, 95, step)]
 
+        # Set results folder and csv with subjects
+    output_folder = os.path.join(root, 'output')
+    dataset_csv = os.path.join(root, 'param', 'data_df.csv')
+    
+    # Print some shit (info)
+    print('[  INFO  ] ===== CURVELET FEATURE EXTRACTION ====')
+    print('\t- Data to be processed at: %s' % results_folder)
+    print('\t- Scales: %d: | Angles: %d' % (n_scales, n_angles))
+    print('\t- Output folder: %s' % output_folder)
+
+    # Load dataset and create output folder
+    df = pd.read_csv(dataset_csv)
+    mkdir(output_folder)
+
+    up_to = 2
+    subjects = [df['folder'][:up_to]]
+
     # Start main
-    os.system('clear')
-    main()
+    # os.system('clear')
+    # main()
+
+    pool = Pool(10)
+    pool.map(process_subject, subjects)
+    pool.close()
+    pool.join()
