@@ -19,13 +19,13 @@ echo -e "\n\n[  OK  ] Deleting container"
 DEL_CONT="docker rm "${CONTAINER_NAME}
 eval ${DEL_CONT}
 
-echo -e "\n\n[  OK  ] Deleting image"
-DEL_IMG="docker rmi "${IMG_NAME}
-eval ${DEL_IMG}
+# echo -e "\n\n[  OK  ] Deleting image"
+# DEL_IMG="docker rmi "${IMG_NAME}
+# eval ${DEL_IMG}
 
-echo -e "\n\n[  OK  ] Creating the new image: "${IMG_NAME}
-CRE_IMG="docker build -t "${IMG_NAME}" --build-arg proxy="${PROXY}" "${CURRENT_DIR}
-eval ${CRE_IMG}
+# echo -e "\n\n[  OK  ] Creating the new image: "${IMG_NAME}
+# CRE_IMG="docker build -t "${IMG_NAME}" --build-arg proxy="${PROXY}" "${CURRENT_DIR}
+# eval ${CRE_IMG}
 
 echo -e "\n\n[  OK  ] Running container: "${CONTAINER_NAME}
 CMD="docker run --name "${CONTAINER_NAME}" --rm -ti -v "${DATA_FOLDER}":/root/data/ -v "${SCRIPTS_DIR}":/py "${IMG_NAME}

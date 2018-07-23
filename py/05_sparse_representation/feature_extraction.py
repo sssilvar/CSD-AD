@@ -39,7 +39,7 @@ def main():
     df = pd.read_csv(dataset_csv)
     mkdir(output_folder)
 
-    up_to = 2
+    up_to = 203
     for i, (subject, label) in enumerate(zip(df['folder'][:up_to], df['target'][:up_to])):
         print('Processing subject ' + subject)
         
