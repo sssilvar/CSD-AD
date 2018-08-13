@@ -1,5 +1,5 @@
 # Docker container for Pycurvelab
-FROM python:2
+FROM ubuntu:trusty
 MAINTAINER Santiago Smith <sssilvar@unal.edu.co>
 
 # Set proxy (if necessary) --build-arg
@@ -27,14 +27,14 @@ RUN chmod -R 777 /app
 ADD scripts /root/scripts
 RUN chmod -R 777 /root/scripts
 
-# Install dependencies
-RUN pip install --no-cache-dir -r /root/scripts/requirements.txt
-
 # Install some stuff
-RUN apt-get update && apt-get -y install fftw* swig
+RUN apt-get update && apt-get -y install python2.7 python2-pip fftw* swig
 RUN cd /app/CurveLab-2.1.3 && make
 RUN export FFTW="/usr/local/lib" && export FDCT="/app/CurveLab-2.1.3" &&\
     cd /app/PyCurvelab/ && python setup.py install && python2.7 setup.py install
+
+# Install dependencies
+RUN pip2 install --no-cache-dir -r /root/scripts/requirements.txt
 
 # Define an entrypoint
 ENTRYPOINT ["/root/scripts/entrypoint.sh"]
