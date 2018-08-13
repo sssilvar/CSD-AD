@@ -6,6 +6,12 @@ MAINTAINER Santiago Smith <sssilvar@unal.edu.co>
 ARG proxy
 ENV http_proxy=$proxy
 
+ARG scales
+ENV SCALES=$scales
+
+ARG angles
+ENV ANGLES=$angles
+
 # Prevent dpkg errors
 ENV TERM=xterm-256color
 

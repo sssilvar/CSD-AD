@@ -87,7 +87,7 @@ def main():
             df_features = df_features.append(df_subject)
     
     # Save results
-    filename_features =os.path.join(output_folder, 'spherical_curvelet_features.h5') 
+    filename_features =os.path.join(output_folder, 'spherical_curvelet_features_nscales_%d_nangles_%d.h5' % (n_scales, n_angles)) 
     df_features.to_hdf(filename_features, key='features', mode='w')
     os.system('chmod 766 ' + filename_features)
 
