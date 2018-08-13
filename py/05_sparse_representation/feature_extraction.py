@@ -26,7 +26,6 @@ from lib.path import get_file_list, mkdir
 
 def main():
     # Set results folder and csv with subjects
-    output_folder = os.path.join(root, 'output')
     dataset_csv = os.path.join(root, 'param', 'data_df.csv')
     
     # Print some shit (info)
@@ -87,7 +86,6 @@ def main():
             df_features = df_features.append(df_subject)
     
     # Save results
-    filename_features =os.path.join(output_folder, 'spherical_curvelet_features_nscales_%d_nangles_%d.h5' % (n_scales, n_angles)) 
     df_features.to_hdf(filename_features, key='features', mode='w')
     os.system('chmod 766 ' + filename_features)
 
@@ -115,12 +113,20 @@ if __name__ == '__main__':
     n_angles = args.a
     img_type = args.t
     results_folder = args.f
+    output_folder = os.path.join(root, 'output')
+    
+    filename_features =os.path.join(output_folder, 'spherical_curvelet_features_nscales_%d_nangles_%d.h5' % (n_scales, n_angles))
     # results_folder = '/home/sssilvar/Documents/dataset/results_radial_vid_optimized/'
+
+    os.system('clear')
+    print('======= CURVELET FEATURE EXTRACTION =======')
+    print('\n\t- N. Scales: %d' % n_scales)
+    print('\n\t- N. Angles: %d' % n_angles)
+    print('\n\t- Feats. File: %s' % filename_features)
 
     step = 1 # Propagation step
     delta = 5 # Sphere thickness
     sphere_radius = [i for i in range(0, 95, step)]
 
     # Start main
-    os.system('clear')
     main()
