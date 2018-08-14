@@ -1,5 +1,5 @@
 # Docker container for Pycurvelab
-FROM ubuntu:trusty
+FROM ubuntu:18.04
 MAINTAINER Santiago Smith <sssilvar@unal.edu.co>
 
 # Set proxy (if necessary) --build-arg
