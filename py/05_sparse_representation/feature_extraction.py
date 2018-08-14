@@ -98,9 +98,11 @@ if __name__ == '__main__':
                         default='/user/ssilvari/home/Documents/temp/sphere_mapped')
     parser.add_argument('-s', metavar='--scales',
                         help='Number of scales.',
+                        type=int,
                         default=6)
     parser.add_argument('-a', metavar='--angles',
                         help='Number of angles (subbands) per scale.',
+                        type=int,
                         default=8)
     parser.add_argument('-t', metavar='--type',
                         help='type of image (intensity, gradient)',
