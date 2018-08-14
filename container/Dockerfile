@@ -14,6 +14,7 @@ ENV ANGLES=$angles
 
 # Prevent dpkg errors
 ENV TERM=xterm-256color
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Create data folder and set an ENV var
 RUN mkdir /root/data /py
