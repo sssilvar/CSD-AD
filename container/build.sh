@@ -32,6 +32,6 @@ eval ${DEL_CONT}
 # eval ${CRE_IMG}
 
 echo -e "\n\n[  OK  ] Running container: "${CONTAINER_NAME}
-CMD="docker run --name "${CONTAINER_NAME}" --rm -ti -v "${DATA_FOLDER}":/root/data/ -v "${SCRIPTS_DIR}":/py -e 'SCALES="${SCALES}"' -e 'ANGLES="${ANGLES}"'"${IMG_NAME}
+CMD="docker run --name "${CONTAINER_NAME}" --rm -ti -v "${DATA_FOLDER}":/root/data/ -v "${SCRIPTS_DIR}":/py -e 'SCALES="${SCALES}"' -e 'ANGLES="${ANGLES}"' "${IMG_NAME}
 echo ${CMD}
 eval ${CMD}
