@@ -28,7 +28,7 @@ ADD scripts /root/scripts
 RUN chmod -R 777 /root/scripts
 
 # Install some stuff
-RUN apt-get -y update && apt-get -y install build-essential python2.7 python-pip fftw* swig
+RUN apt-get -y update && apt-get -y install build-essential python2.7 python-pip python2-numpy fftw* swig
 RUN cd /app/CurveLab-2.1.3 && make
 RUN export FFTW="/usr/local/lib" && export FDCT="/app/CurveLab-2.1.3" &&\
     cd /app/PyCurvelab/ && python setup.py install && python2.7 setup.py install
