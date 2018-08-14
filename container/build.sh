@@ -11,7 +11,7 @@ echo -e "PIPELINE INFO:\n\t- N. Scales: "${SCALES}"\n\t- N. Angles: "${ANGLES}
 CONTAINER_NAME="neuro_curvelets_"${SCALES}"_"${ANGLES}
 USER="sssilvar"
 
-IMG_NAME=$USER"/"${CONTAINER_NAME}
+IMG_NAME=$USER"/neuro_curvelets_5_8"
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 SCRIPTS_DIR=${CURRENT_DIR}"/../"
 
