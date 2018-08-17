@@ -1,4 +1,4 @@
-__author__ = "Santiago Smith"
+__author__ = "Santiago Silva"
 __copyright__ = "Copyright 2018"
 __description__ = """
 Curvelet feature extraction. USAGE:
