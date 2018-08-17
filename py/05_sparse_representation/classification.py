@@ -60,7 +60,7 @@ def main():
 
     # Compensate the data with common data
     X = X_scaled
-    
+
     C = cdf[['AGE', 'GENDER', 'APOE4', 'PTEDUCAT', 'CDRSB', 'MMSE']].values
     w = np.linalg.inv(C.T.dot(C)).dot(C.T.dot(X))
     X = X - C.dot(w)
@@ -73,6 +73,7 @@ def main():
         'precision': [],
         'recall': [],
         'f-score': [],
+        ''
     }
     for train_index, test_index in kf.split(X, y=y):
         # Cross validation
