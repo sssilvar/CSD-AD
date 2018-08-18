@@ -4,10 +4,11 @@ SCALES=$2
 ANGLES=$3
 
 # IMAGE INFO
-CONTAINER_NAME="neuro_curvelets"
+TAG="neuro_curvelets"
 USER="sssilvar"
 
-IMG_NAME=$USER"/"${CONTAINER_NAME}
+IMG_NAME=$USER"/"${TAG}
+CONTAINER_NAME=${TAG}"_"${SCALES}"_"${ANGLES}
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 SCRIPTS_DIR=${CURRENT_DIR}"/../"
 
