@@ -39,7 +39,7 @@ def main():
     df = pd.read_csv(dataset_csv)
     mkdir(output_folder)
 
-    up_to = 3
+    up_to = 203
     for i, (subject, label) in enumerate(zip(df['folder'][:up_to], df['target'][:up_to])):
         print('Processing subject ' + subject)
         
@@ -135,7 +135,7 @@ if __name__ == '__main__':
 
     step = 1 # Propagation step
     delta = 5 # Sphere thickness
-    sphere_radius = [i for i in range(0, 10, step)]
+    sphere_radius = [i for i in range(0, 95, step)]
 
     # Start main
     main()
