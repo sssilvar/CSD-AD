@@ -87,7 +87,8 @@ def main():
         np.savez_compressed(subject_feats_file, **f_dict)
     
         # Give permissions
-        os.system('chmod -766 ' + subject_feats_file)
+        os.system('chmod 766 ' + subject_feats_file)
+    os.system('chmod -R 766 ' + output_subfolder)
 
 
 if __name__ == '__main__':
@@ -130,11 +131,11 @@ if __name__ == '__main__':
     print('======= CURVELET FEATURE EXTRACTION =======')
     print('\n\t- N. Scales: %d' % n_scales)
     print('\n\t- N. Angles: %d' % n_angles)
-    print('\n\t- Feats. File: %s' % filename_features)
+    print('\n\t- Feats. Folder: %s' % output_subfolder)
 
     step = 1 # Propagation step
     delta = 5 # Sphere thickness
-    sphere_radius = [i for i in range(0, 95, step)]
+    sphere_radius = [i for i in range(0, 10, step)]
 
     # Start main
     main()
