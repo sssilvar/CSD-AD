@@ -9,6 +9,7 @@ import os
 import sys
 import argparse
 from tqdm import tqdm
+from os.path import join, dirname, realpath
 
 try:
     import pyct as ct
@@ -18,15 +19,15 @@ except ImportError as e:
 import numpy as np
 import pandas as pd
 
-root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-sys.path.append(os.path.join(root))
+root = dirname(dirname(dirname(realpath(__file__))))
+sys.path.append(join(root))
 
 from lib.curvelets import clarray_to_gen_gaussian_dict
 from lib.path import get_file_list, mkdir
 
 def main():
     # Set results folder and csv with subjects
-    dataset_csv = os.path.join(root, 'param', 'data_df.csv')
+    dataset_csv = join(root, 'param', 'data_df.csv')
     
     # Print some shit (info)
     print('[  INFO  ] ===== CURVELET FEATURE EXTRACTION ====')
@@ -38,21 +39,23 @@ def main():
     df = pd.read_csv(dataset_csv)
     mkdir(output_folder)
 
-    up_to = 203
+    up_to = 3
     for i, (subject, label) in enumerate(zip(df['folder'][:up_to], df['target'][:up_to])):
         print('Processing subject ' + subject)
         
         # Set filename(s)
-        raw_folder = os.path.join(results_folder, subject, 'raw')
+        raw_folder = join(results_folder, subject, 'raw')
         
         # Initialize a feature dictionary per subject
         f_dict = {}
         f_dict['subject'] = subject
         f_dict['target'] = label
+        f_dict['n_scales'] = n_scales
+        f_dict['n_angles'] = n_angles
         
         for r in tqdm(sphere_radius, desc='Sphere scale'):
             # Get type of image and sphere params
-            raw_file = os.path.join(
+            raw_file = join(
                 raw_folder,
                 '%s_%03d_to_%03d_solid_angle_to_sphere.raw' % (
                     img_type, r, (r + delta)
@@ -79,15 +82,12 @@ def main():
             buff = clarray_to_gen_gaussian_dict(A, f, n_scales, n_angles, r)
             f_dict.update(buff)
 
-        if i is 0:
-            df_features = pd.DataFrame(f_dict, index=[0])
-        else:
-            df_subject = pd.DataFrame(f_dict, index=[0])
-            df_features = df_features.append(df_subject)
+        # Save subject results
+        subject_feats_file = join(output_subfolder, '%s.npz' % subject)
+        np.savez_compressed(subject_feats_file, **f_dict)
     
-    # Save results
-    df_features.to_hdf(filename_features, key='features', mode='w')
-    os.system('chmod 766 ' + filename_features)
+        # Give permissions
+        os.system('chmod -766 ' + subject_feats_file)
 
 
 if __name__ == '__main__':
@@ -115,9 +115,15 @@ if __name__ == '__main__':
     n_angles = args.a
     img_type = args.t
     results_folder = args.f
-    output_folder = os.path.join(root, 'output')
+    output_folder = join(root, 'output')
+    output_subfolder = join(output_folder, 'curv_feats_%s_nscales_%d_nangles_%d' % (img_type, n_scales, n_angles))
     
-    filename_features =os.path.join(output_folder, 'spherical_curvelet_features_nscales_%d_nangles_%d.h5' % (n_scales, n_angles))
+    try:
+        os.mkdir(output_subfolder)
+    except FileExistsError:
+        pass
+    
+    filename_features =join(output_folder, 'spherical_curvelet_features_nscales_%d_nangles_%d.h5' % (n_scales, n_angles))
     # results_folder = '/home/sssilvar/Documents/dataset/results_radial_vid_optimized/'
 
     os.system('clear')
