@@ -121,7 +121,7 @@ if __name__ == '__main__':
     
     try:
         os.mkdir(output_subfolder)
-    except FileExistsError:
+    except IOError:
         pass
     
     filename_features =join(output_folder, 'spherical_curvelet_features_nscales_%d_nangles_%d.h5' % (n_scales, n_angles))
