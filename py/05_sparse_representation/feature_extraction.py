@@ -87,8 +87,8 @@ def main():
         np.savez_compressed(subject_feats_file, **f_dict)
     
         # Give permissions
-        os.system('chmod 766 ' + subject_feats_file)
-    os.system('chmod -R 766 ' + output_subfolder)
+        os.system('chmod 777 ' + subject_feats_file)
+    os.system('chmod -R 777 ' + output_subfolder)
 
 
 if __name__ == '__main__':
