@@ -68,14 +68,15 @@ def main():
                 print('No file found: ' + raw_file)
             
             # Get a Curvelet decomposition
-            A = ct.fdct2(
-                img.shape, 
-                nbs=n_scales, 
-                nba=n_angles, 
-                ac=True, 
-                norm=False, 
-                vec=True, 
-                cpx=False)
+            if i is 0:
+                A = ct.fdct2(
+                    img.shape, 
+                    nbs=n_scales, 
+                    nba=n_angles, 
+                    ac=True, 
+                    norm=False, 
+                    vec=True, 
+                    cpx=False)
             f = A.fwd(img)
 
             # Convert data to dict
