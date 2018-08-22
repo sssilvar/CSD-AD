@@ -6,26 +6,20 @@ Curvelet feature extraction. USAGE:
 """
 
 import os
-import gc
 import sys
 import argparse
-from tqdm import tqdm
 from os.path import join, dirname, realpath
 
-try:
-    import pyct as ct
-except ImportError as e:
-    print('[  ERROR  ] {}'.format(e))
+import warnings
+warnings.filterwarnings("ignore", message="numpy.dtype size changed")
 
-import numpy as np
 import pandas as pd
 
 current_dir = dirname(realpath(__file__))
 root = dirname(dirname(dirname(realpath(__file__))))
 sys.path.append(join(root))
 
-from lib.curvelets import clarray_to_gen_gaussian_dict
-from lib.path import get_file_list, mkdir
+from lib.path import mkdir
 
 
 def main():

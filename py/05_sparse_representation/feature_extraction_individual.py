@@ -12,6 +12,9 @@ import argparse
 from tqdm import tqdm
 from os.path import join, dirname, realpath
 
+import warnings
+warnings.filterwarnings("ignore", message="numpy.dtype size changed")
+
 try:
     import pyct as ct
 except ImportError as e:
