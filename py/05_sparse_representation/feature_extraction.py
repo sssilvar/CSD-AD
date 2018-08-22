@@ -12,6 +12,10 @@ import argparse
 from tqdm import tqdm
 from os.path import join, dirname, realpath
 
+import resource
+soft, hard = resource.getrlimit(rsrc)
+resource.setrlimit(rsrc, (2.5e9, hard)) #limit to one kilobyte
+
 try:
     import pyct as ct
 except ImportError as e:
@@ -44,7 +48,6 @@ def main():
     up_to = 203
     for i, (subject, label) in enumerate(zip(df['folder'][:up_to], df['target'][:up_to])):
         print('Processing subject ' + subject)
-        gc.collect()
 
         # Create Curvelet object for 360x180 px
         A = ct.fdct2(
@@ -86,13 +89,16 @@ def main():
 
             # Convert data to dict
             buff = clarray_to_gen_gaussian_dict(A, f, n_scales, n_angles, r)
-            # f_dict.update(buff)
+            f_dict.update(buff)
             del buff, f, img
 
         # Save subject results
         subject_feats_file = join(output_subfolder, '%s.npz' % subject)
         np.savez_compressed(subject_feats_file, **f_dict)
         del f_dict, A
+
+        # Set RAM Free
+        gc.collect()
     
         # Give permissions
         os.system('chmod 777 ' + subject_feats_file)
