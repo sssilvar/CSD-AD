@@ -131,7 +131,7 @@ if __name__ == '__main__':
     output_folder = join(root, 'output')
     output_subfolder = join(output_folder, 'curv_feats_%s_nscales_%d_nangles_%d' % (img_type, n_scales, n_angles))
     os.system('pip install --upgrade pip')
-    os.system('pip install scipy')
+    os.system('pip -U install scipy')
     
     try:
         os.mkdir(output_subfolder)
