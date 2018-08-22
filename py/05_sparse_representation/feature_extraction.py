@@ -82,7 +82,7 @@ def main():
                 print('No file found: ' + raw_file)
             
             # Get a Curvelet decomposition
-            # f = A.fwd(img)
+            f = A.fwd(img)
             os.system('ps -ef')
 
             # Convert data to dict
