@@ -87,7 +87,7 @@ def main():
             # Convert data to dict
             # buff = clarray_to_gen_gaussian_dict(A, f, n_scales, n_angles, r)
             # f_dict.update(buff)
-            del buff, f, img
+            # del buff, f, img
             
             # Set RAM Free
             gc.collect()
