@@ -82,7 +82,7 @@ def main():
                 print('No file found: ' + raw_file)
             
             # Get a Curvelet decomposition
-            f = A.fwd(img)
+            # f = A.fwd(img)
 
             # Convert data to dict
             # buff = clarray_to_gen_gaussian_dict(A, f, n_scales, n_angles, r)
