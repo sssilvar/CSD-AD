@@ -13,6 +13,7 @@ from tqdm import tqdm
 from os.path import join, dirname, realpath
 
 import resource
+rsrc = resource.RLIMIT_DATA
 soft, hard = resource.getrlimit(rsrc)
 resource.setrlimit(rsrc, (2.5e9, hard)) #limit to one kilobyte
 
