@@ -91,7 +91,7 @@ def main():
 
         # Save subject results
         subject_feats_file = join(output_subfolder, '%s.npz' % subject)
-        np.savez_compressed(subject_feats_file, **f_dict)
+        # np.savez_compressed(subject_feats_file, **f_dict)
         del f_dict, A
 
         # Set RAM Free
