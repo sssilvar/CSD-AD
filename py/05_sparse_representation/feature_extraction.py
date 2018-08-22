@@ -63,7 +63,8 @@ def main():
         f_dict['n_scales'] = n_scales
         f_dict['n_angles'] = n_angles
         
-        for r in tqdm(sphere_radius, desc='Sphere scale'):
+        # for r in tqdm(sphere_radius, desc='Sphere scale'):
+        for r in sphere_radius:
             # Get type of image and sphere params
             raw_file = join(
                 raw_folder,
