@@ -16,6 +16,6 @@ echo -e "PIPELINE INFO:\n\t- N. Scales: "${SCALES}"\n\t- N. Angles: "${ANGLES}
 
 # RUN CONTAINER
 echo -e "\n\n[  OK  ] Running container: "${CONTAINER_NAME}
-CMD="docker run --name "${CONTAINER_NAME}" --rm -ti -v "${DATA_FOLDER}":/root/data/ -v "${SCRIPTS_DIR}":/py -e 'SCALES="${SCALES}"' -e 'ANGLES="${ANGLES}"' -m 400m "${IMG_NAME}
+CMD="docker run --name "${CONTAINER_NAME}" --rm -ti -v "${DATA_FOLDER}":/root/data/ -v "${SCRIPTS_DIR}":/py -e 'SCALES="${SCALES}"' -e 'ANGLES="${ANGLES}"' -m 400m --memory-swap 10m "${IMG_NAME}
 echo ${CMD}
 eval ${CMD}
