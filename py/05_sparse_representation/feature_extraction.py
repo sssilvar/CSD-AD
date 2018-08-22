@@ -85,17 +85,17 @@ def main():
             f = A.fwd(img)
 
             # Convert data to dict
-            buff = clarray_to_gen_gaussian_dict(A, f, n_scales, n_angles, r)
-            f_dict.update(buff)
+            # buff = clarray_to_gen_gaussian_dict(A, f, n_scales, n_angles, r)
+            # f_dict.update(buff)
             del buff, f, img
+            
+            # Set RAM Free
+            gc.collect()
 
         # Save subject results
         subject_feats_file = join(output_subfolder, '%s.npz' % subject)
         # np.savez_compressed(subject_feats_file, **f_dict)
         del f_dict
-
-        # Set RAM Free
-        gc.collect()
     
         # Give permissions
         os.system('chmod 777 ' + subject_feats_file)
