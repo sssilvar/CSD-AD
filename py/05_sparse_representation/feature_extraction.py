@@ -12,11 +12,6 @@ import argparse
 from tqdm import tqdm
 from os.path import join, dirname, realpath
 
-import resource
-rsrc = resource.RLIMIT_DATA
-soft, hard = resource.getrlimit(rsrc)
-resource.setrlimit(rsrc, (2.5e8, hard)) #limit to one kilobyte
-
 try:
     import pyct as ct
 except ImportError as e:
@@ -30,6 +25,7 @@ sys.path.append(join(root))
 
 from lib.curvelets import clarray_to_gen_gaussian_dict
 from lib.path import get_file_list, mkdir
+
 
 def main():
     # Set results folder and csv with subjects
