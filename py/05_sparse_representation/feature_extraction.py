@@ -85,6 +85,7 @@ def main():
         # Save subject results
         subject_feats_file = join(output_subfolder, '%s.npz' % subject)
         np.savez_compressed(subject_feats_file, **f_dict)
+        del f_dict
     
         # Give permissions
         os.system('chmod 777 ' + subject_feats_file)
@@ -135,7 +136,7 @@ if __name__ == '__main__':
 
     step = 1 # Propagation step
     delta = 5 # Sphere thickness
-    sphere_radius = [i for i in range(0, 95, step)]
+    sphere_radius = [i for i in range(0, 3, step)]
 
     # Start main
     main()
