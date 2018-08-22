@@ -96,5 +96,6 @@ def clarray_to_gen_gaussian_dict(A, f, scales, n_angles, r):
             curve_data['%d_%d_%d_mean' % (r, scale, angle)] = mean_est
             curve_data['%d_%d_%d_var' % (r, scale, angle)] = var_est
 
+    del A, f
     # Return data converted to dictionary
     return curve_data
