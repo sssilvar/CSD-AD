@@ -6,6 +6,7 @@ Curvelet feature extraction. USAGE:
 """
 
 import os
+import gc
 import sys
 import argparse
 from tqdm import tqdm
@@ -43,8 +44,7 @@ def main():
     up_to = 203
     for i, (subject, label) in enumerate(zip(df['folder'][:up_to], df['target'][:up_to])):
         print('Processing subject ' + subject)
-        for var, obj in locals().items():
-            print(var, sys.getsizeof(obj))
+        gc.collect()
 
         # Create Curvelet object for 360x180 px
         A = ct.fdct2(
