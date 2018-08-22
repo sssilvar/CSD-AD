@@ -41,20 +41,20 @@ def main():
     df = pd.read_csv(dataset_csv)
     mkdir(output_folder)
 
+    # Create Curvelet object for 360x180 px
+    A = ct.fdct2(
+        (360,180), 
+        nbs=n_scales, 
+        nba=n_angles, 
+        ac=True, 
+        norm=False, 
+        vec=True, 
+        cpx=False)
+
 
     up_to = 203
     for i, (subject, label) in enumerate(zip(df['folder'][:up_to], df['target'][:up_to])):
         print('Processing subject ' + subject)
-
-        # Create Curvelet object for 360x180 px
-        A = ct.fdct2(
-            (360,180), 
-            nbs=n_scales, 
-            nba=n_angles, 
-            ac=True, 
-            norm=False, 
-            vec=True, 
-            cpx=False)
         
         # Set filename(s)
         raw_folder = join(results_folder, subject, 'raw')
@@ -92,7 +92,7 @@ def main():
         # Save subject results
         subject_feats_file = join(output_subfolder, '%s.npz' % subject)
         # np.savez_compressed(subject_feats_file, **f_dict)
-        del f_dict, A
+        del f_dict
 
         # Set RAM Free
         gc.collect()
