@@ -86,9 +86,5 @@ if __name__ == '__main__':
     print('\n\t- N. Angles: %d' % n_angles)
     print('\n\t- Feats. Folder: %s' % output_subfolder)
 
-    step = 1 # Propagation step
-    delta = 5 # Sphere thickness
-    sphere_radius = [i for i in range(0, 95, step)]
-
     # Start main
     main()

@@ -133,7 +133,7 @@ if __name__ == '__main__':
 
     step = 1 # Propagation step
     delta = 5 # Sphere thickness
-    sphere_radius = [i for i in range(0, 5, step)]
+    sphere_radius = [i for i in range(0, 95, step)]
 
     # Start main
     main()
