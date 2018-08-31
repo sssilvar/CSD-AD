@@ -20,7 +20,7 @@ if __name__ == '__main__':
             folder = join(out_folder, 'curv_feats_%s_nscales_%d_nangles_%d' % (img_type, scale, angle))
             if os.path.exists(folder):
                 # Get *npy files
-                npz_files = [npf for npf in glob(folder) if npf.endswidth('.npz')]
+                npz_files = [npf for npf in glob(join(folder, '*.npz'))]
                 print(npz_files)
                 print('Number of subjects found: %d' % len(npz_files))
             else:
