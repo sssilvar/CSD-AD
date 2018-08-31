@@ -23,7 +23,7 @@ if __name__ == '__main__':
                 npz_files = [npf for npf in glob(join(folder, '*.npz'))]
                 
                 # === Create DataFrame from all the NPZ present in the folder ====
-                for i, npz_file in enumerate(npz_files):
+                for i, npz_file in enumerate(npz_files[:3]):
                     subject = dict(np.load(npz_file))
                     subject_id = basename(npz_file[:-4])
                     subject_series = pd.Series(subject, name=subject_id)
@@ -34,5 +34,11 @@ if __name__ == '__main__':
                         df = subject_series.to_frame().transpose()
                     else:
                         df = df.append(subject_series)
+                
+                # Save DataFrame in the same folder
+                df.to_hdf(join(folder, 'curv_feats_%s_nscales_%d_nangles_%d.h5' % (img_type, scale, angle)),
+                          key='features',
+                          table=True, 
+                          mode='w')
             else:
                 print('[  ERROR  ] Folder not found')
