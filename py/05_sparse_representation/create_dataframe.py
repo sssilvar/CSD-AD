@@ -21,7 +21,6 @@ if __name__ == '__main__':
             if os.path.exists(folder):
                 # Get *npy files
                 npz_files = [npf for npf in glob(join(folder, '*.npz'))]
-                print(npz_files)
                 print('Number of subjects found: %d' % len(npz_files))
             else:
                 print('[  ERROR  ] Folder not found')
