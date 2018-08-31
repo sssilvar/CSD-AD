@@ -25,10 +25,14 @@ if __name__ == '__main__':
                 # === Create DataFrame from all the NPZ present in the folder ====
                 for i, npz_file in enumerate(npz_files):
                     subject = np.load(npz_file)
-                    print(basename(npz_file[:-4]))
+                    subject_id = basename(npz_file[:-4])
+                    subject_series = pd.Series(subject, name=subject_id)
                     
                     # Initialize dataframe if necessary
-                    # if i == 0:
-                    #     df = pd.DataFrame
+                    print('[  INFO  ] Adding subject: %s' % subject_id)
+                    if i == 0:
+                        df = subject_series.to_frame().transpose()
+                    else:
+                        df = df.append(subject_series)
             else:
                 print('[  ERROR  ] Folder not found')
