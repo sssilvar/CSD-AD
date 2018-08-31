@@ -1,4 +1,5 @@
 import os
+from glob import glob
 from os.path import join, dirname, realpath
 
 import numpy as np
@@ -14,10 +15,13 @@ if __name__ == '__main__':
     img_type = 'gradient'  # Or 'intensity
 
     for scale in scales:
-        print('[  OK  ] Processing scale %d' % scale)
+        print('\n[  OK  ] Processing scale %d' % scale)
         for angle in angles:
             folder = join(out_folder, 'curv_feats_%s_nscales_%d_nangles_%d' % (img_type, scale, angle))
             if os.path.exists(folder):
-                print(folder)
+                # Get *npy files
+                npz_files = [npf for npf in glob(folder) if npf.endswidth('.npz')]
+                print(npz_files)
+                print('Number of subjects found: %d' % len(npz_files))
             else:
                 print('[  ERROR  ] Folder not found')
