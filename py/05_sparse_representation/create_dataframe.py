@@ -24,7 +24,7 @@ if __name__ == '__main__':
                 
                 # === Create DataFrame from all the NPZ present in the folder ====
                 for i, npz_file in enumerate(npz_files):
-                    subject = np.load(npz_file)
+                    subject = dict(np.load(npz_file))
                     subject_id = basename(npz_file[:-4])
                     subject_series = pd.Series(subject, name=subject_id)
                     
