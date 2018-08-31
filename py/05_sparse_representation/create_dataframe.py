@@ -14,6 +14,7 @@ if __name__ == '__main__':
     img_type = 'gradient'  # Or 'intensity
 
     for scale in scales:
+        print('[  OK  ] Processing scale %d' % scale)
         for angle in angles:
             folder = join(out_folder, 'curv_feats_%s_nscales_%d_nangles_%d' % (img_type, scale, angle))
             if os.path.exists(folder):
