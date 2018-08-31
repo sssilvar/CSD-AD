@@ -15,15 +15,15 @@ if __name__ == '__main__':
     img_type = 'gradient'  # Or 'intensity
 
     for scale in scales:
-        print('\n[  OK  ] Processing scale %d' % scale)
         for angle in angles:
+            print('\n[  OK  ] Processing scale %d | angle: %d' % scale, angle)
             folder = join(out_folder, 'curv_feats_%s_nscales_%d_nangles_%d' % (img_type, scale, angle))
             if os.path.exists(folder):
                 # Get *npy files
                 npz_files = [npf for npf in glob(join(folder, '*.npz'))]
                 
                 # === Create DataFrame from all the NPZ present in the folder ====
-                for i, npz_file in enumerate(npz_files[:3]):
+                for i, npz_file in enumerate(npz_files):
                     subject = dict(np.load(npz_file))
                     subject_id = basename(npz_file[:-4])
                     subject_series = pd.Series(subject, name=subject_id)
