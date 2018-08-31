@@ -1,6 +1,6 @@
 import os
 from glob import glob
-from os.path import join, dirname, realpath
+from os.path import join, dirname, realpath, basename
 
 import numpy as np
 import pandas as pd
@@ -23,8 +23,12 @@ if __name__ == '__main__':
                 npz_files = [npf for npf in glob(join(folder, '*.npz'))]
                 
                 # === Create DataFrame from all the NPZ present in the folder ====
-                for npz_file in npz_files:
+                for i, npz_file in enumerate(npz_files):
                     subject = np.load(npz_file)
-                    print(subject.keys())
+                    print(basename(npz_file[:-4]))
+                    
+                    # Initialize dataframe if necessary
+                    # if i == 0:
+                    #     df = pd.DataFrame
             else:
                 print('[  ERROR  ] Folder not found')
