@@ -128,8 +128,6 @@ if __name__ == '__main__':
         os.mkdir(output_subfolder)
     except OSError:
         pass
-    
-    filename_features = join(output_folder, 'spherical_curvelet_features_nscales_%d_nangles_%d.h5' % (n_scales, n_angles))
 
     step = 1 # Propagation step
     delta = 5 # Sphere thickness
