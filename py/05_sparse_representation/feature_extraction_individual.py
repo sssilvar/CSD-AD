@@ -71,6 +71,7 @@ def main():
         
         # Get a Curvelet decomposition
         f = A.fwd(img)
+        print(f.shape)
 
         # Convert data to dict
         buff = clarray_to_gen_gaussian_dict(A, f, n_scales, n_angles, r)

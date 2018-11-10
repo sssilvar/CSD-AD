@@ -24,7 +24,7 @@ if __name__ == '__main__':
     
     # Set the file and read it
     # data_csv = '/disk/conversion/features/curvelets/curvelet_gmm_3_comp.csv'
-    data_csv = '/disk/Datasets/ADNI/screening_aseg/ADNI/wmh_voxels.csv'
+    data_csv = '~/Downloads/wmh_voxels_corrected.csv'
 
     # df = pd.read_csv(data_csv, index_col='sid') # For gmm_X_comp.csv
     # df = pd.read_csv(data_csv, index_col='subject_id')
@@ -103,7 +103,7 @@ if __name__ == '__main__':
     cols = ['PC%d' % (c + 1) for c in range(X_ld.shape[1])]
     X_ld = pd.DataFrame(data=X_ld, columns=cols, index=df.index)
     X_ld['label'] = df['label']
-    X_ld = X_ld[X_ld['label'] != 'NA']
+    X_ld = X_ld[(X_ld['label'] == 'MCIc') | (X_ld['label'] == 'MCInc')]
     print(X_ld.shape)
     print(X_ld['label'].value_counts())
 

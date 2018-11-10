@@ -72,9 +72,9 @@ def main():
         'accuracy': [],
         'precision': [],
         'recall': [],
-        'f-score': [],
-        ''
-    }
+        'f-score': []
+        }
+
     for train_index, test_index in kf.split(X, y=y):
         # Cross validation
         X_train, X_test = X[train_index], X[test_index]

@@ -1,4 +1,5 @@
 import os
+import sys
 from os.path import join, dirname, realpath
 
 import numpy as np
@@ -14,14 +15,15 @@ if __name__ == '__main__':
     # Set groupfile (subjects to process)
     # group_file = '/disk/Datasets/ADNI/screening_aseg/ADNI/groupfile.csv'
     # group_file = '/disk/fs_conversion/groupfile.csv'
-    group_file = '/disk/Datasets/OASIS/oasis_extracted/groupfile.csv'
+    # group_file = '/disk/Datasets/OASIS/oasis_extracted/groupfile.csv'
+    group_file = sys.argv[1]
     dataset_folder = dirname(group_file)
 
     df_group = pd.read_csv(group_file, index_col=0)
     lut = pd.read_csv(join(root, 'param/FreeSurferColorLUT.csv'), index_col='region_id')
 
     # Create a dataframe
-    rois = [77, 78, 79, 10, 11, 12, 13, 17, 18, 26, 49, 50, 51, 52, 53, 54, 58]
+    rois = [77, 78, 79, 10, 11, 12, 13, 17, 18, 26, 49, 50, 51, 52, 53, 54, 58] + [i for i in range(1000,1036)] + [i for i in range(2000,2036)] + [i for i in range(3000,3036)] + [i for i in range(4000,4036)]
     cols = lut.loc[rois, 'label_name'].tolist()
     df = pd.DataFrame(columns=cols)
     
