@@ -31,11 +31,11 @@ if __name__ == '__main__':
     for subject in df_group.index:
         # Load image
         mgz = join(dataset_folder, subject)
-        # mgz = join(mgz, 'FreeSurfer_Cross-Sectional_Processing_aparc+aseg')
-        # mgz = join(mgz, next(os.walk(mgz))[1][0])
-        # mgz = join(mgz, next(os.walk(mgz))[1][0])
-        # mgz = join(mgz, 'mri/aparc+aseg.mgz')
-        mgz = join(mgz, 'mri/aseg.mgz')
+        mgz = join(mgz, 'FreeSurfer_Cross-Sectional_Processing_aparc+aseg')
+        mgz = join(mgz, next(os.walk(mgz))[1][0])
+        mgz = join(mgz, next(os.walk(mgz))[1][0])
+        mgz = join(mgz, 'mri/aparc+aseg.mgz')
+        # mgz = join(mgz, 'mri/aseg.mgz')
         print('[  INFO  ] Processing: %s' % mgz)
 
         img = nb.load(mgz).get_data()
