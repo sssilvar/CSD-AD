@@ -1,5 +1,6 @@
 # Ignore Virtual environment
 .idea/
+.vscode/
 venv/
 output/
 __pycache__/
