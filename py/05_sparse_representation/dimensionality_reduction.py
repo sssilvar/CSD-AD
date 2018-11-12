@@ -24,12 +24,18 @@ if __name__ == '__main__':
     # data_file = '/home/ssilvari/Documents/results/sphere_mapped_curvelet_features/curv_feats_gradient_nscales_5_nangles_8/curv_feats_gradient_nscales_5_nangles_8.h5'
     data_file = sys.argv[1]
     print('[  INFO  ] Loading file (%s)...' % data_file)
-    df = pd.read_hdf(data_file, key='features', mode='r', index_col=0, low_memory=False)
-    df = df.drop(['target', 'n_scales', 'n_angles', 'subject'], axis=1)
+    if data_file.endswith('.h5'):
+        df = pd.read_hdf(data_file, key='features', mode='r', index_col=0, low_memory=False)
+    else:
+        df = pd.read_csv(data_file, index_col=0)
+    
+    # Remove useless columns
+    try:
+        df = df.drop(['target', 'n_scales', 'n_angles', 'subject'], axis=1)
+    except Exception as e:
+        pass
     df.fillna(0)
     print(df.head())
-
-    X = df.values
     
     # Load progressions from MCI to Dementia (MCIc)
     print('[  INFO  ] Loading confounders...')
@@ -43,6 +49,19 @@ if __name__ == '__main__':
     Y['PTGENDER'] = Y['PTGENDER'].astype('category').cat.codes
     Y['AGE2'] = Y['AGE'] ** 2
     Y = Y.fillna(Y.mean())
+    
+    # Load Intra Cranial Volume (ICV)
+    icv = df_prog.loc[df.index, 'ICV']
+    icv = icv.fillna(icv.mean())
+    
+    # Normalize volumes by ICV (if file contains volumes)
+    if 'vol' in data_file or 'wmh' in data_file:
+        print('[  INFO  ] Normalizing by ICV...')
+        df = df.divide(icv, axis=0)
+        print(df.head())
+    
+    # Create a numpy array
+    X = df.values
 
     # Substract effect of confounders
     print('[  INFO  ] Substracting confounders effect...')
@@ -75,6 +94,9 @@ if __name__ == '__main__':
         else:
             labels[i] = 'NA'
     df_pca['label'] = labels
+
+    # Filter data to plot
+    df_pca = df_pca[(df_pca['label'] == 'MCIc') | (df_pca['label'] == 'MCInc')]
     
     # Plot results
     print('[  INFO  ] Plotting results...')
