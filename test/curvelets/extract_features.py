@@ -1,4 +1,5 @@
 import os
+import sys
 from os.path import join, dirname, realpath
 
 import pandas as pd
@@ -7,6 +8,7 @@ current_dir = dirname(realpath(__file__))
 
 if __name__ == "__main__":
     # Define some parameters
+    # group_file = '/disk/FreeSurferSD/groupfile.csv'
     group_file = '/disk/FreeSurferSD/groupfile.csv'
     subjects_dir = dirname(group_file)
     out_folder = '/disk/curvelet_rois'

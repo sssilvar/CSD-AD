@@ -66,7 +66,7 @@ if __name__ == '__main__':
     # Substract effect of confounders
     print('[  INFO  ] Substracting confounders effect...')
     W = np.linalg.inv(Y.T.dot(Y)).dot(Y.T.dot(X))    
-    X = X - Y.dot(W)
+    X = np.nan_to_num(X - Y.dot(W))
 
     # Create a pipeline
     pipeline = Pipeline([
