@@ -130,9 +130,9 @@ if __name__ == '__main__':
     except OSError:
         pass
 
-    step = 1 # Propagation step
-    delta = 5 # Sphere thickness
-    sphere_radius = [i for i in range(0, 95, step)]
+    step = 25 # Propagation step
+    delta = 25 # Sphere thickness
+    sphere_radius = [i for i in range(0, 100, step)]
 
     # Start main
     main()
