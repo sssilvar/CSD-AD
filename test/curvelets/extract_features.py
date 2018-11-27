@@ -27,8 +27,19 @@ if __name__ == "__main__":
 
         # Create command
         script = join(current_dir, 'curvelet_decomposition.py')
-        vol = join(subjects_dir, subject, 'mri/brainmask.mgz')
-        aseg = join(subjects_dir, subject, 'mri/aparc+aseg.mgz')
+        
+        # # Load Brainmask + segmentation
+        # vol = join(subjects_dir, subject, 'mri/brainmask.mgz')
+        # aseg = join(subjects_dir, subject, 'mri/aparc+aseg.mgz')
+
+        # Load just ROI (Fully shape analysis)
+        mgz = join(subjects_dir, subject)
+        mgz = join(mgz, 'FreeSurfer_Cross-Sectional_Processing_aparc+aseg')
+        mgz = join(mgz, next(os.walk(mgz))[1][0])
+        mgz = join(mgz, next(os.walk(mgz))[1][0])
+        mgz = join(mgz, 'mri/aparc+aseg.mgz')
+        vol = mgz
+        aseg = mgz
         
         cmd = '%s -sid %s -vol %s -aseg %s -out %s -scales %d -angles %d -rois %s' % (script, subject, vol, aseg, out_folder, n_scales, n_angles, rois_str)
         print(cmd)
