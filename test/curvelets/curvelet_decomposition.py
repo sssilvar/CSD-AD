@@ -50,7 +50,8 @@ def parse_args():
 def extract_cubic_roi(vol, aseg, visualize=False):
     # Extract ROI
     roi_mask = (aseg.get_data() == roi).astype(np.int)
-    if np.any(roi_mask):
+    if np.sum(roi_mask) > 9:
+        "If ROI contains more than 9 voxels"
         roi_vol = vol.get_data() * roi_mask
 
         # Reduce dimensionality to ROI
