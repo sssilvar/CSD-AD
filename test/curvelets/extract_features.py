@@ -20,7 +20,7 @@ if __name__ == "__main__":
     df = pd.read_csv(group_file, index_col=0)
     
     n_scales = 4
-    n_angles = 4
+    n_angles = 16
     rois = [77, 78, 79, 10, 11, 12, 13, 17, 18, 26, 49, 50, 51, 52, 53, 54, 58] + [4, 14, 15, 28, 43, 60, 72] + [i for i in range(1000,1036)] + [i for i in range(2000,2036)] # + [i for i in range(3000,3036)] + [i for i in range(4000,4036)]
     rois_str = " ".join(map(str, rois))
 
