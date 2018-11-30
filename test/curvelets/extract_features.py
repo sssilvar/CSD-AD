@@ -13,6 +13,9 @@ if __name__ == "__main__":
     subjects_dir = dirname(group_file)
     out_folder = sys.argv[2]
 
+    print(group_file)
+    print(out_folder)
+
     # Load dataset
     df = pd.read_csv(group_file, index_col=0)
     
