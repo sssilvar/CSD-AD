@@ -9,9 +9,9 @@ current_dir = dirname(realpath(__file__))
 if __name__ == "__main__":
     # Define some parameters
     # group_file = '/disk/FreeSurferSD/groupfile.csv'
-    group_file = '/disk/FreeSurferSD/groupfile.csv'
+    group_file = sys.argv[1]
     subjects_dir = dirname(group_file)
-    out_folder = '/disk/curvelet_rois'
+    out_folder = sys.argv[2]
 
     # Load dataset
     df = pd.read_csv(group_file, index_col=0)
