@@ -159,6 +159,7 @@ if __name__ == "__main__":
         feats = curvelet_decomposition(roi_img, n_scales=args.scales, n_angles=args.angles)
         feats.name = args.sid
         feats['ROI'] = roi
+        feats['vol'] = roi_vol
         df = df.append(feats)
 
     df['ROI'] = df['ROI'].astype('int')  # Cast ROI to int
