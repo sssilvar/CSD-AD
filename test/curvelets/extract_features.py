@@ -37,9 +37,9 @@ if __name__ == "__main__":
 
         # Load just ROI (Fully shape analysis)
         mgz = join(subjects_dir, subject)
-        mgz = join(mgz, 'FreeSurfer_Cross-Sectional_Processing_aparc+aseg')
-        mgz = join(mgz, next(os.walk(mgz))[1][0])
-        mgz = join(mgz, next(os.walk(mgz))[1][0])
+        # mgz = join(mgz, 'FreeSurfer_Cross-Sectional_Processing_aparc+aseg')
+        # mgz = join(mgz, next(os.walk(mgz))[1][0])
+        # mgz = join(mgz, next(os.walk(mgz))[1][0])
         mgz = join(mgz, 'mri/aparc+aseg.mgz')
         vol = mgz
         aseg = mgz
