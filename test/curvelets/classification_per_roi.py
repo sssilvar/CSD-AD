@@ -83,7 +83,7 @@ def get_features_and_labels(df):
 if __name__ == "__main__":
     os.system('clear')
     # Load dataset
-    data_file = '/home/ssilvari/Documents/temp/curvelet_rois/curvelet_features_rois_4_scales_4_angles.csv'
+    data_file = '/home/ssilvari/Documents/temp/curvelet_rois/curvelet_features_rois_4_scales_16_angles.csv'
     # data_file = sys.argv[1]
 
     # Load dataset
