@@ -10,6 +10,7 @@ sys.path.append(root)
 from lib.param import load_params
 
 if __name__ == '__main__':
+    os.system('clear')
     params = load_params()
     df = pd.read_csv(os.path.normpath(root + params['data_file']))
     df = df.sort_values(by=['folder'])
@@ -24,7 +25,7 @@ if __name__ == '__main__':
     # Set an work directory
     workspace = r"/run/media/ssilvari/HDD Data/Universidad/MSc/Thesis/Dataset/registered"
 
-    for folder in df['folder']:
+    for folder in df['folder'][:5]:
         mov = os.path.join(dataset_folder, folder, 'mri', 'brainmask.mgz')
         lta = os.path.join(workspace, folder, 'transform.lta')
         mapmov = os.path.join(workspace, folder, 'brainmask_reg.mgz')
@@ -32,10 +33,10 @@ if __name__ == '__main__':
         # Create a folder per each subject
         try:
             os.mkdir(os.path.join(workspace, folder))
-        except FileExistsError:
+        except Exception as e:
             pass
 
         # Build command
-        command = 'mri_robust_register --mov "%s" --dst %s --lta "%s" --mapmov "%s" --satit' \
+        command = 'mri_robust_register --mov "%s" --dst %s --lta "%s" --mapmov "%s" --iscale --sat 4.685 --initorient --maxit 10' \
                   % (mov, dst, lta, mapmov)
         os.system(command)
