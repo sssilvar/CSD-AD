@@ -47,7 +47,7 @@ def recon_all(f):
     subject = '_'.join(fn[1:4])
     
     # Create command
-    cmd = 'recon-all -i {} -s {} -sd {} -autorecon1'.format(f, subject, '/dev/shm')
+    cmd = 'recon-all -i {} -s {} -sd {} -all'.format(f, subject, '/dev/shm')
     # cmd = 'mri_convert {} {}.mgz'.format(f, os.path.join('/dev/shm',subject))
     os.system(cmd)
     os.system('cd /dev/shm && zip -r {}.zip {}'.format(os.path.join(output_folder, subject), subject))
