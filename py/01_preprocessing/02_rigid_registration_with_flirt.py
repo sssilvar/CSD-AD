@@ -24,7 +24,7 @@ if __name__ == '__main__':
 
     # Set an work directory
     # workspace = r"/run/media/ssilvari/HDD Data/Universidad/MSc/Thesis/Dataset/registered"
-    workspace = '~/Documents/dataset/FreeSurferSD_to_MNI'
+    workspace = os.environ['HOME'] + '/Documents/dataset/FreeSurferSD_to_MNI'
 
     for folder in df['folder'][:5]:
         mov = os.path.join(dataset_folder, folder, 'mri', 'brainmask.mgz')
