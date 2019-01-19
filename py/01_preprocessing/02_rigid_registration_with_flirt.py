@@ -26,7 +26,7 @@ if __name__ == '__main__':
     # workspace = r"/run/media/ssilvari/HDD Data/Universidad/MSc/Thesis/Dataset/registered"
     workspace = os.environ['HOME'] + '/Documents/dataset/FreeSurferSD_to_MNI'
 
-    for folder in df['folder'][:5]:
+    for folder in df['folder']:
         mov = os.path.join(dataset_folder, folder, 'mri', 'brainmask.mgz')
         mov_nii = '/dev/shm/brainmask.nii.gz'
         aff_mat = os.path.join(workspace, folder, 'transform.mat')
