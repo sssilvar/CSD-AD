@@ -1,7 +1,8 @@
 # Config folder
 Here you put all your configuration files including relevant information as follows:
+
 <code>
-[dirs]
+[dirs] <br>
     dataset_folder: ...
     dataset_folder_registered: ...
     subjects_dir: ...
