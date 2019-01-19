@@ -134,6 +134,6 @@ if __name__ == '__main__':
 
     # Pool the process
     pool = Pool(n_cores)
-    pool.map(process_image, df['folder'][:3])
+    pool.map(process_image, df['folder'])
     pool.close()
     pool.join()
