@@ -36,7 +36,7 @@ if __name__ == '__main__':
         try:
             os.mkdir(os.path.join(workspace, folder))
         except Exception as e:
-            pass
+            print('[  ERROR  ] Error creating folder: {}.'.format(e))
 
         # Convert to NIFTI
         command = 'mri_convert {} {}'.format(mov, mov_nii)
