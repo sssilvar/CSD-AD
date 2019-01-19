@@ -82,7 +82,7 @@ def process_image(folders):
 
                 for i, z_angle in enumerate(range(-180, 180)):
                     for j, x_angle in enumerate(range(0, 180)):
-                        # solid_ang_mask = rotate_vol(mask_sub, angles=(x_angle, 0, z_angle))
+                        solid_ang_mask = rotate_vol(mask_sub, angles=(x_angle, 0, z_angle))
                         img_masked = vol_sub * solid_ang_mask
                         grad_masked = grad_sub * solid_ang_mask
 
