@@ -1,5 +1,6 @@
 import os
 import sys
+from time import time
 from configparser import ConfigParser
 from os.path import join, dirname, realpath, isfile
 
@@ -80,21 +81,24 @@ def process_image(folders):
                 vol_sub, _ = extract_sub_volume(img, radius=(r_min, r_max), centroid=centroid)
                 grad_sub, _ = extract_sub_volume(img_grad, radius=(r_min, r_max), centroid=centroid)
 
-                for i, z_angle in enumerate(range(-180, 180)):
-                    for j, x_angle in enumerate(range(0, 180)):
-                        solid_ang_mask = rotate_vol(mask_sub, angles=(x_angle, 0, z_angle))
-                        img_masked = vol_sub * solid_ang_mask
-                        grad_masked = grad_sub * solid_ang_mask
+                for i, z_angle in enumerate(range(-180, 180, 4)):
+                    ti = time()
+                    for j, x_angle in enumerate(range(0, 180, 4)):
+                        # solid_ang_mask = rotate_vol(mask_sub, angles=(x_angle, 0, z_angle))
+                        solid_ang_mask = mask_sub
+                        img_masked = np.multiply(vol_sub, solid_ang_mask)
+                        grad_masked = np.multiply(grad_sub, solid_ang_mask)
 
                         # Number of voxels analyzed
-                        n= solid_ang_mask.sum()
+                        n = solid_ang_mask.sum()
 
                         # Set pixel in plane as the mean of the voxels analyzed
-                        img_2d[i, j] = np.nan_to_num(img_masked.sum() / n)
-                        img_grad_2d[i, j] = np.nan_to_num(grad_masked.sum() / n)
+                        img_2d[i, j] = img_masked.sum() / n
+                        img_grad_2d[i, j] = grad_masked.sum() / n
 
-                    print('[ SA ] Scale: %d %s Ang: %s | Point (%d, %d) of (360/180) | Value: %f' %
-                        (n_scale + 1, scale, (x_angle, z_angle), i, j, img_2d[i, j]))
+                    elapsed = time() - ti
+                    print('[ SA ] Scale: %d %s Ang: %s | Point (%d, %d) of (360/180) | Value: %f | Time: %.2f' %
+                        (n_scale + 1, scale, (x_angle, z_angle), i, j, img_2d[i, j], elapsed))
 
                 # Create results:
                 # 2 png files / 2 raw files
