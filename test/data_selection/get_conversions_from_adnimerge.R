@@ -19,3 +19,10 @@ for (sub in subset(data_mci, Month==0)$PTID) {
 
 conversions = data_bl_mci[ (data_bl_mci$PTID %in% sids), ]
 stable = data_bl_mci[ !(data_bl_mci$PTID %in% sids), ]
+
+conversions$target <- "MCIc"
+stable$target <- "MCInc"
+
+# Generate output file
+mci_data <- rbind(conversions, stable)
+write.csv(mci_data, './param/df_conversions.csv')
