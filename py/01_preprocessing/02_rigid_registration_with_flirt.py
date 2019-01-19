@@ -39,7 +39,7 @@ if __name__ == '__main__':
             pass
 
         # Convert to NIFTI
-        command = 'mri_convert {} {}.nii.gz'.format(mov, mov_nii)
+        command = 'mri_convert {} {}'.format(mov, mov_nii)
         os.system(command)
 
         # Register to MNI
