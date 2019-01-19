@@ -1,5 +1,7 @@
 import os
 import sys
+from configparser import ConfigParser
+from os.path import join, dirname, realpath
 
 import numpy as np
 import pandas as pd
@@ -9,7 +11,7 @@ from multiprocessing import Pool
 from scipy.ndimage import affine_transform
 
 # Set root folder
-root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+root = dirname(dirname(dirname(realpath(__file__))))
 
 # Append path to add lib
 sys.path.append(root)
@@ -21,22 +23,22 @@ from lib.geometry import extract_sub_volume, get_centroid
 
 
 def process_image(folders):
-    dataset_registered_folder = '/home/jullygh/sssilvar/Documents/workdir/'
-    results_folder = '/home/jullygh/sssilvar/Documents/results_same_centroid'
-    mni_dir = os.path.join(root, 'lib', 'templates', 'MNI152', 'aseg.mgz')
+    # dataset_registered_folder = '/home/jullygh/sssilvar/Documents/workdir/'
+    # results_folder = '/home/jullygh/sssilvar/Documents/results_same_centroid'
+    # mni_file = join(root, 'param', 'FSL_MNI152_FreeSurferConformed_1mm.nii')
 
     # Get template centroid
-    mni_aseg = nb.load(mni_dir).get_data()
+    mni_aseg = nb.load(mni_file).get_data()
     centroid = tuple(get_centroid(mni_aseg > 0))
     print('[  OK  ] Centroid = {}'.format(centroid))
 
     # Start processing the whole dataset
     for folder in [folders]:
         # Set of folders important in the processing pipeline
-        # aseg_file = os.path.join(subject_dir, 'aseg.mgz') # Segmentation volume per subject
-        subject_dir = os.path.join(dataset_registered_folder, folder)
-        brainmask_file = os.path.join(subject_dir, 'brainmask_reg.mgz')
-        subject_output_dir = os.path.join(results_folder, folder)
+        # aseg_file = join(subject_dir, 'aseg.mgz') # Segmentation volume per subject
+        subject_dir = join(dataset_registered_folder, folder)
+        brainmask_file = join(subject_dir, 'brainmask_reg.nii.gz')
+        subject_output_dir = join(results_folder, folder)
 
         # Print info message
         print('[  INFO  ] Processing subject %s located in %s' % (folder, subject_dir))
@@ -101,12 +103,12 @@ def process_image(folders):
             # 2 png files / 2 raw files
 
             # PNG output for intensities
-            img_filename = os.path.join(subject_output_dir, 'intensity_%d_to_%d_solid_angle_to_sphere' % (r_min, r_max))
+            img_filename = join(subject_output_dir, 'intensity_%d_to_%d_solid_angle_to_sphere' % (r_min, r_max))
             plt.imsave(img_filename + '.png', img_2d, cmap='gray')
             img_2d.tofile(img_filename + '.raw')
 
             # RAW output for gradients
-            grad_filename = os.path.join(subject_output_dir, 'gradient_%d_to_%d_solid_angle_to_sphere' % (r_min, r_max))
+            grad_filename = join(subject_output_dir, 'gradient_%d_to_%d_solid_angle_to_sphere' % (r_min, r_max))
             plt.imsave(grad_filename + '.png', img_grad_2d, cmap='gray')
             img_grad_2d.tofile(grad_filename + '.raw')
 
@@ -120,8 +122,18 @@ if __name__ == '__main__':
     df = pd.read_csv(dataset_csv_file)
     df = df.sort_values('folder')
 
+    # Parse configuration
+    cfg = join(root, 'config', 'config.cfg')
+    config = ConfigParser()
+    config.read(cfg)
+
+    dataset_registered_folder = config.get('dirs', 'dataset_folder_registered')
+    results_folder = config.get('dirs', 'sphere_mapping')
+    n_cores = config.get('resources', 'n_cores')
+    mni_file = join(root, 'param', 'FSL_MNI152_FreeSurferConformed_1mm.nii')
+
     # Pool the process
-    pool = Pool(30)
-    pool.map(process_image, df['folder'])
+    pool = Pool(n_cores)
+    pool.map(process_image, df['folder'][:3])
     pool.close()
     pool.join()

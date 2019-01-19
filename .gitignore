@@ -1,3 +1,6 @@
+# Ignore config files
+*.cfg
+
 # Ignore Virtual environment
 .idea/
 .vscode/
