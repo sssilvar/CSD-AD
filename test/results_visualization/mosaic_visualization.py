@@ -7,15 +7,24 @@ import imageio
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib import gridspec
 
 plt.style.use('ggplot')
 
 
 def imread(filename):
     if filename.endswith('.raw'):
-        return np.fromfile(filename).reshape([360, 180]).T
+        return np.fromfile(filename).reshape([180, 90]).T
     else:
         return imageio.imread(filename)[:,:,0].T
+
+
+def get_dx_age_and_size(df):
+    dx = df.loc[sid, 'target']
+    age = df.loc[sid, 'AGE']
+    sex = df.loc[sid, 'PTGENDER']
+    return dx, age, sex
+
 
 
 if __name__ == "__main__":
@@ -32,7 +41,7 @@ if __name__ == "__main__":
 
     # Look for images
     scale = '0_to_25'
-    im_type = 'intensity'
+    im_type = 'gradient'
     images = []
     for root, dirs, files in os.walk(data_folder):
         for f in files:
@@ -41,11 +50,11 @@ if __name__ == "__main__":
                 images.append(im_path)
     
     # Plot images
-    n_cols = 3
+    n_cols = 5
     n_rows = int(np.ceil(len(images) / n_cols))
     fig, axes = plt.subplots(ncols=n_cols, nrows=n_rows)
-    fig.tight_layout()
-    fig.suptitle('Sphere mapped visualization ({} images)'.format(im_type))
+    # fig.suptitle('Sphere mapped visualization ({} images)'.format(im_type))
+    fig.subplots_adjust(wspace=0, hspace=0.4)
 
     for i, axs in enumerate(axes):
         if np.shape(axs):
@@ -57,8 +66,8 @@ if __name__ == "__main__":
 
                     # Set title
                     sid = basename(dirname(img_file))
-                    tg = df.loc[sid, 'target']
-                    ax.set_title('{}'.format(tg), color='r' if tg == 'MCIc' else 'b')
+                    tg, age, sex = get_dx_age_and_size(df)
+                    ax.set_title('{} | {} yrs | {}'.format(tg, age, sex), color='r' if tg == 'MCIc' else 'b')
 
                 except IndexError as e:
                     print('[ WARNING  ] {}'.format(e))
@@ -73,8 +82,8 @@ if __name__ == "__main__":
 
                 # Set title
                 sid = basename(dirname(img_file))
-                tg = df.loc[sid, 'target']
-                axs.set_title('{}'.format(tg), color='r' if tg == 'MCIc' else 'b')
+                tg, age, sex = get_dx_age_and_size(df)
+                axs.set_title('{} | {} yrs | {}'.format(tg, age, sex), color='r' if tg == 'MCIc' else 'b')
             except IndexError as e:
                 print('[ WARNING  ] {}'.format(e))
             
