@@ -84,8 +84,7 @@ def process_image(folders):
                 for i, z_angle in enumerate(range(-180, 180, 4)):
                     ti = time()
                     for j, x_angle in enumerate(range(0, 180, 4)):
-                        # solid_ang_mask = rotate_vol(mask_sub, angles=(x_angle, 0, z_angle))
-                        solid_ang_mask = mask_sub
+                        solid_ang_mask = rotate_vol(mask_sub, angles=(x_angle, 0, z_angle))
                         img_masked = np.multiply(vol_sub, solid_ang_mask)
                         grad_masked = np.multiply(grad_sub, solid_ang_mask)
 
