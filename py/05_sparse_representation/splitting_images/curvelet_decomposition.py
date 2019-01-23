@@ -53,13 +53,20 @@ if __name__ == "__main__":
     print('\t- Number of scales: %d' % nbs)
     print('\t- Number of angles: %d' % nba)
 
+    # Set create (if not exist) and save individual results
+    if not exists(dirname(out_folder)):
+        os.mkdir(dirname(out_folder))
+        os.mkdir(out_folder)
+    elif not exists(out_folder):
+        os.mkdir(out_folder)
+
     # Load img and split it in half
-    img = np.fromfile(data_file).reshape([360, 180])
+    img = np.fromfile(data_file).reshape([180, 90])
     img_list = np.split(img, 2, axis=0)
 
     # Define a curvelet object
     A = ct.fdct2(
-        (180,180), 
+        (90,90), 
         nbs=nbs, 
         nba=nba, 
         ac=True, 
@@ -109,13 +116,6 @@ if __name__ == "__main__":
                     feats['%s_%d_%d_kurtosis' % (side, scale, angle)] = kurt
                 except IndexError:
                     pass
-
-    # Set create (if not exist) and save individual results
-    if not exists(dirname(out_folder)):
-        os.mkdir(dirname(out_folder))
-        os.mkdir(out_folder)
-    elif not exists(out_folder):
-        os.mkdir(out_folder)
 
     # Save as CSV
     filename, ext = splitext(data_file)

@@ -115,21 +115,21 @@ if __name__ == "__main__":
 
         # Start Classifying: SVM-RBF
         print('[  INFO  ] Setting Classifier up...')
-        clf = SVC(probability=True)
-        # clf = RandomForestClassifier(random_state=42)
+        # clf = SVC(probability=True)
+        clf = RandomForestClassifier(random_state=42)
 
         # Set up the parameters to evaluate
-        param_grid = {
-            'kernel': ['rbf'],
-            'C': [0.001, 0.01, 0.1, 1, 10],
-            'gamma': [0.0001, 0.001, 0.01, 0.1, 1]
-        }
         # param_grid = {
-        #     'n_estimators': [200, 500],
-        #     'max_features': ['auto', 'sqrt', 'log2'],
-        #     'max_depth': [4, 5, 6, 7, 8],
-        #     'criterion': ['gini', 'entropy']
-        #     }
+        #     'kernel': ['rbf'],
+        #     'C': [0.001, 0.01, 0.1, 1, 10],
+        #     'gamma': [0.0001, 0.001, 0.01, 0.1, 1]
+        # }
+        param_grid = {
+            'n_estimators': [200, 500],
+            'max_features': ['auto', 'sqrt', 'log2'],
+            'max_depth': [4, 5, 6, 7, 8],
+            'criterion': ['gini', 'entropy']
+            }
 
         # Set a grit to hypertune the classifier
         print('\t- Tunning classifier...')

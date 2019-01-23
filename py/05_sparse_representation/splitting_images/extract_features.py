@@ -50,8 +50,10 @@ if __name__ == "__main__":
         print('[  INFO  ] Processing %s' % subject)
 
         # Build command
-        raw_folder = join(subjects_dir, subject, 'raw')
+        # raw_folder = join(subjects_dir, subject, 'raw')
+        raw_folder = join(subjects_dir, subject)  # For some cases
         raw_files = [join(raw_folder, rf) for rf in os.listdir(raw_folder) if rf.endswith('.raw')]
+
         for raw_file in raw_files:
             cmd = 'python2 %s -f %s -sid %s -s %d -a %d -out %s' % (curvelet_script, raw_file, subject, nbs, nba, subjects_dir)
             print('\t- Decomposing: %s' % raw_file)

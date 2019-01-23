@@ -40,7 +40,7 @@ if __name__ == "__main__":
     df = pd.read_csv(join(root, 'param/df_conversions.csv'), index_col='PTID')
 
     # Look for images
-    scale = '0_to_25'
+    scale = '25_to_50'
     im_type = 'gradient'
     images = []
     for root, dirs, files in os.walk(data_folder):
@@ -51,6 +51,7 @@ if __name__ == "__main__":
     
     # images = images[:30]
     # Plot images
+    print('Number of subjects found: {}'.format(len(images)))
     n_cols = 6
     n_rows = int(np.ceil(len(images) / n_cols))
     fig, axes = plt.subplots(ncols=n_cols, nrows=n_rows)
