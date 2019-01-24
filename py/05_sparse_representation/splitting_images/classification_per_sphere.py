@@ -6,11 +6,13 @@ from os.path import join, basename, dirname, realpath
 import pandas as pd
 import numpy as np
 
-from sklearn.svm import SVC
+from sklearn.svm import SVC, LinearSVC
+from sklearn.linear_model import LassoCV
 from sklearn.ensemble import RandomForestClassifier
 
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
+from sklearn.feature_selection import SelectFromModel
 from sklearn.model_selection import GridSearchCV, StratifiedKFold, train_test_split
 from sklearn.metrics import classification_report, roc_auc_score, roc_curve
 
@@ -20,7 +22,7 @@ plt.style.use('ggplot')
 # Define root folder
 root = dirname(dirname(dirname(dirname(realpath(__file__)))))
 
-def get_features_and_labels(df):
+def get_features_and_labels(df, confound_correction=False):
     """
     Get labels from dataframe IDs (ADNI only)
     """
@@ -35,30 +37,31 @@ def get_features_and_labels(df):
     adnimerge = adnimerge[adnimerge['VISCODE'] == 'bl']
     df_prog = pd.concat([adni_no_prog, adni_prog], axis=0)
 
-    Y = df_prog.loc[df.index, ['PTGENDER', 'AGE']] #, 'PTRACCAT', 'SITE']#, 'APOE4', 'FDG']
-    Y['PTGENDER'] = Y['PTGENDER'].astype('category').cat.codes
-    Y['AGE2'] = Y['AGE'] ** 2
-    Y = Y.fillna(Y.mean())
-    
-    # Load Intra Cranial Volume (ICV)
-    icv = df_prog.loc[df.index, 'ICV']
-    icv = icv.fillna(icv.mean())
-    
-    # Normalize volumes by ICV (if file contains volumes)
-    if np.any(['vol' in col for col in df.columns]):
-        print('[  INFO  ] Normalizing by ICV...')
-        df = df.divide(icv, axis=0)
-        print(df.head())
-    
-    # Create a numpy array
-    X = df.values
-    scaler = StandardScaler()
-    X = scaler.fit_transform(X)
+    if confound_correction:
+        Y = df_prog.loc[df.index, ['PTGENDER', 'AGE']] #, 'PTRACCAT', 'SITE']#, 'APOE4', 'FDG']
+        Y['PTGENDER'] = Y['PTGENDER'].astype('category').cat.codes
+        Y['AGE2'] = Y['AGE'] ** 2
+        Y = Y.fillna(Y.mean())
+        
+        # Load Intra Cranial Volume (ICV)
+        icv = df_prog.loc[df.index, 'ICV']
+        icv = icv.fillna(icv.mean())
+        
+        # Normalize volumes by ICV (if file contains volumes)
+        if np.any(['vol' in col for col in df.columns]):
+            print('[  INFO  ] Normalizing by ICV...')
+            df = df.divide(icv, axis=0)
+            print(df.head())
+        
+        # Create a numpy array
+        X = df.values
+        scaler = StandardScaler()
+        X = scaler.fit_transform(X)
 
-    # Substract effect of confounders
-    print('[  INFO  ] Substracting confounders effect...')
-    W = np.linalg.inv(Y.T.dot(Y)).dot(Y.T.dot(X))    
-    X = np.nan_to_num(X - Y.dot(W))
+        # Substract effect of confounders
+        print('[  INFO  ] Substracting confounders effect...')
+        W = np.linalg.inv(Y.T.dot(Y)).dot(Y.T.dot(X))    
+        X = np.nan_to_num(X - Y.dot(W))
 
     # Assign labels
     labels = list(np.empty(len(df.index)))
@@ -116,24 +119,33 @@ if __name__ == "__main__":
         # Start Classifying: SVM-RBF
         print('[  INFO  ] Setting Classifier up...')
         # clf = SVC(probability=True)
-        clf = RandomForestClassifier(random_state=42)
+        # clf = RandomForestClassifier(random_state=42)
+
+        # Define a pipeline
+        pipeline = Pipeline([
+            ('scaler', StandardScaler()),
+            ('feature_selection', SelectFromModel(LinearSVC(penalty='l2'))),
+            # ('feature_selection', SelectFromModel(LassoCV(cv=5), threshold=1e-3)),
+            # ('clf', RandomForestClassifier(random_state=42))
+            ('clf', SVC(probability=True))
+        ])
 
         # Set up the parameters to evaluate
-        # param_grid = {
-        #     'kernel': ['rbf'],
-        #     'C': [0.001, 0.01, 0.1, 1, 10],
-        #     'gamma': [0.0001, 0.001, 0.01, 0.1, 1]
-        # }
         param_grid = {
-            'n_estimators': [200, 500],
-            'max_features': ['auto', 'sqrt', 'log2'],
-            'max_depth': [4, 5, 6, 7, 8],
-            'criterion': ['gini', 'entropy']
-            }
+            'clf__kernel': ['rbf', 'linear'],
+            'clf__C': [0.001, 0.01, 0.1, 1, 10],
+            'clf__gamma': [0.0001, 0.001, 0.01, 0.1, 1]
+        }
+        # param_grid = {
+        #     'clf__n_estimators': [200, 500],
+        #     'clf__max_features': ['auto', 'sqrt', 'log2'],
+        #     'clf__max_depth': [4, 5, 6, 7, 8],
+        #     'clf__criterion': ['gini', 'entropy']
+        #     }
 
         # Set a grit to hypertune the classifier
         print('\t- Tunning classifier...')
-        clf_grid = GridSearchCV(clf, param_grid, cv=StratifiedKFold(n_splits=10, random_state=42), iid=True)
+        clf_grid = GridSearchCV(pipeline, param_grid, cv=StratifiedKFold(n_splits=5, random_state=42), iid=True)
         clf_grid.fit(X_train, y_train)
 
         y_pred = clf_grid.predict(X_test)

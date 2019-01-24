@@ -66,9 +66,9 @@ def clarray_to_mean_dict(A, f, scales, n_angles):
     # Return data converted to dictionary
     return curve_data
 
-def clarray_to_gen_gaussian_dict(A, f, scales, n_angles, r):
+def clarray_to_gen_gaussian_dict(A, f, n_scales, n_angles, r):
     curve_data = {}
-    for scale in range(0, scales):
+    for scale in range(0, n_scales):
         scale_data = []
 
         if scale == 0:
@@ -97,4 +97,14 @@ def clarray_to_gen_gaussian_dict(A, f, scales, n_angles, r):
             curve_data['%d_%d_%d_var' % (r, scale, angle)] = var_est
             
     # Return data converted to dictionary
+    return curve_data
+
+def get_sub_bands(A, f):
+    curve_data = {}
+    for sca in range(A.nbs):
+        for ang in range(A.nbs * A.nba):
+            try:
+                curve_data['%d_%d' % (sca, ang)] = f(sca, ang)
+            except IndexError:
+                pass
     return curve_data

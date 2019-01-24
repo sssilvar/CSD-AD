@@ -1,7 +1,8 @@
 #!/bin/env python2
 import os
+import sys
 import argparse
-from os.path import basename, dirname, exists, join, splitext
+from os.path import basename, dirname, exists, join, splitext, realpath
 
 import pyct as ct
 import numpy as np
@@ -9,6 +10,11 @@ import pandas as pd
 from scipy.stats import describe
 
 import matplotlib.pyplot as plt
+
+root = dirname(dirname(dirname(dirname(realpath(__file__)))))
+sys.path.append(join(root))
+
+from lib.curvelets import clarray_to_gen_gaussian_dict
 
 
 def parse_args():
@@ -96,26 +102,31 @@ if __name__ == "__main__":
         f = A.fwd(img)
         print('[  INFO  ] Curvelet decomposition shape: %s' % str(f.shape))
 
+        # Use generalized Gaussian to fit features
+        data_dict = clarray_to_gen_gaussian_dict(A, f, nbs, nba, r=0)
+        for key, val in data_dict.items():
+            feats[key[2:]] = val
+        
         # Set features
-        for scale in range(nbs):
-            for angle in range(nba):
-                try:
-                    ix = A.index(scale, angle)
-                    data = f[ix[0]:ix[1]] # Extract magnitude
+        # for scale in range(nbs):
+        #     for angle in range(nba):
+        #         try:
+        #             ix = A.index(scale, angle)
+        #             data = f[ix[0]:ix[1]] # Extract magnitude
 
-                    # Extract several statistics
-                    n, (mi, ma), mea, var, skew, kurt = describe(data)
+        #             # Extract several statistics
+        #             n, (mi, ma), mea, var, skew, kurt = describe(data)
 
-                    # Assign to series
-                    feats['%s_%d_%d_n' % (side, scale, angle)] = n
-                    feats['%s_%d_%d_min' % (side, scale, angle)] = mi
-                    feats['%s_%d_%d_max' % (side, scale, angle)] = ma
-                    feats['%s_%d_%d_mean' % (side, scale, angle)] = mea
-                    feats['%s_%d_%d_var' % (side, scale, angle)] = var
-                    feats['%s_%d_%d_skew' % (side, scale, angle)] = skew
-                    feats['%s_%d_%d_kurtosis' % (side, scale, angle)] = kurt
-                except IndexError:
-                    pass
+        #             # Assign to series
+        #             feats['%s_%d_%d_n' % (side, scale, angle)] = n
+        #             feats['%s_%d_%d_min' % (side, scale, angle)] = mi
+        #             feats['%s_%d_%d_max' % (side, scale, angle)] = ma
+        #             feats['%s_%d_%d_mean' % (side, scale, angle)] = mea
+        #             feats['%s_%d_%d_var' % (side, scale, angle)] = var
+        #             feats['%s_%d_%d_skew' % (side, scale, angle)] = skew
+        #             feats['%s_%d_%d_kurtosis' % (side, scale, angle)] = kurt
+        #         except IndexError:
+        #             pass
 
     # Save as CSV
     filename, ext = splitext(data_file)
