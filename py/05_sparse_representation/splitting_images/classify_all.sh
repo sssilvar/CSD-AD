@@ -7,7 +7,7 @@ echo -e "[  INFO  ] Data folder in: ${CURRENT_DIR}"
 
 # Define scales and angles
 SCALES=(4)
-ANGLES=(16)
+ANGLES=(32)
 
 # Run classification
 for scale in ${SCALES[@]}

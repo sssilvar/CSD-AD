@@ -20,7 +20,7 @@ if __name__ == "__main__":
     mapped_dir = cfg.get('dirs', 'sphere_mapping')
     
     # Ge a single image
-    img_file = join(mapped_dir, '002_S_0729/gradient_0_to_25_solid_angle_to_sphere.raw')
+    img_file = join(mapped_dir, '002_S_0729/gradient_25_to_50_solid_angle_to_sphere.raw')
     img = np.fromfile(img_file).reshape([180,90]).T
 
     # Decompose in curvelets
@@ -37,15 +37,19 @@ if __name__ == "__main__":
     f = A.fwd(img)
     curv_data = get_sub_bands(A, f)
     n = len(curv_data)
-    ncols = 8
-    fig, ax = plt.subplots(ncols=ncols, nrows=np.ceil(n/ncols).astype(int) + 1)
+    print(n, curv_data.keys())
+    ncols = 9
+    fig, ax = plt.subplots(ncols=ncols, nrows=np.ceil(n/ncols).astype(int))
+    fig.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=None, hspace=None)
+
     for i, (key, val) in enumerate(curv_data.items()):
         ix = i // ncols
-        for j in range(ncols):
-            print(ix, j)
-            ax[ix, j].imshow(val)
-            ax[ix, j].set_title(key)
-            ax[ix, j].axis('off')
+        iy = i % ncols
+        # ax[ix, iy].imshow(val)
+        ax[ix, iy].hist(val.ravel())
+        ax[ix, iy].legend([key], fontsize='xx-small')
+        # ax[ix, iy].set_title(key)
+        ax[ix, iy].axis('off')
     plt.show()
 
 

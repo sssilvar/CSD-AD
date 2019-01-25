@@ -7,14 +7,14 @@ from os.path import basename, dirname, exists, join, splitext, realpath
 import pyct as ct
 import numpy as np
 import pandas as pd
-from scipy.stats import describe
+from scipy.stats import describe, gennorm
 
 import matplotlib.pyplot as plt
 
 root = dirname(dirname(dirname(dirname(realpath(__file__)))))
 sys.path.append(join(root))
 
-from lib.curvelets import clarray_to_gen_gaussian_dict
+from lib.curvelets import get_sub_bands
 
 
 def parse_args():
@@ -103,9 +103,12 @@ if __name__ == "__main__":
         print('[  INFO  ] Curvelet decomposition shape: %s' % str(f.shape))
 
         # Use generalized Gaussian to fit features
-        data_dict = clarray_to_gen_gaussian_dict(A, f, nbs, nba, r=0)
+        data_dict = get_sub_bands(A, f)
         for key, val in data_dict.items():
-            feats[key[2:]] = val
+            beta_est, mean_est, var_est = gennorm.fit(val)
+            feats[key + '_beta'] = beta_est
+            feats[key + '_mean'] = mean_est
+            feats[key + '_var'] = var_est
         
         # Set features
         # for scale in range(nbs):

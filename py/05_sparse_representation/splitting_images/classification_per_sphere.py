@@ -30,7 +30,7 @@ def get_features_and_labels(df, confound_correction=False):
     df = df.fillna(0)
 
     # Load progressions from MCI to Dementia (MCIc)
-    print('[  INFO  ] Loading confounders...')
+    print('[  INFO  ] Loading common data...')
     adni_prog = pd.read_csv(join(root, 'param/common/adnimerge_conversions_v2.csv'), index_col='PTID')
     adni_no_prog = pd.read_csv(join(root, 'param/common/adnimerge_MCInc_v2.csv'), index_col='PTID')
     adnimerge = pd.read_csv(join(root, 'param/common/adnimerge.csv'), index_col='PTID', low_memory=False)
@@ -105,66 +105,77 @@ if __name__ == "__main__":
         
         # Get X and y
         X = df_std.drop('label', axis=1).values
-        y = df_std['label'].cat.codes
+        y = df_std['label'] == 'MCIc'
 
         # Set a pipeline and classify
         # Split data into training and testing set
         print('[  INFO  ] Splitting dataset...')
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.27, random_state=21, stratify=y)
-        print('\t- Number of features (%d)' % X.shape[1])
-        print('\t- Total observations (%d)' % len(y))
-        print('\t- Training observations (%d)' % len(y_train))
-        print('\t- Test observations (%d)' % len(y_test))
+        # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=21, stratify=y)
+        skf = StratifiedKFold(n_splits=10, random_state=42)
+        plt.figure(figsize=[12.8, 9.6], dpi=150)
 
-        # Start Classifying: SVM-RBF
-        print('[  INFO  ] Setting Classifier up...')
-        # clf = SVC(probability=True)
-        # clf = RandomForestClassifier(random_state=42)
+        for fold_i, (train_index, test_index) in enumerate(skf.split(X, y)):
+            X_train, X_test = X[train_index], X[test_index]
+            y_train, y_test = y[train_index], y[test_index]
 
-        # Define a pipeline
-        pipeline = Pipeline([
-            ('scaler', StandardScaler()),
-            ('feature_selection', SelectFromModel(LinearSVC(penalty='l2'))),
-            # ('feature_selection', SelectFromModel(LassoCV(cv=5), threshold=1e-3)),
-            # ('clf', RandomForestClassifier(random_state=42))
-            ('clf', SVC(probability=True))
-        ])
+            print('\n\n[  INFO  ] Processing fold No. %d' % fold_i)
+            print('\t- Number of features (%d)' % X.shape[1])
+            print('\t- Number of subjects \n%s' % df_std['label'].value_counts())
+            print('\t- Total observations (%d)' % len(y))
+            print('\t- Training observations (%d)' % len(y_train))
+            print('\t- Test observations (%d)' % len(y_test))
 
-        # Set up the parameters to evaluate
-        param_grid = {
-            'clf__kernel': ['rbf', 'linear'],
-            'clf__C': [0.001, 0.01, 0.1, 1, 10],
-            'clf__gamma': [0.0001, 0.001, 0.01, 0.1, 1]
-        }
-        # param_grid = {
-        #     'clf__n_estimators': [200, 500],
-        #     'clf__max_features': ['auto', 'sqrt', 'log2'],
-        #     'clf__max_depth': [4, 5, 6, 7, 8],
-        #     'clf__criterion': ['gini', 'entropy']
-        #     }
+            # Start Classifying: SVM-RBF
+            print('[  INFO  ] Setting Classifier up...')
+            # clf = SVC(probability=True)
+            # clf = RandomForestClassifier(random_state=42)
 
-        # Set a grit to hypertune the classifier
-        print('\t- Tunning classifier...')
-        clf_grid = GridSearchCV(pipeline, param_grid, cv=StratifiedKFold(n_splits=5, random_state=42), iid=True)
-        clf_grid.fit(X_train, y_train)
+            # Define a pipeline
+            pipeline = Pipeline([
+                ('scaler', StandardScaler()),
+                ('feature_selection', SelectFromModel(LinearSVC(penalty='l2'))),
+                # ('feature_selection', SelectFromModel(LassoCV(cv=5), threshold=1e-3)),
+                # ('clf', RandomForestClassifier(random_state=42))
+                ('clf', SVC(probability=True))
+            ])
 
-        y_pred = clf_grid.predict(X_test)
-        y_pred_proba = clf_grid.predict_proba(X_test)[:,1]
+            # Set up the parameters to evaluate
+            param_grid = {
+                'clf__kernel': ['rbf'],
+                'clf__C': [0.001, 0.01, 0.1, 1, 10],
+                'clf__gamma': [0.0001, 0.001, 0.01, 0.1, 1]
+            }
+            # param_grid = {
+            #     'clf__n_estimators': [200, 500],
+            #     'clf__max_features': ['auto', 'sqrt', 'log2'],
+            #     'clf__max_depth': [4, 5, 6, 7, 8],
+            #     'clf__criterion': ['gini', 'entropy']
+            #     }
 
-        # Compute rates and plot AUC
-        fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
-        auc = roc_auc_score(y_test, y_pred_proba)
+            # Set a grit to hypertune the classifier
+            print('\t- Tunning classifier...')
+            clf_grid = GridSearchCV(pipeline, param_grid, cv=StratifiedKFold(n_splits=5, random_state=42), iid=True)
+            clf_grid.fit(X_train, y_train)
 
-        print('[  INFO  ] Classification report: \n%s' % classification_report(y_test, y_pred))
-        print('[  INFO  ] Best Params: %s' % clf_grid.best_params_)
+            y_pred = clf_grid.predict(X_test)
+            y_pred_proba = clf_grid.predict_proba(X_test)[:,1]
 
-        plt.figure()
-        plt.plot([0, 1], [0, 1], 'k--')
-        plt.plot(fpr, tpr)
-        plt.legend(['AUC = %.2f' % auc])
+            # Compute rates and plot AUC
+            fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
+            auc = roc_auc_score(y_test, y_pred_proba)
+
+            print('[  INFO  ] Classification report: \n%s' % classification_report(y_test, y_pred))
+            print('[  INFO  ] Best Params: %s' % clf_grid.best_params_)
+
+            plt.plot([0, 1], [0, 1], 'k--')
+            plt.plot(fpr, tpr, label='AUC (fold %d) = %.2f' % (fold_i + 1, auc))
+        # plt.legend(['AUC (fold %d) = %.2f' % (f, auc) for f in range(1, skf.get_n_splits() + 1)])
+        plt.legend()
         plt.xlabel('False positive rate')
         plt.ylabel('True positive rate')
-        plt.title('ROC for %s' % sphere)
+        plt.title(
+            'ROC for {} voxels ({})'.format(sphere, basename(data_file).split('_')[0]),
+            fontdict={'fontsize': 24})
 
         fig_file = join(dirname(data_file), 'ROC', basename(data_file)[:-4] + '_roc_%s.png' % sphere)
         plt.savefig(fig_file, bbox_inches='tight')
