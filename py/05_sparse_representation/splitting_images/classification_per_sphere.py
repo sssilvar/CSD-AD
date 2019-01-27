@@ -111,7 +111,7 @@ if __name__ == "__main__":
         # Split data into training and testing set
         print('[  INFO  ] Splitting dataset...')
         # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=21, stratify=y)
-        skf = StratifiedKFold(n_splits=10, random_state=42)
+        skf = StratifiedKFold(n_splits=7, random_state=42)
         plt.figure(figsize=[12.8, 9.6], dpi=150)
 
         for fold_i, (train_index, test_index) in enumerate(skf.split(X, y)):
@@ -134,7 +134,7 @@ if __name__ == "__main__":
             pipeline = Pipeline([
                 ('scaler', StandardScaler()),
                 ('feature_selection', SelectFromModel(LinearSVC(penalty='l2'))),
-                # ('feature_selection', SelectFromModel(LassoCV(cv=5), threshold=1e-3)),
+                # ('feature_selection', SelectFromModel(LassoCV(cv=5), threshold=1e-2)),
                 # ('clf', RandomForestClassifier(random_state=42))
                 ('clf', SVC(probability=True))
             ])
@@ -154,7 +154,7 @@ if __name__ == "__main__":
 
             # Set a grit to hypertune the classifier
             print('\t- Tunning classifier...')
-            clf_grid = GridSearchCV(pipeline, param_grid, cv=StratifiedKFold(n_splits=5, random_state=42), iid=True)
+            clf_grid = GridSearchCV(pipeline, param_grid, cv=StratifiedKFold(n_splits=4, random_state=42), scoring='roc_auc')
             clf_grid.fit(X_train, y_train)
 
             y_pred = clf_grid.predict(X_test)

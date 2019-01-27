@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 import nibabel as nb
 import matplotlib.pyplot as plt
-from scipy.ndimage import affine_transform
+from scipy import ndimage as ndi
 
 # Set root folder
 root = dirname(dirname(dirname(realpath(__file__))))
@@ -34,7 +34,6 @@ def poolcontext(*args, **kwargs):
 
 def process_image(folder, n_scale, scale):
     # Set of folders important in the processing pipeline
-    # aseg_file = join(subject_dir, 'aseg.mgz') # Segmentation volume per subject
     subject_dir = join(dataset_registered_folder, folder)
     brainmask_file = join(subject_dir, 'brainmask_reg.nii.gz')
     subject_output_dir = join(results_folder, folder)
@@ -59,6 +58,13 @@ def process_image(folder, n_scale, scale):
         gx, gy, gz = np.gradient(img)
         img_grad = np.sqrt(gx ** 2 + gy ** 2 + gz ** 2)
 
+        # Extract edges with sobel
+        sobel_mode = 'reflect'
+        sobel_x = ndi.sobel(img, axis=0, mode=sobel_mode)
+        sobel_y = ndi.sobel(img, axis=1, mode=sobel_mode)
+        sobel_z = ndi.sobel(img, axis=2, mode=sobel_mode)
+        img_sobel = np.sqrt(sobel_x ** 2 + sobel_y ** 2 + sobel_z ** 2)
+
         # Crete a solid angle from a scale: sa
         r_min, r_max = scale
         sa = solid_cone(radius=(r_min, r_max), center=centroid)
@@ -67,10 +73,13 @@ def process_image(folder, n_scale, scale):
         ns = 2  # TODO: Chack if it's neccesary to change it
         img_2d = np.zeros([360 // ns, 180 // ns])
         img_grad_2d = np.zeros_like(img_2d)
+        img_sobel_2d = np.zeros_like(img_2d)
 
+        # Extract only relevant volume
         mask_sub, center = extract_sub_volume(sa, radius=(r_min, r_max), centroid=centroid)
         vol_sub, _ = extract_sub_volume(img, radius=(r_min, r_max), centroid=centroid)
         grad_sub, _ = extract_sub_volume(img_grad, radius=(r_min, r_max), centroid=centroid)
+        sobel_sub, _ = extract_sub_volume(img_sobel, radius=(r_min, r_max), centroid=centroid)
 
         for i, z_angle in enumerate(range(-180, 180, ns)):
             ti = time()
@@ -78,6 +87,7 @@ def process_image(folder, n_scale, scale):
                 solid_ang_mask = rotate_vol(mask_sub, angles=(x_angle, 0, z_angle))
                 img_masked = np.multiply(vol_sub, solid_ang_mask)
                 grad_masked = np.multiply(grad_sub, solid_ang_mask)
+                sobel_masked = np.multiply(sobel_sub, solid_ang_mask)
 
                 # Number of voxels analyzed
                 n = solid_ang_mask.sum()
@@ -85,6 +95,7 @@ def process_image(folder, n_scale, scale):
                 # Set pixel in plane as the mean of the voxels analyzed
                 img_2d[i, j] = img_masked.sum() / n
                 img_grad_2d[i, j] = grad_masked.sum() / n
+                img_sobel_2d[i, j] = sobel_masked.sum() / n
 
             elapsed = time() - ti
             print('[ SA ] Scale: %d %s Ang: %s | Point (%d, %d) of (360/180) | Value: %f | Time: %.2f' %
@@ -93,15 +104,20 @@ def process_image(folder, n_scale, scale):
         # Create results:
         # 2 png files / 2 raw files
 
-        # PNG output for intensities
+        # Image output for intensities
         img_filename = join(subject_output_dir, 'intensity_%d_to_%d_solid_angle_to_sphere' % (r_min, r_max))
         plt.imsave(img_filename + '.png', img_2d, cmap='gray')
         img_2d.tofile(img_filename + '.raw')
 
-        # RAW output for gradients
+        # Image output for gradients
         grad_filename = join(subject_output_dir, 'gradient_%d_to_%d_solid_angle_to_sphere' % (r_min, r_max))
         plt.imsave(grad_filename + '.png', img_grad_2d, cmap='gray')
         img_grad_2d.tofile(grad_filename + '.raw')
+
+        # Image output for sobel
+        sobel_filename = join(subject_output_dir, 'sobel_%d_to_%d_solid_angle_to_sphere' % (r_min, r_max))
+        plt.imsave(sobel_filename + '.png', img_sobel_2d, cmap='gray')
+        img_sobel_2d.tofile(grad_filename + '.raw')
     else:
         print('[  ERROR  ] File {} was not found'.format(brainmask_file))
 
