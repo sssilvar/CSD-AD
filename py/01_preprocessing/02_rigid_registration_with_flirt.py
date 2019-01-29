@@ -1,50 +1,97 @@
 import os
 import sys
+from zipfile import ZipFile
+from configparser import ConfigParser
+from os.path import join, dirname, realpath, isfile, isdir
+
+from multiprocessing import Pool
+from contextlib import contextmanager
 
 import pandas as pd
 
-root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+root = dirname(dirname(dirname(realpath(__file__))))
 print('[  ROOT  ] {}'.format(root))
 
 sys.path.append(root)
-from lib.param import load_params
 
-if __name__ == '__main__':
-    os.system('clear')
-    params = load_params()
-    df = pd.read_csv(os.path.normpath(root + params['data_file']))
-    df = df.sort_values(by=['folder'])
+@contextmanager
+def poolcontext(*args, **kwargs):
+    pool = Pool(*args, **kwargs)
+    yield pool
+    pool.terminate()
 
-    # Load dataset folder
-    dataset_folder = '~/Documents/dataset/FreeSurferSD/'
-    # dataset_folder = r"/run/media/ssilvari/HDD Data/Universidad/MSc/Thesis/Dataset/FreeSurferSD"
-
-    # Set template to register to
+def register_subject_with_flirt(subject_id):
+    """
+        Registers a NII image to a MNI152 template
+    """
+    # Define template volume directory
     dst = os.path.join(root, 'param', 'FSL_MNI152_FreeSurferConformed_1mm.nii')
+    
+    # Check if file is zipped
+    subjects_dir = cfg.get('dirs', 'subjects_dir')
+    mov = os.path.join(subjects_dir, subject_id, 'mri', 'brainmask.mgz')
+    zipped_file = os.path.join(subjects_dir, subject_id + '.zip')
 
-    # Set an work directory
-    # workspace = r"/run/media/ssilvari/HDD Data/Universidad/MSc/Thesis/Dataset/registered"
-    workspace = os.environ['HOME'] + '/Documents/dataset/FreeSurferSD_to_MNI'
+    if not isfile(mov) and isfile(zipped_file):
+        print('[  INFO  ] Extracting data from: {}'.format(zipped_file))
+        bmask_path =join(subject_id, 'mri/brainmask.mgz')
 
-    for folder in df['folder']:
-        mov = os.path.join(dataset_folder, folder, 'mri', 'brainmask.mgz')
-        mov_nii = '/dev/shm/brainmask.nii.gz'
-        aff_mat = os.path.join(workspace, folder, 'transform.mat')
-        mapmov = os.path.join(workspace, folder, 'brainmask_reg.nii.gz')
-
+        with ZipFile(zipped_file, 'r') as zf:
+            zf.extract(bmask_path, '/dev/shm/')
+        subjects_dir = '/dev/shm'
+    
+    
+    # Define mooving volumes (We have to convert MGZ to NIFTI due to FSL compatibility)
+    mov = os.path.join(subjects_dir, subject_id, 'mri', 'brainmask.mgz')
+    mov_nii = '/dev/shm/{}.nii.gz'.format(subject_id)
+    aff_mat = os.path.join(registered_folder, subject_id, 'transform.mat')
+    mapmov = os.path.join(registered_folder, subject_id, 'brainmask_reg.nii.gz')
+    print(mov)
+    
+    # Check if file exists
+    if isfile(mov):
         # Create a folder per each subject
         try:
-            os.mkdir(os.path.join(workspace, folder))
+            os.mkdir(os.path.join(registered_folder, subject_id))
         except Exception as e:
-            print('[  ERROR  ] Error creating folder: {}.'.format(e))
+            print('[  ERROR  ] Error creating subject_id: {}.'.format(e))
 
         # Convert to NIFTI
         command = 'mri_convert {} {}'.format(mov, mov_nii)
         os.system(command)
+
+        # Remove extracted if exist
+        if isdir('/dev/shm/{}'.format(subject_id)):
+            os.system('rm -rf /dev/shm/{}'.format(subject_id))
 
         # Register to MNI
         # flirt -ref /home/sssilvar/Documents/code/CSD-AD/param/FSL_MNI152_FreeSurferConformed_1mm.nii -in brain.nii.gz -omat my_affine_transf.mat -out registered.nii.gz
         command = 'flirt -ref {} -in {} -omat {} -out {}'.format(dst, mov_nii, aff_mat, mapmov)
         os.system(command)
 
+        # Remove folder from RAM
         os.system('rm {}'.format(mov_nii))
+    else:
+        print('[  ERROR  ] File {} not found'.format(mov))
+
+
+
+if __name__ == '__main__':
+    # Clear screen
+    os.system('clear')
+
+    # Load variables of interest
+    print('[  INFO  ] Loading configuration and dataset files...')
+    cfg = ConfigParser()
+    cfg.read(join(root, 'config/config.cfg'))
+
+    dataset_folder = cfg.get('dirs', 'dataset_folder')
+    registered_folder = cfg.get('dirs', 'dataset_folder_registered')
+    n_cores = cfg.getint('resources', 'n_cores')
+    
+    # Read file containing subject's IDs
+    df = pd.read_csv(join(dataset_folder, 'groupfile.csv'), index_col=0)
+
+    with poolcontext(processes=n_cores) as pool:
+        pool.map(register_subject_with_flirt, df.index)
+    
