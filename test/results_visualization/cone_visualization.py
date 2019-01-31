@@ -2,17 +2,16 @@ import sys
 from configparser import ConfigParser
 from os.path import join, dirname, realpath
 
-import numpy as np
-import nibabel as nb
-from nilearn import plotting
 import matplotlib.pyplot as plt
+import nibabel as nb
+import numpy as np
+from nilearn import plotting
 
 root = dirname(dirname(dirname(realpath(__file__))))
 
 sys.path.append(root)
-from lib.geometry import solid_cone, sphere
-from lib.transformations import rotate_vol
-from lib.geometry import get_centroid, extract_sub_volume
+from lib.geometry import sphere
+from lib.geometry import get_centroid
 
 plt.style.use('ggplot')
 
