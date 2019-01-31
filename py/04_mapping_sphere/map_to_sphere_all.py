@@ -1,17 +1,16 @@
 import os
 import sys
-from time import time
 from configparser import ConfigParser
-from os.path import join, dirname, realpath, isfile
-
-from multiprocessing import Pool
-from functools import partial
 from contextlib import contextmanager
+from functools import partial
+from multiprocessing import Pool
+from os.path import join, dirname, realpath, isfile
+from time import time
 
+import matplotlib.pyplot as plt
+import nibabel as nb
 import numpy as np
 import pandas as pd
-import nibabel as nb
-import matplotlib.pyplot as plt
 from scipy import ndimage as ndi
 
 # Set root folder
@@ -21,7 +20,6 @@ root = dirname(dirname(dirname(realpath(__file__))))
 sys.path.append(root)
 from lib.param import load_params
 from lib.masks import solid_cone
-from lib.visualization import show_mri
 from lib.transformations import rotate_vol
 from lib.geometry import extract_sub_volume, get_centroid
 
@@ -32,14 +30,27 @@ def poolcontext(*args, **kwargs):
     yield pool
     pool.terminate()
 
+
 def process_image(folder, n_scale, scale):
     # Set of folders important in the processing pipeline
     subject_dir = join(dataset_registered_folder, folder)
     brainmask_file = join(subject_dir, 'brainmask_reg.nii.gz')
     subject_output_dir = join(results_folder, folder)
 
+    # Get radius range from scale
+    r_min, r_max = scale
+
+    # Declare image output filenames
+    intensities_file = join(subject_output_dir, 'intensity_%d_to_%d_solid_angle_to_sphere' % (r_min, r_max))
+    gradients_file = join(subject_output_dir, 'gradient_%d_to_%d_solid_angle_to_sphere' % (r_min, r_max))
+    sobel_file = join(subject_output_dir, 'sobel_%d_to_%d_solid_angle_to_sphere' % (r_min, r_max))
+
+    # Create a condition checking if mappings exist
+    images_missed = any([not isfile(f + '.raw') for f in [intensities_file, gradients_file]])
+    print('[  INFO  ] Is any image missed?: {}'.format('Yes' if images_missed else 'No'))
+
     # Execute if file exists
-    if isfile(brainmask_file):
+    if isfile(brainmask_file) and images_missed:
         # Print info message
         print('[  INFO  ] Processing subject %s located in %s' % (folder, subject_dir))
 
@@ -48,7 +59,7 @@ def process_image(folder, n_scale, scale):
             os.mkdir(subject_output_dir)
             print('[  OK  ] Folder created at: ' + subject_output_dir)
         except OSError:
-            print('[  WARNING  ] Folder already exists.')
+            print('[  WARNING  ] Folder {} already exists.'.format(subject_output_dir))
 
         # Load MRI image and aseg file
         mgz = nb.load(brainmask_file)
@@ -66,7 +77,6 @@ def process_image(folder, n_scale, scale):
         img_sobel = np.sqrt(sobel_x ** 2 + sobel_y ** 2 + sobel_z ** 2)
 
         # Crete a solid angle from a scale: sa
-        r_min, r_max = scale
         sa = solid_cone(radius=(r_min, r_max), center=centroid)
 
         # Start go over the whole sphere (x_angle: [0, pi] and z_angle [-pi, pi])
@@ -99,25 +109,22 @@ def process_image(folder, n_scale, scale):
 
             elapsed = time() - ti
             print('[ SA ] Scale: %d %s Ang: %s | Point (%d, %d) of (360/180) | Value: %f | Time: %.2f' %
-                (n_scale + 1, scale, (x_angle, z_angle), i, j, img_2d[i, j], elapsed))
+                  (n_scale + 1, scale, (x_angle, z_angle), i, j, img_2d[i, j], elapsed))
 
         # Create results:
         # 2 png files / 2 raw files
 
         # Image output for intensities
-        img_filename = join(subject_output_dir, 'intensity_%d_to_%d_solid_angle_to_sphere' % (r_min, r_max))
-        plt.imsave(img_filename + '.png', img_2d, cmap='gray')
-        img_2d.tofile(img_filename + '.raw')
+        plt.imsave(intensities_file + '.png', img_2d, cmap='gray')
+        img_2d.tofile(intensities_file + '.raw')
 
         # Image output for gradients
-        grad_filename = join(subject_output_dir, 'gradient_%d_to_%d_solid_angle_to_sphere' % (r_min, r_max))
-        plt.imsave(grad_filename + '.png', img_grad_2d, cmap='gray')
-        img_grad_2d.tofile(grad_filename + '.raw')
+        plt.imsave(gradients_file + '.png', img_grad_2d, cmap='gray')
+        img_grad_2d.tofile(gradients_file + '.raw')
 
         # Image output for sobel
-        sobel_filename = join(subject_output_dir, 'sobel_%d_to_%d_solid_angle_to_sphere' % (r_min, r_max))
-        plt.imsave(sobel_filename + '.png', img_sobel_2d, cmap='gray')
-        img_sobel_2d.tofile(grad_filename + '.raw')
+        plt.imsave(sobel_file + '.png', img_sobel_2d, cmap='gray')
+        img_sobel_2d.tofile(sobel_file + '.raw')
     else:
         print('[  ERROR  ] File {} was not found'.format(brainmask_file))
 
