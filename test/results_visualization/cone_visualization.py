@@ -1,32 +1,36 @@
-import os
 import sys
+from configparser import ConfigParser
+from os.path import join, dirname, realpath
 
 import numpy as np
-from skimage.io import imread
 import nibabel as nb
+from nilearn import plotting
 import matplotlib.pyplot as plt
-import matplotlib.font_manager as fm
 
-root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+root = dirname(dirname(dirname(realpath(__file__))))
 
 sys.path.append(root)
 from lib.geometry import solid_cone, sphere
 from lib.transformations import rotate_vol
-from lib.visualization import show_mri
 from lib.geometry import get_centroid, extract_sub_volume
 
 plt.style.use('ggplot')
 
 
 if __name__ == '__main__':
+    # Load from configuration
+    cfg = ConfigParser()
+    cfg.read(join(root, 'config', 'config.cfg'))
+    registered_folder = cfg.get('dirs', 'dataset_folder_registered')
+
     # Define file names
-    vol_filename = os.path.join(root, 'test', 'test_data', '941_S_1363.mgz')
-    aseg_filename = os.path.join(root, 'test', 'test_data', 'mri', 'aseg.mgz')
-    render_dir = os.path.join(root, 'output', 'render')
+    vol_filename = join(registered_folder, '002_S_0729/brainmask_reg.nii.gz')
+    mni_filename = join(root, 'param/FSL_MNI152_FreeSurferConformed_1mm.nii')
 
     # Load images
-    vol = nb.load(vol_filename).get_data()
-    aseg = nb.load(aseg_filename).get_data()
+    nii = nb.load(vol_filename)
+    mni_vol = nb.load(mni_filename).get_data()
+    vol = nii.get_data()
 
     # Define radius and center
     # radius = (0, 25)
@@ -36,33 +40,26 @@ if __name__ == '__main__':
         (50, 75),
         (75, 100)
     ]
-    centroid = tuple(get_centroid(aseg > 0))
+    centroid = tuple(get_centroid(mni_vol > 0))
     print('[  OK  ] Centroid = {}'.format(centroid))
 
     for i, radius in enumerate(scales):
         # Create a binary mask (cone between scales)
-        mask = solid_cone(radius=radius, center=centroid)
-
-        # Subsample the whole volume and the mask
-        vol_sub, center = extract_sub_volume(vol, radius=radius, centroid=centroid)
-        mask_sub, _ = extract_sub_volume(mask, radius=radius, centroid=centroid)
-
-        mask_sub = rotate_vol(mask_sub, angles=(45, 0, 0))
-        solid_ang_mask = rotate_vol(mask_sub, angles=(0, 0, -180))
+        mask = sphere(radius=radius, center=centroid)
 
         # Mask sub-sampled volume
-        vol_masked_sub = vol_sub * solid_ang_mask
-        mean_int = np.nan_to_num(vol_masked_sub.sum() / solid_ang_mask.sum())
+        vol_masked = np.multiply(vol, mask)
 
-        print(mean_int)
-        image_out_filename = os.path.join(root, 'output', 'intensity_%d_to_%d_three_views.png' % radius)
+        # Create NIFTI Images
+        nii_mask = nb.Nifti1Image(mask.astype(np.int32), nii.affine)
+        nii_masked = nb.Nifti1Image(vol_masked, nii.affine)
 
-        # Load render
-        img = imread(os.path.join(render_dir, '%d.png' % (i + 3)))
+        # Plot result
+        display = plotting.plot_anat(nii, title='%s to %s vox.' % radius)
+        display.add_overlay(nii_mask, alpha=0.3)
+        display.add_overlay(nii_masked, alpha=0.6)
 
-        # Plot them all
-        show_mri(vol_masked_sub, slice_xyz=center)
-        plt.suptitle('Volume size: [%d x %d x %d]' % tuple(vol_sub.shape))
-        # show_mri(vol_masked_sub, slice_xyz=center)
-        # plt.savefig(image_out_filename, cmap='gray', bbox_inches='tight')
+        # Save figures
+        plt.savefig('/tmp/%s_to_%s_visualization.png' % radius)
+
         plt.show()
