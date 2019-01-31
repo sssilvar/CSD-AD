@@ -13,8 +13,6 @@ sys.path.append(root)
 from lib.geometry import sphere
 from lib.geometry import get_centroid
 
-plt.style.use('ggplot')
-
 
 if __name__ == '__main__':
     # Load from configuration
