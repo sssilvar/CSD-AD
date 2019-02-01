@@ -131,22 +131,21 @@ def process_image(folder, n_scale, scale):
 
 if __name__ == '__main__':
     # Load database
-    params = load_params()
-    dataset_csv_file = os.path.normpath(root + params['data_file'])
-
-    # Load the list of subjects and order by subject_id: df
-    df = pd.read_csv(dataset_csv_file)
-    df = df.sort_values('folder')
-
     # Parse configuration
     cfg = join(root, 'config', 'config.cfg')
     config = ConfigParser()
     config.read(cfg)
 
+    # Load parammeters from config file
+    dataset_folder = config.get('dirs', 'dataset_folder')
     dataset_registered_folder = config.get('dirs', 'dataset_folder_registered')
     results_folder = config.get('dirs', 'sphere_mapping')
     n_cores = config.getint('resources', 'n_cores')
     mni_file = join(root, 'param', 'FSL_MNI152_FreeSurferConformed_1mm.nii')
+
+    # Load the list of subjects and order by subject_id: df
+    dataset_csv_file = join(dataset_folder, 'groupfile.csv')
+    df = pd.read_csv(dataset_csv_file, index_col=0)
 
     # Get template centroid
     mni_aseg = nb.load(mni_file).get_data()
@@ -164,7 +163,7 @@ if __name__ == '__main__':
     for n_scale, scale in enumerate(scales):
         # Pool the process
         with poolcontext(processes=n_cores) as pool:
-            pool.map(partial(process_image, n_scale=n_scale, scale=scale), df['folder'])
+            pool.map(partial(process_image, n_scale=n_scale, scale=scale), df.index)
     # pool = Pool(n_cores)
     # pool.map(process_image, df['folder'])
     # pool.close()
