@@ -29,28 +29,34 @@ def register_subject_with_flirt(subject_id):
     # Define template volume directory
     dst = os.path.join(root, 'param', 'FSL_MNI152_FreeSurferConformed_1mm.nii')
 
-    # Check if file is zipped
+    # Get subjects directory from conf file
     subjects_dir = cfg.get('dirs', 'subjects_dir')
+
+    # Define useful files for the registration process
     mov = os.path.join(subjects_dir, subject_id, 'mri', 'brainmask.mgz')
+    mapmov = os.path.join(registered_folder, subject_id, 'brainmask_reg.nii.gz')
+    mov_nii = '/dev/shm/{}.nii.gz'.format(subject_id)
+    aff_mat = os.path.join(registered_folder, subject_id, 'transform.mat')
+
+    # Check if file is zipped
     zipped_file = os.path.join(subjects_dir, subject_id + '.zip')
 
-    if not isfile(mov) and isfile(zipped_file):
+    if not isfile(mov) and isfile(zipped_file) and not isfile(mapmov):
         print('[  INFO  ] Extracting data from: {}'.format(zipped_file))
         bmask_path = join(subject_id, 'mri/brainmask.mgz')
 
         with ZipFile(zipped_file, 'r') as zf:
-            zf.extract(bmask_path, '/dev/shm/')
+            try:
+                zf.extract(bmask_path, '/dev/shm/')
+            except KeyError as e:
+                print('[  ERROR  ] Extraction failed: {}'.format(e))
         subjects_dir = '/dev/shm'
 
-    # Define mooving volumes (We have to convert MGZ to NIFTI due to FSL compatibility)
+    # Re-define moving image path (if subjects zipped)
     mov = os.path.join(subjects_dir, subject_id, 'mri', 'brainmask.mgz')
-    mov_nii = '/dev/shm/{}.nii.gz'.format(subject_id)
-    aff_mat = os.path.join(registered_folder, subject_id, 'transform.mat')
-    mapmov = os.path.join(registered_folder, subject_id, 'brainmask_reg.nii.gz')
-    print(mov)
 
     # Check if file exists
-    if isfile(mov):
+    if isfile(mov) and not isfile(mapmov):
         # Create a folder per each subject
         try:
             os.mkdir(os.path.join(registered_folder, subject_id))
@@ -73,6 +79,8 @@ def register_subject_with_flirt(subject_id):
 
         # Remove folder from RAM
         os.system('rm {}'.format(mov_nii))
+    elif isfile(mapmov):
+        print('[  WARNING  ] Registered file was found for {} in: {}'.format(subject_id, mapmov))
     else:
         print('[  ERROR  ] File {} not found'.format(mov))
 
