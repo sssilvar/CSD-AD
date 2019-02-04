@@ -31,7 +31,7 @@ def get_feats_file():
         cfg = ConfigParser()
         cfg.read(join(root, 'config/config.cfg'))
         data_folder = cfg.get('dirs', 'sphere_mapping')
-        return join(data_folder, 'gradient_curvelet_features_4_scales_32_angles.csv')
+        return join(data_folder, 'sobel_curvelet_features_4_scales_32_angles.csv')
 
 
 def reshape_dataframe(df):
@@ -45,11 +45,12 @@ def reshape_dataframe(df):
         df_buff.columns = ['{}_{}'.format(i, sphere) for i in df_buff.columns]
         df_list.append(df_buff)
 
-    return pd.concat(df_list, axis='columns', ignore_index=False)
+    return pd.concat(df_list, axis='columns', ignore_index=False, sort=True)
 
 
 def balance_dataset(df_features):
     """Balances the dataset"""
+    print_and_log('Balancing the dataset...')
     # Get lengths
     len_mcic = sum(df_features['target'] == 'MCIc')
     len_mcinc = sum(df_features['target'] == 'MCInc')
@@ -111,7 +112,7 @@ if __name__ == "__main__":
 
     # Load features file and set number of folds
     feats_file = get_feats_file()
-    n_folds = 7
+    n_folds = 10
 
     # Create and setup logger
     log_file = join(dirname(feats_file),
@@ -131,6 +132,7 @@ if __name__ == "__main__":
     # Assign values to X and y
     y = X.target == 'MCIc'
     X = X.drop('target', axis='columns')
+    X = X.fillna(X.mean())
 
     print_and_log('Preview\n {}'.format(X.head()))
     print_and_log('Data dimensions: {}'.format(X.shape))
@@ -149,6 +151,7 @@ if __name__ == "__main__":
         y_train, y_test = y[train_index], y[test_index]
 
         # Start classification task
+        print_and_log('\n\nProcessing fold No. {}'.format(fold_i + 1))
         print_and_log('Number of features (%d)' % X.shape[1])
         print_and_log('Total observations (%d)' % len(y))
         print_and_log('Training observations (%d)' % len(y_train))
