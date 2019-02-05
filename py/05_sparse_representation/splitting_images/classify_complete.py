@@ -189,7 +189,7 @@ if __name__ == "__main__":
                                 param_grid,
                                 cv=StratifiedKFold(n_splits=3, random_state=42),
                                 iid=True,
-                                n_jobs=3)
+                                n_jobs=7)
         clf_grid.fit(X_train, y_train)
 
         y_pred = clf_grid.predict(X_test)
