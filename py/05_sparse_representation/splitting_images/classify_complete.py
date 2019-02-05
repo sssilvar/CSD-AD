@@ -18,10 +18,12 @@ from sklearn.feature_selection import SelectFromModel
 from sklearn.model_selection import GridSearchCV, StratifiedKFold, train_test_split
 from sklearn.metrics import classification_report, roc_auc_score, roc_curve
 
+import matplotlib
 import matplotlib.pyplot as plt
 
 root = dirname(dirname(dirname(dirname(realpath(__file__)))))
 plt.style.use('ggplot')
+matplotlib.use('Agg')
 
 
 def get_feats_file():
