@@ -26,16 +26,6 @@ plt.style.use('ggplot')
 matplotlib.use('Agg')
 
 
-def get_feats_file():
-    try:
-        return sys.argv[1]
-    except IndexError:
-        cfg = ConfigParser()
-        cfg.read(join(root, 'config/config.cfg'))
-        data_folder = cfg.get('dirs', 'sphere_mapping')
-        return join(data_folder, 'sobel_curvelet_features_4_scales_32_angles.csv')
-
-
 def reshape_dataframe(df):
     # Uses 'sphere' to reshape in a single one row
     df['sphere'] = df['sphere'].astype('category')
@@ -113,8 +103,15 @@ if __name__ == "__main__":
     # Clear screen
     os.system('clear')
 
+    # Parse configuration
+    cfg = ConfigParser()
+    cfg.read(join(root, 'config/config.cfg'))
+    data_folder = cfg.get('dirs', 'sphere_mapping')
+    n_cores = cfg.getint('resources', 'n_cores')
+    n_cores = n_cores if n_cores <= 10 else 10
+
     # Load features file and set number of folds
-    feats_file = get_feats_file()
+    feats_file = join(data_folder, 'sobel_curvelet_features_4_scales_32_angles.csv')
     n_folds = 10
 
     # Create and setup logger
@@ -189,7 +186,7 @@ if __name__ == "__main__":
                                 param_grid,
                                 cv=StratifiedKFold(n_splits=3, random_state=42),
                                 iid=True,
-                                n_jobs=7)
+                                n_jobs=n_cores)
         clf_grid.fit(X_train, y_train)
 
         y_pred = clf_grid.predict(X_test)
