@@ -32,11 +32,10 @@ def reshape_dataframe(df):
 
     df_list = []
     for sphere in df['sphere'].cat.categories:
-        if '75_to_100' not in sphere:
-            df_buff = df.loc[df.sphere == sphere]
-            df_buff = df_buff.drop('sphere', axis='columns')
-            df_buff.columns = ['{}_{}'.format(i, sphere) for i in df_buff.columns]
-            df_list.append(df_buff)
+        df_buff = df.loc[df.sphere == sphere]
+        df_buff = df_buff.drop('sphere', axis='columns')
+        df_buff.columns = ['{}_{}'.format(i, sphere) for i in df_buff.columns]
+        df_list.append(df_buff)
 
     return pd.concat(df_list, axis='columns', ignore_index=False, sort=True)
 
