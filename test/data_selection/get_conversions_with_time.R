@@ -63,5 +63,7 @@ for (month in c(12, 24, 48)) {
 
 library(ggplot2)
 mci_processed %>%
+  filter(!Month.SC %in% c(0, 102, 114, 126, 150)) %>%
+  mutate(Month.SC = as.numeric(as.character(Month.SC))) %>%
   group_by(label) %>%
-  pull(Months.SCONV)
+  ggplot(aes(x = label, fill = label)) + geom_bar() + facet_wrap(~Month.SC)
