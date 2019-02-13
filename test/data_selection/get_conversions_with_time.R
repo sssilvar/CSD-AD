@@ -1,6 +1,7 @@
 # Include ADNIMERGE
 library(ADNIMERGE)
 library(dplyr)
+library(ggplot2)
 
 mci_data <- adnimerge %>%
   filter(Month == 0 & DX == "MCI")
@@ -46,24 +47,31 @@ for (sid in mci_ids) {
 # Save results to file
 #write.csv(mci_processed, './param/df_conversions_with_times.csv')
 
-# Visualize results
-#mci_processed$Month.CONVERSION = as.numeric(mci_processed$Month.CONVERSION)
-#mci_processed$Month.STABILITY = as.numeric(mci_processed$Month.STABILITY)
+# Drop zero-months
+mci_processed <- mci_processed %>%
+  filter(!Month.SC == 0)
 
-for (month in c(12, 24, 48)) {
+for (month in c(24, 36, 60)) {
   summ <- mci_processed %>%
     filter(
-      as.numeric(as.character(Month.STABILITY)) > month | 
-      as.numeric(as.character(Month.CONVERSION)) == month)%>%
+      as.numeric(as.character(Month.STABILITY)) >= month | 
+      as.numeric(as.character(Month.CONVERSION)) <= month)%>%
     group_by(label) %>%
-    summarise(Total=n(), MeanAge=mean(AGE, na.rm = TRUE), StdAge=sd(AGE, na.rm = TRUE))
+    summarise(Total=n(), MeanAge=mean(AGE, na.rm = TRUE), StdAge=sd(AGE, na.rm = TRUE)) %>%
+    arrange(desc(label))
   print(sprintf("At least %d months of stability and %d months for conversion", month, month))
   print(summ)
 }
 
-library(ggplot2)
 mci_processed %>%
   filter(!Month.SC %in% c(0, 102, 114, 126, 150)) %>%
   mutate(Month.SC = paste(as.character(Month.SC), "Months")) %>%
-  group_by(label) %>%
-  ggplot(aes(x = label, fill = label)) + geom_bar() + facet_wrap(~Month.SC) + theme(text = element_text(size=20))
+  ggplot(aes(x = label, fill = label)) + geom_bar() + facet_wrap(~Month.SC) #+ theme(text = element_text(size=20))
+
+month = 60
+mci_processed %>%
+  mutate(
+    Month.CONVERSION = as.numeric(as.character(Month.CONVERSION)),
+    Month.STABILITY = as.numeric(as.character(Month.STABILITY))) %>%
+  filter(Month.CONVERSION <= month | Month.STABILITY >= month) %>%
+  ggplot(aes(x=label, fill=label)) + geom_bar()
