@@ -20,7 +20,7 @@ for (sid in baseline$RID) {
       month <- subject_data %>% filter(DX == "Dementia") %>% arrange(Month) %>% head(1) %>% pull(Month)
       subject_valid <- subject_data %>%
         filter(Month == 0) %>%
-        mutate(label = "MCIc", Month.SC = month, Month.CONVERSION = month)
+        mutate(target = "MCIc", Month.SC = month, Month.CONVERSION = month)
       mci_data <- merge(mci_data, subject_valid, all = TRUE)
     }
   } else {
@@ -32,23 +32,24 @@ for (sid in baseline$RID) {
       month <- subject_data %>% arrange(desc(Month)) %>% head(1) %>% pull(Month)
       subject_valid <- subject_data %>%
         filter(Month == 0) %>%
-        mutate(label = "MCInc", Month.SC = month, Month.STABLE = month)
+        mutate(target = "MCInc", Month.SC = month, Month.STABLE = month)
       mci_data <- merge(mci_data, subject_valid, all = TRUE)
     }
   }
 }
 
-#mci_processed <- mci_data %>% filter(!Month.SC == 0)
-mci_processed <- mci_data
+mci_non_zero <- mci_data %>% filter(!Month.SC == 0)
 
 for (month in c(24, 36, 60)) {
-  summ <- mci_processed %>%
+  summ <- mci_non_zero %>%
     filter(
       as.numeric(as.character(Month.STABLE)) >= month | 
         as.numeric(as.character(Month.CONVERSION)) <= month)%>%
-    group_by(label) %>%
+    group_by(target) %>%
     summarise(Total=n(), MeanAge=mean(AGE, na.rm = TRUE), StdAge=sd(AGE, na.rm = TRUE)) %>%
-    arrange(desc(label))
+    arrange(desc(target))
   print(sprintf("At least %d months of stability and %d months for conversion", month, month))
   print(summ)
 }
+
+write.csv(mci_non_zero, "./param/df_conversions_with_times.csv")

@@ -64,12 +64,23 @@ def get_labels(x):
     """Obtains labels from indexes"""
     # Load information from ADNIMERGE
     df_common = pd.read_csv(
-        join(root, 'param/df_conversions.csv'),
+        join(root, 'param/df_conversions_with_times.csv'),
         index_col='PTID'
     )
 
+    # Assign labels
+    x['target'] = df_common.reindex(x.index).target.astype('category')
+
+    # Filter per month
+    month = 36
+    print('For {} months | Data shape: {}:'.format(month, x.shape))
+    df_common = df_common.loc[(df_common['Month.STABLE'] >= month) | (df_common['Month.CONVERSION'] <= month)]
+    print(df_common['target'].astype('category').value_counts())
+    print('Intersection: %d' % len(set(x.index) and set(df_common.index)))
+    print('DataFrames Lenghts: {} and {}'.format(x.shape[0], df_common.shape[0]))
+
     # Return Labels
-    return df_common.loc[x.index, 'target'].astype('category')
+    return x.reindex(df_common.index).dropna(axis='rows', how='all')
 
 
 def setup_logger(logfile):
@@ -124,18 +135,18 @@ if __name__ == "__main__":
     X = pd.read_csv(feats_file, index_col=0)
     X = reshape_dataframe(X)
 
-    # Get labels and append them as a column
-    X['target'] = get_labels(X)
-    X = balance_dataset(X)
+    # Get labels, remove unused observations and append them as a column
+    X = get_labels(X)
+    # X = balance_dataset(X)
+
+    print_and_log('Preview\n {}'.format(X.head()))
+    print_and_log('Data dimensions: {}'.format(X.shape))
+    print_and_log('Number of observations:\n{}'.format(X.target.value_counts()))
 
     # Assign values to X and y
     y = X.target == 'MCIc'
     X = X.drop('target', axis='columns')
     X = X.fillna(X.mean())
-
-    print_and_log('Preview\n {}'.format(X.head()))
-    print_and_log('Data dimensions: {}'.format(X.shape))
-    print_and_log('Number of observations:\n{}'.format(get_labels(X).value_counts()))
 
     # Split dataset
     print_and_log('Splitting dataset...')
@@ -160,24 +171,24 @@ if __name__ == "__main__":
         pipeline = Pipeline([
             ('scaler', StandardScaler()),
             ('feature_selection', SelectFromModel(LinearSVC(penalty='l2'))),
-            # ('clf', SVC(probability=True))
-            ('clf', RandomForestClassifier(random_state=42))
+            ('clf', SVC(probability=True))
+            # ('clf', RandomForestClassifier(random_state=42))
         ])
 
         # Define a search grid
         print_and_log('Setting classifier\'s parameters...')
-        param_grid = {
-            'clf__n_estimators': [200, 500],
-            'clf__max_features': ['auto', 'sqrt', 'log2'],
-            'clf__max_depth': [4, 5, 6, 7, 8],
-            'clf__criterion': ['gini', 'entropy']
-        }
-
         # param_grid = {
-        #     'clf__kernel': ['rbf'],
-        #     'clf__C': [0.001, 0.01, 0.1, 1, 10],
-        #     'clf__gamma': [0.0001, 0.001, 0.01, 0.1, 1]
+        #     'clf__n_estimators': [200, 500],
+        #     'clf__max_features': ['auto', 'sqrt', 'log2'],
+        #     'clf__max_depth': [4, 5, 6, 7, 8],
+        #     'clf__criterion': ['gini', 'entropy']
         # }
+
+        param_grid = {
+            'clf__kernel': ['rbf'],
+            'clf__C': [0.001, 0.01, 0.1, 1, 10],
+            'clf__gamma': [0.0001, 0.001, 0.01, 0.1, 1]
+        }
 
         # Set a grit to hypertune the classifier
         print_and_log('Looking for the best parameters...')
