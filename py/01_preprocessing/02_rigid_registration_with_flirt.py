@@ -94,11 +94,12 @@ if __name__ == '__main__':
     cfg = ConfigParser()
     cfg.read(join(root, 'config/config.cfg'))
 
+    dataset_folder = cfg.get('dirs', 'subjects_dir')
     registered_folder = cfg.get('dirs', 'dataset_folder_registered')
     n_cores = cfg.getint('resources', 'n_cores')
 
     # Read file containing subject's IDs
-    df = pd.read_csv(join(registered_folder, 'groupfile.csv'), index_col=0)
+    df = pd.read_csv(join(dataset_folder, 'groupfile.csv'), index_col=0)
 
     with poolcontext(processes=n_cores) as pool:
         pool.map(register_subject_with_flirt, df.index)
