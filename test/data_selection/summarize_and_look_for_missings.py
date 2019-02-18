@@ -30,7 +30,7 @@ if __name__ == '__main__':
     # Get subjects' data
     df_missed = df.reindex(missed_subjects)
     print(df_missed['COLPROT'].value_counts())
-    print(df_missed.loc[df_missed['COLPROT'] == 'ADNIGO'].head())
+    print(df_missed.sort_values('PTID'))
 
     # Write result to file
     missed_subjects_file = join(root, 'test', 'explore_data', 'missed_subjects.txt')
