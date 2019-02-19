@@ -10,12 +10,14 @@ One script to rule them all.
 This script executes Freesurfer recon-all command over a whole dataset (ADNI)
 USAGE:
 
-    python recon_all.py -g [groupfile.csv] -f [dataset_folder] -o [output_folder]
+    python recon_all.py -g [groupfile.csv] -f [dataset_folder] -o [output_folder] -c [number_of_cores]
 """
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description=__description__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('-g', required=True, metavar='--groupfile', help='A CSV containing subject IDs to be processed.')
+    parser.add_argument('-g', required=True, metavar='--groupfile',
+                        help='A CSV containing subject IDs to be processed.')
     parser.add_argument('-f', required=True, metavar='--folder', help='Folders where subjects are')
     parser.add_argument('-o', required=True, metavar='--output', help='Folders output.')
     parser.add_argument('-c', required=True, metavar='--cores', help='Number of cores used.', type=int)
@@ -45,7 +47,7 @@ def recon_all(f):
     # Extract subject ID from filename
     fn = os.path.basename(f).split('_')
     subject = '_'.join(fn[1:4])
-    
+
     # Create command
     cmd = 'recon-all -i {} -s {} -sd {} -all'.format(f, subject, '/dev/shm')
     # cmd = 'mri_convert {} {}.mgz'.format(f, os.path.join('/dev/shm',subject))
