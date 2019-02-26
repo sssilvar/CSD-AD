@@ -246,7 +246,6 @@ if __name__ == "__main__":
 
     # Get Classifier name, basename of the features file and
     # the type of images (gradient, intensities, sobel)
-    clf_type = str(pipeline.named_steps['clf']).split('(')[0]
     basename_file = basename(feats_file).split('.')[0]
     img_type = basename(feats_file).split('_')[0]
 
@@ -254,9 +253,10 @@ if __name__ == "__main__":
     plt.xlabel('False positive rate')
     plt.ylabel('True positive rate')
     plt.legend()
-    plt.title('ROC {} ({})'.format(clf_type, img_type))
+    plt.title('ROC {} ({})'.format(clf_name, img_type))
 
     fig_file = join(dirname(feats_file),
                     'ROC',
-                    '{name}_aio_roc_{folds}_fold.png'.format(name=basename_file, folds=n_folds))
+                    '{name}_aio_roc_{folds}_fold_{clf}_{time}_months.png'
+                    .format(name=basename_file, folds=n_folds, clf=clf_type, time=study_time))
     plt.savefig(fig_file, bbox_inches='tight')
