@@ -1,48 +1,24 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Get current directory
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-# Parse arguments
-MAIN_DIR=${1-"/home/ssilvari/Documents/temp/spherical_mapping/sphere_mapped_4_spheres"}
-CLF_TYPE=${2-"svm"}
+# Set conversion times of interest
+TIMES=(24 36 60)
 
-# Set output folder
-ROC_FOLDER="${MAIN_DIR}/ROC"
-echo -e "[  INFO  ] Data folder in: ${CURRENT_DIR}"
+# Set other params
+CLF="svm"
+FOLDS=10
+IMG_TYPES=("intensity" "gradient" "sobel")
 
-# Define scales and angles
-IMG_TYPES=("intensity" "gradient")
-SCALES=(4)
-ANGLES=(32)
-
-# Create ROC folder if does not exist
-if [[ ! -d ${ROC_FOLDER} ]]; then
-    echo "[  INFO  ] Creating Results Folder: ${ROC_FOLDER}"
-    mkdir ${ROC_FOLDER}
-fi
-
-# Run classification
-for img_type in ${IMG_TYPES[@]}
+for imtype in ${IMG_TYPES[@]}
 do
-    for scale in ${SCALES[@]}
+    for t in ${TIMES[@]}
     do
-        for angle in ${ANGLES[@]}
-        do
-            SCRIPT="${CURRENT_DIR}/classification_per_sphere.py"
-            CSV_FILE="${MAIN_DIR}/${img_type}_curvelet_features_${scale}_scales_${angle}_angles.csv"
-            CMD="python3 ${SCRIPT} -f ${CSV_FILE} -clf ${CLF_TYPE} -log ${ROC_FOLDER}/classification_${scale}_scales_${angle}_angles_${img_type}.log"
+        echo "Processing ${imtype} images for subjects in ${t} months of conversion/stability..."
+        SCRIPT="${CURRENT_DIR}/classify_complete.py -time ${t} -folds ${FOLDS} -clf ${CLF} -imtype ${imtype}"
+        eval "python3 ${SCRIPT}"
 
-            # Check if CSV exists and run
-            if [[ -f ${CSV_FILE} ]]; then
-                echo -e "[  INFO  ]Running classification..."
-                echo -e "\t- Image type: ${img_type}"
-                echo -e "\t- Number of scales: ${scale}"
-                echo -e "\t- Number of orientations: ${angle}"
-                eval ${CMD}
-            else
-                echo -e "[  ERROR  ] File ${CSV_FILE} not found!\n"
-            fi
-        done
+        echo -e "\n\n"
     done
 done

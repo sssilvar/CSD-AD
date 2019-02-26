@@ -2,6 +2,7 @@
 import os
 import sys
 import logging
+import argparse
 from configparser import ConfigParser
 from os.path import join, dirname, realpath, basename
 
@@ -24,6 +25,27 @@ import matplotlib.pyplot as plt
 root = dirname(dirname(dirname(dirname(realpath(__file__)))))
 plt.style.use('ggplot')
 matplotlib.use('Agg')
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Classification task for Currvelet features in MCI to AD conversion")
+    parser.add_argument('-time',
+                        help='Conversion/Stability time criteria (24, 36, 60) months',
+                        default=24,
+                        type=int)
+    parser.add_argument('-folds',
+                        help='Numbers of folds for cross-validation (K-fold)',
+                        type=int,
+                        default=10)
+    parser.add_argument('-clf',
+                        help='Type of classifier to be used [svm/rf]',
+                        type=str,
+                        default='svm')
+    parser.add_argument('-imtype',
+                        help='Type of the images to be classified [intensity/gradient/sobel]',
+                        type=str,
+                        default='gradient')
+    return parser.parse_args()
 
 
 def reshape_dataframe(df):
@@ -112,6 +134,14 @@ if __name__ == "__main__":
     # Clear screen
     os.system('clear')
 
+    # Parse arguments
+    args = parse_args()
+    n_folds = args.folds
+    study_time = args.time
+    img_type = args.imtype
+    clf_type = args.clf.lower()
+    clf_name = 'SVM' if clf_type == 'svm' else 'Random Forest'
+
     # Parse configuration
     cfg = ConfigParser()
     cfg.read(join(root, 'config/config.cfg'))
@@ -120,15 +150,14 @@ if __name__ == "__main__":
     n_cores = n_cores if n_cores <= 10 else 10
 
     # Load features file and set number of folds
-    feats_file = join(data_folder, 'gradient_curvelet_features_4_scales_32_angles.csv')
-    n_folds = 10
-    study_time = 60
+    feats_file = join(data_folder, '{}_curvelet_features_4_scales_32_angles.csv'.format(img_type))
 
     # Create and setup logger
     log_file = join(dirname(feats_file),
                     'ROC', 'classification_{basename}_aio.log'.format(basename=basename(feats_file).split('.')[0]))
     logger = setup_logger(log_file)
     print_and_log('Classification task:')
+    print_and_log('Selected classifier {}'.format(clf_name))
     print_and_log('Features file: {}'.format(feats_file))
     print_and_log('Log file: {}'.format(log_file))
     print_and_log('Conversion/stable time: {} months'.format(study_time))
@@ -143,6 +172,7 @@ if __name__ == "__main__":
     print_and_log('Preview\n {}'.format(X.head()))
     print_and_log('Data dimensions: {}'.format(X.shape))
     print_and_log('Number of observations:\n{}'.format(X.target.value_counts()))
+    exit()
 
     # Assign values to X and y
     y = X.target == 'MCIc'
@@ -168,28 +198,30 @@ if __name__ == "__main__":
         print_and_log('Training observations (%d)' % len(y_train))
         print_and_log('Test observations (%d)' % len(y_test))
 
+        # Define classifier and grid depending on param
+        print_and_log('Setting classifier\'s parameters...')
+        if clf_type == 'svm':
+            clf = SVC(probability=True)
+            param_grid = {
+                'clf__kernel': ['rbf'],
+                'clf__C': [0.001, 0.01, 0.1, 1, 10],
+                'clf__gamma': [0.0001, 0.001, 0.01, 0.1, 1]
+            }
+        else:
+            clf = RandomForestClassifier(random_state=42)
+            param_grid = {
+                'clf__n_estimators': [200, 500],
+                'clf__max_features': ['auto', 'sqrt', 'log2'],
+                'clf__max_depth': [4, 5, 6, 7, 8],
+                'clf__criterion': ['gini', 'entropy']
+            }
+
         # Start classification
         pipeline = Pipeline([
             ('scaler', StandardScaler()),
             ('feature_selection', SelectFromModel(LinearSVC(penalty='l2'))),
-            ('clf', SVC(probability=True))
-            # ('clf', RandomForestClassifier(random_state=42))
+            ('clf', clf)
         ])
-
-        # Define a search grid
-        print_and_log('Setting classifier\'s parameters...')
-        # param_grid = {
-        #     'clf__n_estimators': [200, 500],
-        #     'clf__max_features': ['auto', 'sqrt', 'log2'],
-        #     'clf__max_depth': [4, 5, 6, 7, 8],
-        #     'clf__criterion': ['gini', 'entropy']
-        # }
-
-        param_grid = {
-            'clf__kernel': ['rbf'],
-            'clf__C': [0.001, 0.01, 0.1, 1, 10],
-            'clf__gamma': [0.0001, 0.001, 0.01, 0.1, 1]
-        }
 
         # Set a grit to hypertune the classifier
         print_and_log('Looking for the best parameters...')
