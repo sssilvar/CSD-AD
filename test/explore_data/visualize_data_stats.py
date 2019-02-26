@@ -10,7 +10,7 @@ if __name__ == '__main__':
     df = pd.read_csv(conversions_file, index_col='PTID')
 
     # Set a conversion times of interes: toi
-    toi = [24, 48, 60]
+    toi = [24, 36, 60]
     for t in toi:
         df_mci = df.loc[(df['Month.CONVERSION'] <= t) | (df['Month.STABLE'] >= t)]
         print('Data distribution for {} months'.format(t))

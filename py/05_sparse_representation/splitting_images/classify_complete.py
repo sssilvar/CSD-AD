@@ -60,7 +60,7 @@ def balance_dataset(df_features):
     return df_features.loc[index_mcic].append(df_features.loc[index_mcinc])
 
 
-def get_labels(x):
+def get_times_and_labels(x, time):
     """Obtains labels from indexes"""
     # Load information from ADNIMERGE
     df_common = pd.read_csv(
@@ -72,12 +72,11 @@ def get_labels(x):
     x['target'] = df_common.reindex(x.index).target.astype('category')
 
     # Filter per month
-    month = 36
-    print('For {} months | Data shape: {}:'.format(month, x.shape))
-    df_common = df_common.loc[(df_common['Month.STABLE'] >= month) | (df_common['Month.CONVERSION'] <= month)]
-    print(df_common['target'].astype('category').value_counts())
-    print('Intersection: %d' % len(set(x.index) and set(df_common.index)))
-    print('DataFrames Lenghts: {} and {}'.format(x.shape[0], df_common.shape[0]))
+    print('For {} months | Data shape: {}:'.format(time, x.shape))
+    df_common = df_common.loc[(df_common['Month.STABLE'] >= time) | (df_common['Month.CONVERSION'] <= time)]
+    print_and_log('Number of subjects found in ADNIMERGE for {} months:\n{}'
+                  .format(time, df_common['target']
+                          .value_counts()))
 
     # Return Labels
     return x.reindex(df_common.index).dropna(axis='rows', how='all')
@@ -121,8 +120,9 @@ if __name__ == "__main__":
     n_cores = n_cores if n_cores <= 10 else 10
 
     # Load features file and set number of folds
-    feats_file = join(data_folder, 'sobel_curvelet_features_4_scales_32_angles.csv')
+    feats_file = join(data_folder, 'gradient_curvelet_features_4_scales_32_angles.csv')
     n_folds = 10
+    study_time = 60
 
     # Create and setup logger
     log_file = join(dirname(feats_file),
@@ -131,12 +131,13 @@ if __name__ == "__main__":
     print_and_log('Classification task:')
     print_and_log('Features file: {}'.format(feats_file))
     print_and_log('Log file: {}'.format(log_file))
+    print_and_log('Conversion/stable time: {} months'.format(study_time))
 
     X = pd.read_csv(feats_file, index_col=0)
     X = reshape_dataframe(X)
 
     # Get labels, remove unused observations and append them as a column
-    X = get_labels(X)
+    X = get_times_and_labels(X, time=study_time)
     # X = balance_dataset(X)
 
     print_and_log('Preview\n {}'.format(X.head()))
