@@ -172,7 +172,6 @@ if __name__ == "__main__":
     print_and_log('Preview\n {}'.format(X.head()))
     print_and_log('Data dimensions: {}'.format(X.shape))
     print_and_log('Number of observations:\n{}'.format(X.target.value_counts()))
-    exit()
 
     # Assign values to X and y
     y = X.target == 'MCIc'
