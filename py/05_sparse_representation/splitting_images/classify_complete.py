@@ -45,6 +45,10 @@ def parse_args():
                         help='Type of the images to be classified [intensity/gradient/sobel]',
                         type=str,
                         default='gradient')
+    parser.add_argument('-tune',
+                        help='Type of the images to be classified [intensity/gradient/sobel]',
+                        type=int,
+                        default=0)
     return parser.parse_args()
 
 
@@ -141,6 +145,7 @@ if __name__ == "__main__":
     img_type = args.imtype
     clf_type = args.clf.lower()
     clf_name = 'SVM' if clf_type == 'svm' else 'Random Forest'
+    clf_tuning = bool(args.tune)
 
     # Parse configuration
     cfg = ConfigParser()
@@ -158,6 +163,7 @@ if __name__ == "__main__":
     logger = setup_logger(log_file)
     print_and_log('Classification task:')
     print_and_log('Selected classifier {}'.format(clf_name))
+    print_and_log('Hypertunning?: {}'.format(clf_tuning))
     print_and_log('Features file: {}'.format(feats_file))
     print_and_log('Log file: {}'.format(log_file))
     print_and_log('Conversion/stable time: {} months'.format(study_time))
@@ -199,21 +205,39 @@ if __name__ == "__main__":
 
         # Define classifier and grid depending on param
         print_and_log('Setting classifier\'s parameters...')
-        if clf_type == 'svm':
-            clf = SVC(probability=True)
-            param_grid = {
-                'clf__kernel': ['rbf'],
-                'clf__C': [0.001, 0.01, 0.1, 1, 10],
-                'clf__gamma': [0.0001, 0.001, 0.01, 0.1, 1]
-            }
+        if clf_tuning:
+            if clf_type == 'svm':
+                clf = SVC(probability=True)
+                param_grid = {
+                    'clf__kernel': ['rbf'],
+                    'clf__C': [0.001, 0.01, 0.1, 1, 10],
+                    'clf__gamma': [0.0001, 0.001, 0.01, 0.1, 1]
+                }
+            else:
+                clf = RandomForestClassifier(random_state=42)
+                param_grid = {
+                    'clf__n_estimators': [200, 500],
+                    'clf__max_features': ['auto', 'sqrt', 'log2'],
+                    'clf__max_depth': [4, 5, 6, 7, 8],
+                    'clf__criterion': ['gini', 'entropy']
+                }
         else:
-            clf = RandomForestClassifier(random_state=42)
-            param_grid = {
-                'clf__n_estimators': [200, 500],
-                'clf__max_features': ['auto', 'sqrt', 'log2'],
-                'clf__max_depth': [4, 5, 6, 7, 8],
-                'clf__criterion': ['gini', 'entropy']
-            }
+            # No optimization is done
+            if clf_type == 'svm':
+                clf = SVC(
+                    probability=True,
+                    kernel='rbf',
+                    gamma=0.001
+                ) #TODO: Add params
+            else:
+                clf = RandomForestClassifier(
+                    random_state=42,
+                    criterion='gini',
+                    max_depth=5,
+                    max_features='auto',
+                    n_estimators=500,
+                    n_jobs=n_cores
+                )
 
         # Start classification
         pipeline = Pipeline([
@@ -223,24 +247,32 @@ if __name__ == "__main__":
         ])
 
         # Set a grit to hypertune the classifier
-        print_and_log('Looking for the best parameters...')
-        clf_grid = GridSearchCV(pipeline,
-                                param_grid,
-                                cv=StratifiedKFold(n_splits=3, random_state=42),
-                                iid=True,
-                                n_jobs=n_cores)
-        clf_grid.fit(X_train, y_train)
+        if clf_tuning:
+            print_and_log('Looking for the best parameters...')
+            clf_grid = GridSearchCV(pipeline,
+                                    param_grid,
+                                    cv=StratifiedKFold(n_splits=3, random_state=42),
+                                    iid=True,
+                                    n_jobs=n_cores)
+            clf_grid.fit(X_train, y_train)
 
-        y_pred = clf_grid.predict(X_test)
-        y_pred_proba = clf_grid.predict_proba(X_test)[:, 1]
+            y_pred = clf_grid.predict(X_test)
+            y_pred_proba = clf_grid.predict_proba(X_test)[:, 1]
+            print_and_log('Best Params: %s' % clf_grid.best_params_)
+        else:
+            print_and_log('Performing classification...')
+            print_and_log('Training classifier...')
+            pipeline.fit(X_train, y_train)
+
+            print_and_log('Classifying..')
+            y_pred = pipeline.predict(X_test)
+            y_pred_proba = pipeline.predict_proba(X_test)[:, 1]
 
         # Compute rates and plot AUC
         fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
         auc = roc_auc_score(y_test, y_pred_proba)
 
         print_and_log('Classification report: \n%s' % classification_report(y_test, y_pred))
-        print_and_log('Best Params: %s' % clf_grid.best_params_)
-
         plt.plot([0, 1], [0, 1], 'k--')
         plt.plot(fpr, tpr, label='Fold {} AUC = {:.2f}'.format((fold_i + 1), auc))
 

@@ -7,9 +7,9 @@ CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 TIMES=(24 36 60)
 
 # Set other params
-CLF="rf"
-FOLDS=10
-IMG_TYPES=("intensity" "gradient" "sobel")
+CLF="svm"
+FOLDS=6
+IMG_TYPES=("gradient" "sobel")
 
 for imtype in ${IMG_TYPES[@]}
 do
