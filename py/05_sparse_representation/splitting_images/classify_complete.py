@@ -16,8 +16,8 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import LabelBinarizer, StandardScaler
 from sklearn.feature_selection import SelectFromModel
-from sklearn.model_selection import GridSearchCV, StratifiedKFold, train_test_split
-from sklearn.metrics import classification_report, roc_auc_score, roc_curve
+from sklearn.model_selection import GridSearchCV, StratifiedKFold, train_test_split, KFold
+from sklearn.metrics import classification_report, roc_auc_score, roc_curve, accuracy_score, confusion_matrix
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -188,6 +188,7 @@ if __name__ == "__main__":
     print_and_log('Splitting dataset...')
     # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=21, stratify=y)
     skf = StratifiedKFold(n_splits=n_folds, random_state=42)
+    # skf = KFold(n_splits=n_folds, random_state=42)
 
     # Create a figure
     plt.figure(figsize=[12.8, 9.6], dpi=150)
@@ -207,9 +208,8 @@ if __name__ == "__main__":
         print_and_log('Setting classifier\'s parameters...')
         if clf_tuning:
             if clf_type == 'svm':
-                clf = SVC(probability=True)
+                clf = SVC(kernel='rbf', probability=True)
                 param_grid = {
-                    'clf__kernel': ['rbf'],
                     'clf__C': [0.001, 0.01, 0.1, 1, 10],
                     'clf__gamma': [0.0001, 0.001, 0.01, 0.1, 1]
                 }
@@ -253,6 +253,7 @@ if __name__ == "__main__":
                                     param_grid,
                                     cv=StratifiedKFold(n_splits=3, random_state=42),
                                     iid=True,
+                                    scoring='accuracy',
                                     n_jobs=n_cores)
             clf_grid.fit(X_train, y_train)
 
@@ -269,10 +270,26 @@ if __name__ == "__main__":
             y_pred_proba = pipeline.predict_proba(X_test)[:, 1]
 
         # Compute rates and plot AUC
-        fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
+        fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba, pos_label=1)
         auc = roc_auc_score(y_test, y_pred_proba)
 
-        print_and_log('Classification report: \n%s' % classification_report(y_test, y_pred))
+        print_and_log('Classification report: \n%s' %
+                      classification_report(
+                          y_test, y_pred,
+                          labels=[0, 1],
+                          target_names=['MCInc', 'MCIc']))
+
+        # Compile extra metrics
+        acc = accuracy_score(y_test, y_pred, normalize=True)
+        tn, fp, fn, tp = confusion_matrix(y_test, y_pred).ravel()
+        sen = tp / (tp + fn)
+        spe = tn / (tn + fp)
+
+        print_and_log('ACC: {:.2f}'.format(acc))
+        print_and_log('SEN: {:.2f}'.format(sen))
+        print_and_log('SPE: {:.2f}'.format(spe))
+
+        # Plot ROC
         plt.plot([0, 1], [0, 1], 'k--')
         plt.plot(fpr, tpr, label='Fold {} AUC = {:.2f}'.format((fold_i + 1), auc))
 
