@@ -1,69 +1,122 @@
 #!/bin/env python2
 import os
 import sys
+import argparse
+from os.path import basename, dirname, exists, join, splitext, realpath, isfile
 
 import pyct as ct
 import numpy as np
+import pandas as pd
+from scipy.stats import describe, gennorm
 
-root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-sys.path.append(os.path.join(root))
+import matplotlib.pyplot as plt
 
-from lib.curvelets import clarray_to_mean_dict
-from lib.path import get_file_list, mkdir
+root = dirname(dirname(dirname(realpath(__file__))))
+sys.path.append(join(root))
 
-if __name__ == '__main__':
-    # Set results folder and subjects to be processed
-    results_folder = '/home/sssilvar/Documents/dataset/results_radial_vid_optimized/'
+from lib.curvelets import get_sub_bands
 
-    subjects = [
-        '002_S_0729',
-        '002_S_1155'
-    ]
 
-    # Get filenames
-    for subject in subjects:
-        filenames = get_file_list(os.path.join(results_folder, subject, 'raw'), ext='.raw')
+def parse_args():
+    parser = argparse.ArgumentParser(description="Curvelet decomposition of a RAW binary file.")
+    parser.add_argument('-f', metavar='--file',
+                        help='File to  decompose.',
+                        type=str,
+                        required=True)
+    parser.add_argument('-sid', metavar='--subject-id',
+                        help='Subject\'s ID',
+                        type=str,
+                        required=True)
+    parser.add_argument('-out', metavar='--output-folder',
+                        help='Output folder',
+                        type=str,
+                        required=True)
+    parser.add_argument('-s', metavar='--scales',
+                        help='Number of scales.',
+                        type=int,
+                        required=True)
+    parser.add_argument('-a', metavar='--angles',
+                        help='Number of angles.',
+                        type=int,
+                        required=True)
 
-        # Just use for testing (one observation - scale)
-        # filenames = [filenames[0]]
+    return parser.parse_args()
 
-        # Create folder for curvelet data
-        output_folder = os.path.join(results_folder, subject, 'curvelet')
-        print('[  OK  ] Saving results in: ' + output_folder)
-        mkdir(output_folder)
-        mkdir(os.path.join(output_folder, 'png'))
 
-        # Define number of scales and angles
-        n_scales = int(sys.argv[1])
-        n_angles = int(sys.argv[2])
+if __name__ == "__main__":
+    # Parse arguments
+    args = parse_args()
+    data_file = args.f
+    nbs = args.s
+    nba = args.a
+    subject_id = args.sid
+    out_folder = join(args.out, subject_id, 'curvelet')
 
-        for filename in filenames:
-            filename_path = os.path.join(results_folder, subject, 'raw', filename)
-            print('Processing: {}'.format(filename_path))
+    # Print info
+    print('[  INFO  ] Decomposing info:')
+    print('\t- File: %s' % data_file)
+    print('\t- Subject: %s' % subject_id)
+    print('\t- Output folder: %s' % out_folder)
+    print('\t- Number of scales: %d' % nbs)
+    print('\t- Number of angles: %d' % nba)
 
-            file_output = os.path.join(output_folder, filename[:-4] + '.npy')
-            print(file_output)
+    # Set create (if not exist) and save individual results
+    if not exists(dirname(out_folder)):
+        os.mkdir(dirname(out_folder))
+        os.mkdir(out_folder)
+    elif not exists(out_folder):
+        os.mkdir(out_folder)
 
-            # Check if there is a previous analysis
-            if not os.path.exists(file_output):
-                img = np.fromfile(filename_path, dtype=np.float).reshape([360, 180]).T
+    # Set output filename
+    filename, ext = splitext(data_file)
+    filename = basename(filename)
+    filename = join(out_folder, filename + '_curvelet_%d_%d_non_split.csv' % (nbs, nba))
 
-                # Get a Curvelet decomposition
-                A = ct.fdct2(img.shape, nbs=n_scales, nba=n_angles, ac=True, norm=False, vec=True, cpx=False)
-                f = A.fwd(img)
+    if not isfile(filename):
+        # Load img and split it in half
+        img = np.fromfile(data_file).reshape([180, 90])
+        img_list = np.split(img, 2, axis=0)
 
-                # Convert data to dict
-                f_dict = clarray_to_mean_dict(A, f, n_scales, n_angles)
+        # Define a curvelet object
+        A = ct.fdct2(
+            img.shape,
+            nbs=nbs,
+            nba=nba,
+            ac=True,
+            norm=False,
+            vec=True,
+            cpx=False)
 
-                # Print the dictionary
-                # for key, val in f_dict.items():
-                #     print('Scale %s: ' % key)
-                #     print('Values:\n\t {}'.format(val))
+        # # Visualize if necessary
+        # plt.subplot(1,2,1)
+        # plt.imshow(img_list[0].T, cmap='gray')
+        # plt.axis('off')
+        # plt.title('Left')
+        # plt.subplot(1,2,2)
+        # plt.imshow(img_list[1].T, cmap='gray')
+        # plt.axis('off')
+        # plt.title('Right')
+        # plt.show()
 
-                # Save curvelet decomposition in a *.npy file
-                np.save(file_output, f_dict)
-                print('[  OK  ] Curvelet decomposition saved at: ' + file_output)
+        # Decompose
+        feats = pd.Series()
+        feats.name = subject_id
 
-            # Execute a script for plotting the results (Only works on Python 3.x)
-            script = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'plot_results_python3.py')
-            os.system('python %s %s %d %d' % (script, file_output, n_scales, n_angles))
+        # Start decomposition
+        f = A.fwd(img)
+        print('[  INFO  ] Curvelet decomposition shape: %s' % str(f.shape))
+
+        # Use generalized Gaussian to fit features
+        data_dict = get_sub_bands(A, f)
+        for key, val in data_dict.items():
+            beta_est, mean_est, var_est = gennorm.fit(val)
+            feats[key + '_beta'] = beta_est
+            feats[key + '_mean'] = mean_est
+            feats[key + '_var'] = var_est
+
+        # Save as CSV
+        feats = pd.DataFrame(feats).T  # As a row observation (instead of column)
+        feats.to_csv(filename)
+    else:
+        print('[  WARN  ] File {} already exists. Delete it if you want to replace it.'.format(filename))
+
