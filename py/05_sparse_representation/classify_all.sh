@@ -10,7 +10,7 @@ TIMES=(24 36 60)
 FEATS="/home/jullygh/sssilvar/Documents/Dataset/ADNI_FS_sphere_mapped/curvelets_non_split"
 
 # Set other params
-CLF="svm"
+CLF="rf"
 FOLDS=5
 IMG_TYPES=("gradient" "sobel")
 

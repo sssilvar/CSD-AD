@@ -257,10 +257,10 @@ if __name__ == "__main__":
             else:
                 clf = RandomForestClassifier(
                     random_state=42,
-                    criterion='gini',
-                    max_depth=5,
+                    criterion='entropy',
+                    max_depth=7,
                     max_features='auto',
-                    n_estimators=500,
+                    n_estimators=200,
                     n_jobs=n_cores
                 )
 
