@@ -52,9 +52,9 @@ if __name__ == '__main__':
         os.mkdir(out_folder)
 
     # Process subjects
-    # pool = Pool(n_cores)
-    # pool.map(process_subject, subjects.index)
-    # pool.close()
+    pool = Pool(n_cores)
+    pool.map(process_subject, subjects.index)
+    pool.close()
 
     # Save them in a single dataframe
     img_types = ['intensity', 'gradient', 'sobel']
