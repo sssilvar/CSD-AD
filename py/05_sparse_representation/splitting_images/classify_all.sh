@@ -16,7 +16,7 @@ do
     for t in ${TIMES[@]}
     do
         echo "Processing ${imtype} images for subjects in ${t} months of conversion/stability..."
-        SCRIPT="${CURRENT_DIR}/classify_complete.py -time ${t} -folds ${FOLDS} -clf ${CLF} -imtype ${imtype} -tune 1"
+        SCRIPT="${CURRENT_DIR}/classify_complete.py -time ${t} -folds ${FOLDS} -clf ${CLF} -imtype ${imtype} -tune 1 -clear 1"
         eval "python3 ${SCRIPT}"
 
         echo -e "\n\n"

@@ -1,10 +1,11 @@
 #!/bin/env python
 import os
+import shutil
 import sys
 import logging
 import argparse
 from configparser import ConfigParser
-from os.path import join, dirname, realpath, basename
+from os.path import join, dirname, realpath, basename, isdir
 
 import pandas as pd
 import numpy as np
@@ -47,6 +48,10 @@ def parse_args():
                         default='gradient')
     parser.add_argument('-tune',
                         help='Type of the images to be classified [intensity/gradient/sobel]',
+                        type=int,
+                        default=0)
+    parser.add_argument('-clear',
+                        help='Clear all the previous output instead of appending.',
                         type=int,
                         default=0)
     return parser.parse_args()
@@ -136,7 +141,7 @@ def print_and_log(msg, level='INFO'):
 
 if __name__ == "__main__":
     # Clear screen
-    os.system('clear')
+    os.system('cls' if os.name == 'nt' else 'clear')
 
     # Parse arguments
     args = parse_args()
@@ -154,12 +159,26 @@ if __name__ == "__main__":
     n_cores = cfg.getint('resources', 'n_cores')
     n_cores = n_cores if n_cores <= 20 else 20
 
+    # Folders of interest
+    out_folder = join(data_folder, 'ROC')
+
+    # Delete previous output if clear enabled
+    if args.clear:
+        try:
+            shutil.rmtree(out_folder)
+        except FileNotFoundError as e:
+            print(e)
+
+    # Create folder if does not exist
+    if not isdir(out_folder):
+        os.mkdir(out_folder)
+
     # Load features file and set number of folds
     feats_file = join(data_folder, '{}_curvelet_features_4_scales_32_angles.csv'.format(img_type))
 
     # Create and setup logger
-    log_file = join(dirname(feats_file),
-                    'ROC', 'classification_{basename}_aio.log'.format(basename=basename(feats_file).split('.')[0]))
+    log_file = join(out_folder,
+                    'classification_{basename}_aio.log'.format(basename=basename(feats_file).split('.')[0]))
     logger = setup_logger(log_file)
     print_and_log('Classification task:')
     print_and_log('Selected classifier {}'.format(clf_name))
