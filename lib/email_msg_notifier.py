@@ -21,7 +21,7 @@ parser.add_argument('-msg',
                     required=True)
 
 # Setup email
-msg = MIMEText('This is the body of the message.')
+msg = MIMEText('Your process has finished! :D')
 msg['From'] = sender_email
 msg['To'] = 'sssilvar@unal.edu.co'
 msg['Subject'] = 'Notification from server {}'.format(socket.gethostname())
