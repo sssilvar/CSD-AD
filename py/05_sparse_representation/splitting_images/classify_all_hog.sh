@@ -10,7 +10,7 @@ TIMES=(24 36 60)
 FEATS="/home/jullygh/sssilvar/Documents/Dataset/ADNI_FS_sphere_mapped/HOG/gradient_hog_features.csv"
 
 # Set other params
-CLF="rf"
+CLF="svm"
 FOLDS=5
 IMG_TYPES=("gradient" "sobel")
 
