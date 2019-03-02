@@ -60,19 +60,19 @@ if __name__ == "__main__":
     print('\t- Number of scales: %d' % nbs)
     print('\t- Number of angles: %d' % nba)
 
-    # Set create (if not exist) and save individual results
-    if not exists(dirname(out_folder)):
-        os.mkdir(dirname(out_folder))
-        os.mkdir(out_folder)
-    elif not exists(out_folder):
-        os.mkdir(out_folder)
-
     # Set output filename
     filename, ext = splitext(data_file)
     filename = basename(filename)
     filename = join(out_folder, filename + '_curvelet_%d_%d_non_split.csv' % (nbs, nba))
 
     if not isfile(filename):
+        # Set create (if not exist) and save individual results
+        if not exists(dirname(out_folder)):
+            os.mkdir(dirname(out_folder))
+            os.mkdir(out_folder)
+        elif not exists(out_folder):
+            os.mkdir(out_folder)
+
         # Load img and split it in half
         img = np.fromfile(data_file).reshape([180, 90])
         img_list = np.split(img, 2, axis=0)
