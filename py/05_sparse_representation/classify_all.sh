@@ -19,7 +19,7 @@ do
     for t in ${TIMES[@]}
     do
         echo "Processing ${imtype} images for subjects in ${t} months of conversion/stability..."
-        SCRIPT="${CURRENT_DIR}/splitting_images/classify_complete.py -time ${t} -folds ${FOLDS} -clf ${CLF} -imtype ${imtype} -tune 1 -features ${FEATS}/${imtype}_curvelet_features_non_split.csv"
+        SCRIPT="${CURRENT_DIR}/splitting_images/classify_complete.py -time ${t} -folds ${FOLDS} -clf ${CLF} -imtype ${imtype} -tune 0 -features ${FEATS}/${imtype}_curvelet_features_non_split.csv"
         eval "python3 ${SCRIPT}"
 
         echo -e "\n\n"
