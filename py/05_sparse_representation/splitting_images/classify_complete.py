@@ -34,6 +34,9 @@ def parse_args():
                         help='Conversion/Stability time criteria (24, 36, 60) months',
                         default=24,
                         type=int)
+    parser.add_argument('-features',
+                        help='Features file',
+                        default=None)
     parser.add_argument('-folds',
                         help='Numbers of folds for cross-validation (K-fold)',
                         type=int,
@@ -159,8 +162,14 @@ if __name__ == "__main__":
     n_cores = cfg.getint('resources', 'n_cores')
     n_cores = n_cores if n_cores <= 20 else 20
 
+    # Load features file and set number of folds
+    if not args.features:
+        feats_file = join(data_folder, '{}_curvelet_features_4_scales_32_angles.csv'.format(img_type))
+    else:
+        feats_file = args.features
+
     # Folders of interest
-    out_folder = join(data_folder, 'ROC')
+    out_folder = join(dirname(feats_file), 'ROC')
 
     # Delete previous output if clear enabled
     if args.clear:
@@ -172,9 +181,6 @@ if __name__ == "__main__":
     # Create folder if does not exist
     if not isdir(out_folder):
         os.mkdir(out_folder)
-
-    # Load features file and set number of folds
-    feats_file = join(data_folder, '{}_curvelet_features_4_scales_32_angles.csv'.format(img_type))
 
     # Create and setup logger
     log_file = join(out_folder,
