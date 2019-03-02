@@ -152,7 +152,7 @@ if __name__ == "__main__":
     cfg.read(join(root, 'config/config.cfg'))
     data_folder = cfg.get('dirs', 'sphere_mapping')
     n_cores = cfg.getint('resources', 'n_cores')
-    n_cores = n_cores if n_cores <= 10 else 10
+    n_cores = n_cores if n_cores <= 20 else 20
 
     # Load features file and set number of folds
     feats_file = join(data_folder, '{}_curvelet_features_4_scales_32_angles.csv'.format(img_type))
