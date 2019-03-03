@@ -223,6 +223,7 @@ if __name__ == "__main__":
     tpr_df = pd.DataFrame()
     fpr_df = pd.DataFrame()
     thr_df = pd.DataFrame()
+    mean_fpr = np.linspace(0, 1, 100)
 
     for fold_i, (train_index, test_index) in enumerate(skf.split(X, y)):
         X_train, X_test = X.iloc[train_index], X.iloc[test_index]
@@ -325,9 +326,13 @@ if __name__ == "__main__":
         m_data = pd.Series({'ACC': acc, 'SEN': sen, 'SPE': spe, 'AUC': auc}, name=fold_name)
         metrics = metrics.append(m_data)
 
-        fpr_df = fpr_df.append(pd.Series(fpr, name=fold_name))
-        tpr_df = tpr_df.append(pd.Series(tpr, name=fold_name))
+        # fpr_df = fpr_df.append(pd.Series(np.interp(mean_fpr, fpr, tpr), name=fold_name))
+        tpr_df = tpr_df.append(pd.Series(np.interp(mean_fpr, fpr, tpr), name=fold_name))
         thr_df = thr_df.append(pd.Series(thresholds, name=fold_name))
+
+        print(tpr.shape, tpr_df.shape)
+        print(tpr.shape, tpr_df.shape)
+        print(metrics.tail())
 
         # Plot ROC
         plt.plot([0, 1], [0, 1], 'k--')
@@ -354,19 +359,20 @@ if __name__ == "__main__":
     mean_metrics = metrics.mean()
 
     mean_tpr = tpr_df.mean(axis=0)
-    mean_fpr = fpr_df.mean(axis=0)
     std_tpr = tpr_df.std(axis=0)
 
-    tpr_upper = mean_tpr + std_tpr
-    tpr_lower = mean_tpr - std_tpr
+    tpr_upper = np.minimum(mean_tpr + std_tpr, 1)
+    tpr_lower = np.maximum(mean_tpr - std_tpr, 0)
 
     # Print final results
     print_and_log('Final mean metrics: \n{}'.format(mean_metrics))
+    print(mean_tpr.shape)
 
     # Plot final ROC
     plt.figure(figsize=(8, 8))
     plt.plot([0, 1], [0, 1], 'k--')
-    plt.plot(fpr_df.mean(axis=0), tpr_df.mean(axis=0), label='AUC = {:.2f}'.format(mean_metrics['AUC']))
+
+    plt.plot(mean_fpr, mean_tpr, label='AUC = {:.2f}'.format(mean_metrics['AUC']))
     plt.fill_between(mean_fpr, tpr_lower, tpr_upper, color='grey', alpha=.2)
 
     # Set labels, enable legends and title
