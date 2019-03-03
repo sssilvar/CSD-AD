@@ -2,23 +2,27 @@ import sys
 from configparser import ConfigParser
 from os.path import join, dirname, realpath
 
-import matplotlib.pyplot as plt
-import nibabel as nb
 import numpy as np
+import nibabel as nb
+import scipy.ndimage as ndi
+from skimage import feature
+
+import matplotlib.pyplot as plt
 from nilearn import plotting
 
 root = dirname(dirname(dirname(realpath(__file__))))
 
 sys.path.append(root)
 from lib.geometry import sphere
-from lib.geometry import get_centroid
-
+from lib.geometry import get_centroid, extract_sub_volume
 
 if __name__ == '__main__':
     # Load from configuration
     cfg = ConfigParser()
     cfg.read(join(root, 'config', 'config.cfg'))
     registered_folder = cfg.get('dirs', 'dataset_folder_registered')
+    extract_subs = False
+    gradients = True
 
     # Define file names
     vol_filename = join(registered_folder, '002_S_0729/brainmask_reg.nii.gz')
@@ -40,23 +44,45 @@ if __name__ == '__main__':
     centroid = tuple(get_centroid(mni_vol > 0))
     print('[  OK  ] Centroid = {}'.format(centroid))
 
-    for i, radius in enumerate(scales):
-        # Create a binary mask (cone between scales)
-        mask = sphere(radius=radius, center=centroid)
+    # Use gradients
+    if gradients:
+        vol = mni_vol.astype(np.float)
+        dx, dy, dz = np.gradient(vol)
+        mag = np.sqrt(dx ** 2 + dy ** 2 + dz ** 2)
 
-        # Mask sub-sampled volume
-        vol_masked = np.multiply(vol, mask)
+        nii_grad = nb.Nifti1Image(mag, nii.affine)
+        display = plotting.plot_anat(nii_grad, annotate=True, draw_cross=False, dim=-1.25)
+        # display.add_overlay(nii_grad)
+    else:
+        for i, radius in enumerate(scales):
+            # Create a binary mask (cone between scales)
+            mask = sphere(radius=radius, center=centroid)
 
-        # Create NIFTI Images
-        nii_mask = nb.Nifti1Image(mask.astype(np.int32), nii.affine)
-        nii_masked = nb.Nifti1Image(vol_masked, nii.affine)
+            # Mask sub-sampled volume
+            vol_masked = np.multiply(vol, mask)
 
-        # Plot result
-        display = plotting.plot_anat(nii, title='%s to %s vox.' % radius)
-        display.add_overlay(nii_mask, alpha=0.3)
-        display.add_overlay(nii_masked, alpha=0.6)
+            # Extract sub-volumes
+            if extract_subs:
+                vol_sub, _ = extract_sub_volume(vol, radius=radius, centroid=centroid)
+                mask, _ = extract_sub_volume(mask, radius=radius, centroid=centroid)
+                vol_masked, _ = extract_sub_volume(vol_masked, radius=radius, centroid=np.array(centroid))
+            else:
+                vol_sub = vol
 
-        # Save figures
-        plt.savefig('/tmp/%s_to_%s_visualization.png' % radius)
+            # Create NIFTI Images
+            nii_sub = nb.Nifti1Image(vol_sub, nii.affine)
+            nii_mask = nb.Nifti1Image(mask.astype(np.int32), nii.affine)
+            nii_masked = nb.Nifti1Image(vol_masked, nii.affine)
 
-        plt.show()
+            # Plot result
+            display = plotting.plot_anat(nii_sub,
+                                         # title='%s to %s vox.' % radius,
+                                         black_bg=True,
+                                         alpha=0.8)
+            display.add_overlay(nii_mask, alpha=0.8)
+            display.add_overlay(nii_masked, alpha=0.7)
+
+            # Save figures
+            plt.savefig('/tmp/%s_to_%s_visualization.png' % radius)
+
+    plt.show()
