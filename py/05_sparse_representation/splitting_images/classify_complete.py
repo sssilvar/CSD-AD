@@ -40,7 +40,7 @@ def parse_args():
     parser.add_argument('-folds',
                         help='Numbers of folds for cross-validation (K-fold)',
                         type=int,
-                        default=10)
+                        default=5)
     parser.add_argument('-clf',
                         help='Type of classifier to be used [svm/rf]',
                         type=str,
@@ -218,12 +218,19 @@ if __name__ == "__main__":
     # Create a figure
     plt.figure(figsize=[12.8, 9.6], dpi=150)
 
+    # Variables of interests
+    metrics = pd.DataFrame(columns=['ACC', 'SEN', 'SPE', 'AUC'])
+    tpr_df = pd.DataFrame()
+    fpr_df = pd.DataFrame()
+    thr_df = pd.DataFrame()
+
     for fold_i, (train_index, test_index) in enumerate(skf.split(X, y)):
         X_train, X_test = X.iloc[train_index], X.iloc[test_index]
         y_train, y_test = y[train_index], y[test_index]
+        fold_name = 'Fold_{}'.format(fold_i + 1)
 
         # Start classification task
-        print_and_log('\n\nProcessing fold No. {}'.format(fold_i + 1))
+        print_and_log('\n\nProcessing {}'.format(fold_name))
         print_and_log('Number of features (%d)' % X.shape[1])
         print_and_log('Total observations (%d)' % len(y))
         print_and_log('Training observations (%d)' % len(y_train))
@@ -314,9 +321,17 @@ if __name__ == "__main__":
         print_and_log('SEN: {:.2f}'.format(sen))
         print_and_log('SPE: {:.2f}'.format(spe))
 
+        # Append metrics to DataFrame
+        m_data = pd.Series({'ACC': acc, 'SEN': sen, 'SPE': spe, 'AUC': auc}, name=fold_name)
+        metrics = metrics.append(m_data)
+
+        fpr_df = fpr_df.append(pd.Series(fpr, name=fold_name))
+        tpr_df = tpr_df.append(pd.Series(tpr, name=fold_name))
+        thr_df = thr_df.append(pd.Series(thresholds, name=fold_name))
+
         # Plot ROC
         plt.plot([0, 1], [0, 1], 'k--')
-        plt.plot(fpr, tpr, label='Fold {} AUC = {:.2f}'.format((fold_i + 1), auc))
+        plt.plot(fpr, tpr, label='{} AUC = {:.2f}'.format(fold_name, auc))
 
     # Get Classifier name, basename of the features file and
     # the type of images (gradient, intensities, sobel)
@@ -332,5 +347,36 @@ if __name__ == "__main__":
     fig_file = join(dirname(feats_file),
                     'ROC',
                     '{name}_aio_roc_{folds}_fold_{clf}_{time}_months.png'
+                    .format(name=basename_file, folds=n_folds, clf=clf_type, time=study_time))
+    plt.savefig(fig_file, bbox_inches='tight')
+
+    # Get stats
+    mean_metrics = metrics.mean()
+
+    mean_tpr = tpr_df.mean(axis=0)
+    mean_fpr = fpr_df.mean(axis=0)
+    std_tpr = tpr_df.std(axis=0)
+
+    tpr_upper = mean_tpr + std_tpr
+    tpr_lower = mean_tpr - std_tpr
+
+    # Print final results
+    print_and_log('Final mean metrics: \n{}'.format(mean_metrics))
+
+    # Plot final ROC
+    plt.figure(figsize=(8, 8))
+    plt.plot([0, 1], [0, 1], 'k--')
+    plt.plot(fpr_df.mean(axis=0), tpr_df.mean(axis=0), label='AUC = {:.2f}'.format(mean_metrics['AUC']))
+    plt.fill_between(mean_fpr, tpr_lower, tpr_upper, color='grey', alpha=.2)
+
+    # Set labels, enable legends and title
+    plt.xlabel('False positive rate')
+    plt.ylabel('True positive rate')
+    plt.legend()
+    plt.title('ROC {} ({})'.format(clf_name, img_type))
+
+    fig_file = join(dirname(feats_file),
+                    'ROC',
+                    '{name}_aio_roc_{folds}_fold_{clf}_{time}_months_final.png'
                     .format(name=basename_file, folds=n_folds, clf=clf_type, time=study_time))
     plt.savefig(fig_file, bbox_inches='tight')
