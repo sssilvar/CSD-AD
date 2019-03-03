@@ -15,8 +15,8 @@ if __name__ == '__main__':
 
     # Load params
     data_folder = cfg.get('dirs', 'sphere_mapping')
-    roc_folder = join(data_folder, 'ROC')
-    n_folds = 5
+    roc_folder = join(data_folder, 'curvelets_non_split', 'ROC')
+    n_folds = 10
 
     # Classifiers, image types and months
     classifiers = ['svm', 'rf']
@@ -29,10 +29,10 @@ if __name__ == '__main__':
             plt.figure(figsize=(7, 7))
             for t in times:
                 # gradient_curvelet_features_non_split_aio_5_fold_svm_60_months_final.csv
-                # file_pattern = '{name}_curvelet_features_non_split_aio_{folds}_fold_{clf}_{time}_months_final.csv'
+                file_pattern = '{name}_curvelet_features_non_split_aio_{folds}_fold_{clf}_{time}_months_final.csv'
 
-                # sobel_curvelet_features_4_scales_32_angles_aio_5_fold_rf_24_months_final.csv
-                file_pattern = '{name}_curvelet_features_4_scales_32_angles_aio_{folds}_fold_{clf}_{time}_months_final.csv'
+                # # sobel_curvelet_features_4_scales_32_angles_aio_5_fold_rf_24_months_final.csv
+                # file_pattern = '{name}_curvelet_features_4_scales_32_angles_aio_{folds}_fold_{clf}_{time}_months_final.csv'
                 file_pattern = file_pattern.format(name=img_type, folds=n_folds, clf=clf, time=t)
 
                 data_file = join(roc_folder, file_pattern)
@@ -68,4 +68,4 @@ if __name__ == '__main__':
                 )
             )
             print('Saving figure at: {}'.format(fig_file))
-            plt.savefig(fig_file, bbox_inches='tight')
+            plt.savefig(fig_file + '.eps', bbox_inches='tight')
