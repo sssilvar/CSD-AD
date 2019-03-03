@@ -1,6 +1,6 @@
 import os
 from configparser import ConfigParser
-from os.path import join, dirname, realpath
+from os.path import join, dirname, realpath, isdir
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -40,10 +40,27 @@ if __name__ == '__main__':
                     df['mean_fpr'], df['mean_tpr'],
                     label='{time} (AUC = {auc:.2f})'.format(
                         time='{} Months'.format(t),
-                        auc=df['mean_auc'][0]))
+                        auc=df['mean_auc'][0]),
+                    linewidth=2.5,
+                    alpha=0.8
+                )
                 plt.xlabel('False positive rate')
                 plt.ylabel('True positive rate')
                 plt.legend()
 
-                plt.title('Mean ROC - {} - {}'.format(clf_name, img_type.capitalize()))
-    plt.show()
+                plt.title('Mean ROC - {} - {} - {} folds'.format(clf_name, img_type.capitalize(), n_folds))
+            # Save figures
+            fig_folder = join(roc_folder, 'roc_by_month')
+            if not isdir(fig_folder):
+                os.mkdir(fig_folder)
+
+            fig_file = join(
+                fig_folder,
+                '{img_type}_{clf}_{folds}_folds'.format(
+                    img_type=img_type,
+                    clf=clf_name.lower().replace(' ', '_'),
+                    folds=n_folds
+                )
+            )
+            print('Saving figure at: {}'.format(fig_file))
+            plt.savefig(fig_file, bbox_inches='tight')
