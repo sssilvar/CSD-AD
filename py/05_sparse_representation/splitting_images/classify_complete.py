@@ -261,7 +261,7 @@ if __name__ == "__main__":
                     probability=True,
                     kernel='rbf',
                     gamma=0.001
-                ) #TODO: Add params
+                )  # TODO: Add params
             else:
                 clf = RandomForestClassifier(
                     random_state=42,
@@ -336,7 +336,7 @@ if __name__ == "__main__":
 
         # Plot ROC
         plt.plot([0, 1], [0, 1], 'k--')
-        plt.plot(fpr, tpr, label='{} AUC = {:.2f}'.format(fold_name, auc))
+        plt.plot(fpr, tpr, label='{} AUC = {:.2f}'.format(fold_name.replace('_', ' '), auc))
 
     # Get Classifier name, basename of the features file and
     # the type of images (gradient, intensities, sobel)
@@ -367,7 +367,24 @@ if __name__ == "__main__":
 
     # Print final results
     print_and_log('Final mean metrics: \n{}'.format(mean_metrics))
-    print(mean_tpr.head())
+
+    # Create final results as DataFrame and save them
+    f_data = {
+        'mean_fpr': mean_fpr,
+        'mean_tpr': mean_tpr,
+        'mean_auc': mean_metrics['AUC'],
+        'mean_axc': mean_metrics['ACC'],
+        'mean_sen': mean_metrics['SEN'],
+        'mean_spe': mean_metrics['SPE'],
+        'time': '{} Months'.format(study_time)
+    }
+
+    csv_file_out = join(out_folder,
+                        '{name}_aio_{folds}_fold_{clf}_{time}_months_final.csv'
+                        .format(name=basename_file, folds=n_folds, clf=clf_type, time=study_time))
+
+    df_final = pd.DataFrame().from_dict(f_data)
+    df_final.to_csv(csv_file_out)
 
     # Plot final ROC
     plt.figure(figsize=(8, 8))
@@ -382,8 +399,7 @@ if __name__ == "__main__":
     plt.legend()
     plt.title('ROC {} ({})'.format(clf_name, img_type))
 
-    fig_file = join(dirname(feats_file),
-                    'ROC',
+    fig_file = join(out_folder,
                     '{name}_aio_roc_{folds}_fold_{clf}_{time}_months_final.png'
                     .format(name=basename_file, folds=n_folds, clf=clf_type, time=study_time))
     plt.savefig(fig_file, bbox_inches='tight')

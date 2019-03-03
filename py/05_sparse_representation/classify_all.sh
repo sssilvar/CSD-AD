@@ -10,18 +10,21 @@ TIMES=(24 36 60)
 FEATS="/home/jullygh/sssilvar/Documents/Dataset/ADNI_FS_sphere_mapped/curvelets_non_split"
 
 # Set other params
-CLF="rf"
+CLASSIFIERS=("svm" "rf")
 FOLDS=5
 IMG_TYPES=("gradient" "sobel")
 
-for imtype in ${IMG_TYPES[@]}
+for clf in ${CLASSIFIERS[@]}
 do
-    for t in ${TIMES[@]}
+    for imtype in ${IMG_TYPES[@]}
     do
-        echo "Processing ${imtype} images for subjects in ${t} months of conversion/stability..."
-        SCRIPT="${CURRENT_DIR}/splitting_images/classify_complete.py -time ${t} -folds ${FOLDS} -clf ${CLF} -imtype ${imtype} -tune 0 -features ${FEATS}/${imtype}_curvelet_features_non_split.csv"
-        eval "python3 ${SCRIPT}"
+        for t in ${TIMES[@]}
+        do
+            echo "Processing ${imtype} images for subjects in ${t} months of conversion/stability..."
+            SCRIPT="${CURRENT_DIR}/splitting_images/classify_complete.py -time ${t} -folds ${FOLDS} -clf ${clf} -imtype ${imtype} -tune 0 -features ${FEATS}/${imtype}_curvelet_features_non_split.csv"
+            eval "python3 ${SCRIPT}"
 
-        echo -e "\n\n"
+            echo -e "\n\n"
+        done
     done
 done
