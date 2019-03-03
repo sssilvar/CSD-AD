@@ -11,7 +11,7 @@ FEATS="/home/jullygh/sssilvar/Documents/Dataset/ADNI_FS_sphere_mapped/curvelets_
 
 # Set other params
 CLASSIFIERS=("svm" "rf")
-FOLDS=5
+FOLDS=10
 IMG_TYPES=("gradient" "sobel")
 
 for clf in ${CLASSIFIERS[@]}
