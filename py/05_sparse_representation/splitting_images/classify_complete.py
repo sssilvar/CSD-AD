@@ -358,6 +358,7 @@ if __name__ == "__main__":
     # Get stats
     mean_metrics = metrics.mean()
 
+    tpr_df.iloc[:, 0] = 0
     mean_tpr = tpr_df.mean(axis=0)
     std_tpr = tpr_df.std(axis=0)
 
@@ -366,7 +367,7 @@ if __name__ == "__main__":
 
     # Print final results
     print_and_log('Final mean metrics: \n{}'.format(mean_metrics))
-    print(mean_tpr.shape)
+    print(mean_tpr.head())
 
     # Plot final ROC
     plt.figure(figsize=(8, 8))
