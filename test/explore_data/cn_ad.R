@@ -10,3 +10,9 @@ hc_ad <- adnimerge %>%
 hc_ad %>%
   group_by(DX, PTGENDER) %>%
   summarize(TOTAL = n())
+
+# Save Groupfile
+groupfile <- hc_ad %>%
+  mutate(subj=PTID) %>%
+  select(subj)
+write.csv(groupfile, file = "/tmp/groupfile_cn_ad.csv", row.names = FALSE)
