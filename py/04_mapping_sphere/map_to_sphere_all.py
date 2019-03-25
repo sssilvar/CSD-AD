@@ -1,3 +1,4 @@
+import argparse
 import os
 import sys
 from configparser import ConfigParser
@@ -129,22 +130,51 @@ def process_image(folder, n_scale, scale):
         print('[  ERROR  ] File {} was not found'.format(brainmask_file))
 
 
-if __name__ == '__main__':
-    # Load database
-    # Parse configuration
-    cfg = join(root, 'config', 'config.cfg')
-    config = ConfigParser()
-    config.read(cfg)
+def parse_args():
+    """Parse arguments"""
+    parser = argparse.ArgumentParser(description='Map MRI to a plane.')
+    parser.add_argument('-mode',
+                        help='Use config file "auto" or load manual configuration "manual"',
+                        default='auto')
+    parser.add_argument('-groupfile',
+                        help='CSV with subjects to be processed')
+    parser.add_argument('-folder',
+                        help='Folder with subjects')
+    parser.add_argument('-cores',
+                        help='Number of cores',
+                        type=int,
+                        default=25)
+    parser.add_argument('-out',
+                        help='output folder')
+    return parser.parse_args()
 
-    # Load parammeters from config file
-    dataset_folder = config.get('dirs', 'dataset_folder')
-    dataset_registered_folder = config.get('dirs', 'dataset_folder_registered')
-    results_folder = config.get('dirs', 'sphere_mapping')
-    n_cores = config.getint('resources', 'n_cores')
+
+if __name__ == '__main__':
+    # Parse arguments
+    args = parse_args()
+    if args.mode == 'auto':
+        # Load database
+        # Parse configuration
+        cfg = join(root, 'config', 'config.cfg')
+        config = ConfigParser()
+        config.read(cfg)
+
+        # Load parammeters from config file
+        dataset_folder = config.get('dirs', 'dataset_folder')
+        dataset_registered_folder = config.get('dirs', 'dataset_folder_registered')
+        results_folder = config.get('dirs', 'sphere_mapping')
+        n_cores = config.getint('resources', 'n_cores')
+        dataset_csv_file = join(dataset_folder, 'groupfile.csv')
+    else:
+        dataset_folder = args.folder
+        dataset_csv_file = args.groupfile
+        n_cores = args.cores
+        results_folder = args.out
+
+    # MNI152 file
     mni_file = join(root, 'param', 'FSL_MNI152_FreeSurferConformed_1mm.nii')
 
     # Load the list of subjects and order by subject_id: df
-    dataset_csv_file = join(dataset_folder, 'groupfile.csv')
     df = pd.read_csv(dataset_csv_file, index_col=0)
 
     # Get template centroid
