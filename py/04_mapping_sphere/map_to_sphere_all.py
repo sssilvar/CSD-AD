@@ -19,7 +19,7 @@ root = dirname(dirname(dirname(realpath(__file__))))
 
 # Append path to add lib
 sys.path.append(root)
-from lib.param import load_params
+
 from lib.masks import solid_cone
 from lib.transformations import rotate_vol
 from lib.geometry import extract_sub_volume, get_centroid
@@ -159,14 +159,14 @@ if __name__ == '__main__':
         config = ConfigParser()
         config.read(cfg)
 
-        # Load parammeters from config file
+        # Load parameters from config file
         dataset_folder = config.get('dirs', 'dataset_folder')
         dataset_registered_folder = config.get('dirs', 'dataset_folder_registered')
         results_folder = config.get('dirs', 'sphere_mapping')
         n_cores = config.getint('resources', 'n_cores')
         dataset_csv_file = join(dataset_folder, 'groupfile.csv')
     else:
-        dataset_folder = args.folder
+        dataset_registered_folder = args.folder
         dataset_csv_file = args.groupfile
         n_cores = args.cores
         results_folder = args.out
