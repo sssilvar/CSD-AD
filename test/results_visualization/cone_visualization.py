@@ -33,14 +33,15 @@ if __name__ == '__main__':
     mni_vol = nb.load(mni_filename).get_data()
     vol = nii.get_data()
 
-    # Define radius and center
-    # radius = (0, 25)
-    scales = [
-        (0, 25),
-        (25, 50),
-        (50, 75),
-        (75, 100)
-    ]
+    # Calculate the inner and outer radius
+    # for all the spheres: scales
+    max_radius = 100
+    tk = 20
+    overlap = 5
+    n_spheres = max_radius // (tk - overlap)
+    scales = [(i * (tk - overlap), ((i + 1) * tk) - (i * overlap)) for i in range(n_spheres)]
+
+    # Compute the centroid
     centroid = tuple(get_centroid(mni_vol > 0))
     print('[  OK  ] Centroid = {}'.format(centroid))
 
