@@ -1,6 +1,7 @@
 import argparse
 import os
 import sys
+from time import sleep
 from configparser import ConfigParser
 from contextlib import contextmanager
 from functools import partial
@@ -183,13 +184,19 @@ if __name__ == '__main__':
     print('[  OK  ] Centroid = {}'.format(centroid))
     print('[  INFO  ] Number of cores used: {}'.format(n_cores))
 
-    # Start processing the whole dataset
-    scales = [
-        (0, 25),
-        (25, 50),
-        (50, 75),
-        (75, 100),
-    ]
+    # Calculate the inner and outer radius
+    # for all the spheres: scales
+    max_radius = 100
+    tk = 20
+    overlap = 5
+    n_spheres = max_radius // (tk - overlap)
+    scales = [(i * (tk - overlap), ((i + 1) * tk) - (i * overlap)) for i in range(n_spheres)]
+
+    # Print and wait 5 seconds (in case of canceling)
+    print('Scales to process:\n{}'.format(scales))
+    sleep(5)
+
+    # Start processing
     for n_scale, scale in enumerate(scales):
         # Pool the process
         with poolcontext(processes=n_cores) as pool:
