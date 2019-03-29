@@ -66,6 +66,8 @@ if __name__ == '__main__':
                 n_stables += 1
         except KeyError as e:
             print('Subject {} not found in MCI list'.format(e))
+        except FileNotFoundError as e:
+            print(e)
 
     print('\nFinal report:\n\t- Number of MCIc:{mcic}\n\t- Number of MCInc: {mcinc}'
           .format(mcic=n_converters, mcinc=n_stables))
