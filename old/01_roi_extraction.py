@@ -55,8 +55,8 @@ if __name__ == '__main__':
     # Do the magic
     for sid in subjects_df.index:
         try:
-            print('Processing {}'.format(sid))
             dx = mci_df.loc[sid, 'target']
+            print('Processing {} - {}'.format(sid, dx))
             mri_vol = nb.load(join(data_folder, sid, 'brainmask_reg.nii.gz')).get_data().astype(np.float)
             if dx == 'MCIc':
                 converter_sum_vol += mri_vol
