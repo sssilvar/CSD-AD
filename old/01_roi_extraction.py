@@ -45,6 +45,9 @@ if __name__ == '__main__':
     csv_mci = join(root, 'param', 'df_conversions_with_times.csv')
     mci_df = pd.read_csv(csv_mci, index_col='PTID')
 
+    # Load MNI template
+    mni_nii = nb.load(join(root, 'param', 'FSL_MNI152_FreeSurferConformed_1mm.nii'))
+
     # Initialize average images
     converter_sum_vol = np.zeros([256, 256, 256])
     stable_sum_vol = np.zeros_like(converter_sum_vol)
@@ -78,13 +81,16 @@ if __name__ == '__main__':
 
     # Map of absolute differences
     map_of_differences_vol = np.abs(stable_sum_vol, converter_sum_vol)
+    map_of_differences_vol_norm = map_of_differences_vol / map_of_differences_vol.max() * 255
 
     # Create NIFTI images
-    stable_nii = nb.Nifti1Image(stable_avg_vol, affine=np.eye(4))
-    converter_nii = nb.Nifti1Image(converter_avg_vol, affine=np.eye(4))
-    map_of_differences_nii = nb.Nifti1Image(map_of_differences_vol, np.eye(4))
+    stable_nii = nb.Nifti1Image(stable_avg_vol, affine=mni_nii.affine)
+    converter_nii = nb.Nifti1Image(converter_avg_vol, affine=mni_nii.affine)
+    map_of_differences_nii = nb.Nifti1Image(map_of_differences_vol, mni_nii.affine)
+    map_of_differences_norm_nii = nb.Nifti1Image(map_of_differences_vol_norm, mni_nii.affine)
 
     # Save them all
     nb.save(stable_nii, join(out_folder, 'MCInc.nii.gz'))
     nb.save(converter_nii, join(out_folder, 'MCIc.nii.gz'))
     nb.save(map_of_differences_nii, join(out_folder, 'differences.nii.gz'))
+    nb.save(map_of_differences_norm_nii, join(out_folder, 'differences_norm.nii.gz'))
