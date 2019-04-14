@@ -9,7 +9,7 @@ from contextlib import contextmanager
 
 import pandas as pd
 
-root = dirname(dirname(dirname(realpath(__file__))))
+root = dirname(dirname(realpath(__file__)))
 print('[  ROOT  ] {}'.format(root))
 
 sys.path.append(root)
