@@ -65,9 +65,7 @@ def register_subject_with_flirt(subject_id):
     aseg_nii = nb.load(aseg)
 
     bmask_raw = np.multiply(brain_nii.get_data(), aseg_nii.get_data() > 0)
-
     nb.save(nb.Nifti1Image(bmask_raw, brain_nii.affine), mov)
-    exit()
 
     # Check if file exists
     if isfile(mov) and not isfile(mapmov):
