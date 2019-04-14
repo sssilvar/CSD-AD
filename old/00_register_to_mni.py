@@ -7,7 +7,9 @@ from os.path import join, dirname, realpath, isfile, isdir
 from multiprocessing import Pool
 from contextlib import contextmanager
 
+import numpy as np
 import pandas as pd
+import nibabel as nb
 
 root = dirname(dirname(realpath(__file__)))
 print('[  ROOT  ] {}'.format(root))
@@ -33,7 +35,7 @@ def register_subject_with_flirt(subject_id):
     subjects_dir = cfg.get('dirs', 'subjects_dir')
 
     # Define useful files for the registration process
-    mov = os.path.join(subjects_dir, subject_id, 'mri/orig', '001.mgz')
+    mov = os.path.join(subjects_dir, subject_id, 'mri', 'orig.mgz')
     mapmov = os.path.join(registered_folder, subject_id, 'orig_reg.nii.gz')
     mov_nii = '/dev/shm/{}.nii.gz'.format(subject_id)
     aff_mat = os.path.join(registered_folder, subject_id, 'transform.mat')
@@ -43,17 +45,29 @@ def register_subject_with_flirt(subject_id):
 
     if not isfile(mov) and isfile(zipped_file) and not isfile(mapmov):
         print('[  INFO  ] Extracting data from: {}'.format(zipped_file))
-        bmask_path = join(subject_id, 'mri/orig/001.mgz')
+        brain_path = join(subject_id, 'mri/orig.mgz')
+        aseg_path = join(subject_id, 'mri/aseg.mgz')
 
         with ZipFile(zipped_file, 'r') as zf:
             try:
-                zf.extract(bmask_path, '/dev/shm/')
+                zf.extract(brain_path, '/dev/shm/')
+                zf.extract(aseg_path, '/dev/shm/')
             except KeyError as e:
                 print('[  ERROR  ] Extraction failed: {}'.format(e))
         subjects_dir = '/dev/shm'
 
     # Re-define moving image path (if subjects zipped)
-    mov = os.path.join(subjects_dir, subject_id, 'mri/orig', '001.mgz')
+    mov = os.path.join(subjects_dir, subject_id, 'mri', 'orig.mgz')
+    aseg = os.path.join(subjects_dir, subject_id, 'mri', 'aseg.mgz')
+
+    # Extract RAW brain mask
+    brain_nii = nb.load(mov)
+    aseg_nii = nb.load(aseg)
+
+    bmask_raw = np.multiply(brain_nii.get_data(), aseg_nii.get_data() > 0)
+
+    nb.save(nb.Nifti1Image(bmask_raw, brain_nii.affine), mov)
+    exit()
 
     # Check if file exists
     if isfile(mov) and not isfile(mapmov):
