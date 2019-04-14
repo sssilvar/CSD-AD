@@ -33,7 +33,7 @@ def register_subject_with_flirt(subject_id):
     subjects_dir = cfg.get('dirs', 'subjects_dir')
 
     # Define useful files for the registration process
-    mov = os.path.join(subjects_dir, subject_id, 'mri/orig', 'orig.mgz')
+    mov = os.path.join(subjects_dir, subject_id, 'mri/orig', '001.mgz')
     mapmov = os.path.join(registered_folder, subject_id, 'orig_reg.nii.gz')
     mov_nii = '/dev/shm/{}.nii.gz'.format(subject_id)
     aff_mat = os.path.join(registered_folder, subject_id, 'transform.mat')
@@ -43,7 +43,7 @@ def register_subject_with_flirt(subject_id):
 
     if not isfile(mov) and isfile(zipped_file) and not isfile(mapmov):
         print('[  INFO  ] Extracting data from: {}'.format(zipped_file))
-        bmask_path = join(subject_id, 'mri/orig/orig.mgz')
+        bmask_path = join(subject_id, 'mri/orig/001.mgz')
 
         with ZipFile(zipped_file, 'r') as zf:
             try:
@@ -53,7 +53,7 @@ def register_subject_with_flirt(subject_id):
         subjects_dir = '/dev/shm'
 
     # Re-define moving image path (if subjects zipped)
-    mov = os.path.join(subjects_dir, subject_id, 'mri/orig', 'brainmask.mgz')
+    mov = os.path.join(subjects_dir, subject_id, 'mri/orig', '001.mgz')
 
     # Check if file exists
     if isfile(mov) and not isfile(mapmov):
