@@ -60,7 +60,7 @@ if __name__ == '__main__':
         try:
             dx = mci_df.loc[sid, 'target']
             print('Processing {} - {}'.format(sid, dx))
-            mri_vol = nb.load(join(data_folder, sid, 'brainmask_reg.nii.gz')).get_data().astype(np.float)
+            mri_vol = nb.load(join(data_folder, sid, 'orig_reg.nii.gz')).get_data().astype(np.float)
             if dx == 'MCIc':
                 converter_sum_vol += mri_vol
                 n_converters += 1
