@@ -1,20 +1,41 @@
 #!/bin/env puthon3
+import argparse
 from os.path import join, dirname, realpath
 
 import numpy as np
 import pandas as pd
 import nibabel as nb
 
-from  sklearn.decomposition import PCA
+from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 
 root = dirname(dirname(dirname(realpath(__file__))))
 
+
+def parse_args():
+    """Parse arguments"""
+    parser = argparse.ArgumentParser(
+        description='{desc}\n\nCitation:{cite}'.format(desc=__description__, cite=__cite__),
+        formatter_class=argparse.RawTextHelpFormatter
+    )
+    parser.add_argument('-groupfile', help='CSV containing subject IDs', required=True)
+    parser.add_argument('-out', help='Output folder', required=True)
+    parser.add_argument('-folder', help='Subjects folder', required=False)
+
+    return parser.parse_args()
+
+
 if __name__ == '__main__':
+    # Parse arguments
+    args = parse_args()
+
     # Load groupfile
-    csv_file = '/run/media/ssilvari/SMITH_DATA_1TB/Universidad/MSc/Thesis/Dataset/ADNI_FS_ZIP/groupfile.csv'
-    dataset_folder = '/run/media/ssilvari/SMITH_DATA_1TB/Universidad/MSc/Thesis/Dataset/ADNI_FS_registered_flirt'
+    csv_file = args.groupfile
+    dataset_folder = args.folder
+    out_folder = args.out
+
+    # Load data
     subjects = pd.read_csv(csv_file, index_col=0)
     adnimerge = pd.read_csv(join(root, 'param', 'df_conversions_with_times.csv'), index_col='PTID')
 
@@ -52,4 +73,4 @@ if __name__ == '__main__':
         print('Range PC{} ({},{})'.format(i + 1, component.min(), component.max()))
 
         nii_pca = nb.Nifti1Image(component.reshape(nii.shape).astype(np.float), nii.affine)
-        nb.save(nii_pca, '/tmp/PC{}_pca.nii.gz'.format(i + 1))
+        nb.save(nii_pca, join(out_folder, 'PC{}_pca.nii.gz'.format(i + 1)))
