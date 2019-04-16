@@ -1,4 +1,12 @@
 #!/bin/env puthon3
+__author__ = 'Santiago Smith'
+__description__ = 'An automated method for ROI extraction in groups of MRI'
+__year__ = '2019'
+__cite__ = """
+Silva, et al. Characterizing brain patterns in conversion from mild cognitive impairment (MCI) to Alzheimer's disease,
+13th International Symposium on Medical Information Processing and Analysis, 2017
+"""
+
 import argparse
 from os.path import join, dirname, realpath
 
