@@ -29,7 +29,8 @@ def register_subject_with_flirt(subject_id):
         Registers a NII image to a MNI152 template
     """
     # Define template volume directory
-    dst = os.path.join(root, 'param', 'FSL_MNI152_FreeSurferConformed_1mm.nii')
+    # dst = os.path.join(root, 'param', 'FSL_MNI152_FreeSurferConformed_1mm.nii')
+    dst = r'/home/ssilvari/Downloads/MNI152_T1_1mm_Brain_c.nii.gz'
 
     # Get subjects directory from conf file
     subjects_dir = cfg.get('dirs', 'subjects_dir')
@@ -37,7 +38,6 @@ def register_subject_with_flirt(subject_id):
     # Define useful files for the registration process
     mov = os.path.join(subjects_dir, subject_id, 'mri', 'orig.mgz')
     mapmov = os.path.join(registered_folder, subject_id, 'orig_reg.nii.gz')
-    mov_nii = '/dev/shm/{}.nii.gz'.format(subject_id)
     aff_mat = os.path.join(registered_folder, subject_id, 'transform.mat')
 
     # Check if file is zipped
@@ -76,21 +76,21 @@ def register_subject_with_flirt(subject_id):
             print('[  ERROR  ] Error creating subject_id: {}.'.format(e))
 
         # Convert to NIFTI
-        command = 'mri_convert {} {}'.format(mov, mov_nii)
+        # command = 'mri_convert {} {}'.format(mov, mov_nii)
+        # os.system(command)
+
+        # Register to MNI flirt
+        # -ref FSL_MNI152_FreeSurferConformed_1mm.nii -in brain.nii.gz
+        # -omat my_affine_transf.mat -out registered.nii.gz
+        # command = 'flirt -ref {} -in {} -omat {} -out {}'.format(dst, mov_nii, aff_mat, mapmov)
+
+        command = 'fsl_rigid_register -r {ref} -i {i} -o {out}'.format(ref=dst, i=mov, out=mapmov)
+        print(command)
         os.system(command)
 
         # Remove extracted if exist
         if isdir('/dev/shm/{}'.format(subject_id)):
             os.system('rm -rf /dev/shm/{}'.format(subject_id))
-
-        # Register to MNI flirt
-        # -ref FSL_MNI152_FreeSurferConformed_1mm.nii -in brain.nii.gz
-        # -omat my_affine_transf.mat -out registered.nii.gz
-        command = 'flirt -ref {} -in {} -omat {} -out {}'.format(dst, mov_nii, aff_mat, mapmov)
-        os.system(command)
-
-        # Remove folder from RAM
-        os.system('rm {}'.format(mov_nii))
     elif isfile(mapmov):
         print('[  WARNING  ] Registered file was found for {} in: {}'.format(subject_id, mapmov))
     else:

@@ -62,7 +62,7 @@ if __name__ == '__main__':
             print('Processing {} - {}'.format(sid, dx))
             mri_vol = nb.load(join(data_folder, sid, 'orig_reg.nii.gz')).get_data().astype(np.float)
             if dx == 'MCIc':
-                converter_sum_vol += mri_vol
+                converter_sum_vol -= mri_vol
                 n_converters += 1
             elif dx == 'MCInc':
                 stable_sum_vol += mri_vol
