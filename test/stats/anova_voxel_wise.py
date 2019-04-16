@@ -7,6 +7,7 @@ Silva, et al. Characterizing brain patterns in conversion from mild cognitive im
 13th International Symposium on Medical Information Processing and Analysis, 2017
 """
 
+
 import argparse
 from os.path import join, dirname, realpath
 
