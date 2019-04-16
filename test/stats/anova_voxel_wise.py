@@ -50,7 +50,7 @@ if __name__ == '__main__':
 
     # Load images
     X = []
-    for subject in subjects.index[:20]:
+    for subject in subjects.index:
         try:
             label = adnimerge.loc[subject, 'target']
             if label == 'MCIc' or label == 'MCInc':
