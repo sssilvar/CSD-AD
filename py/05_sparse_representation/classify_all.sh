@@ -7,7 +7,7 @@ CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 TIMES=(24 36 60)
 
 # Features file
-FEATS="/home/jullygh/sssilvar/Documents/Dataset/ADNI_FS_sphere_mapped/curvelets_non_split"
+FEATS="/home/jullygh/sssilvar/Documents/Dataset/ADNI_FS_sphere_mapped_6_sph_overlap/curvelets_non_split"
 
 # Set other params
 CLASSIFIERS=("svm" "rf")
