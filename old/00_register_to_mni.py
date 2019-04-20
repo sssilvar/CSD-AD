@@ -79,7 +79,9 @@ def register_subject_with_flirt(subject_id):
 
         # Register to MNI flirt
         if not isfile(mapmov):
-            command = 'fsl_rigid_register -r {ref} -i {i} -o {out}'.format(ref=mni, i=mov_nii_stripped, out=mapmov)
+            # command = 'fsl_rigid_register -r {ref} -i {i} -o {out}'.format(ref=mni, i=mov_nii_stripped, out=mapmov)
+            command = 'flirt -ref {ref} -in {i} -out {out} ' \
+                      '-omat {omat}'.format(ref=mni, i=mov_nii_stripped, out=mapmov, omat=aff_mat)
             print(command)
             os.system(command)
 
