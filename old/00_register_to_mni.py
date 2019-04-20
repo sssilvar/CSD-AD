@@ -40,6 +40,7 @@ def register_subject_with_flirt(subject_id):
     mov = os.path.join(subjects_dir, subject_id, 'mri', 'orig', '001.mgz')
     mapmov = os.path.join(registered_folder, subject_id, '001_reg.nii.gz')
     aff_mat = os.path.join(registered_folder, subject_id, 'transform.mat')
+    mov_nii_stripped_disk = os.path.join(registered_folder, subject_id, '001_stripped.nii.gz')
 
     # Check if file is zipped
     zipped_file = os.path.join(subjects_dir, subject_id + '.zip')
@@ -73,15 +74,16 @@ def register_subject_with_flirt(subject_id):
         os.system(command)
 
         # Skull stripping
-        if not isfile(mov_nii_stripped):
+        if not isfile(mov_nii_stripped_disk):
             command = 'bash {robex} {in_file} {out}'.format(robex=robex, in_file=mov_nii, out=mov_nii_stripped)
             os.system(command)
+            os.system('mv {} {}'.format(mov_nii_stripped, mov_nii_stripped_disk))
 
         # Register to MNI flirt
         if not isfile(mapmov):
-            # command = 'fsl_rigid_register -r {ref} -i {i} -o {out}'.format(ref=mni, i=mov_nii_stripped, out=mapmov)
-            command = 'flirt -ref {ref} -in {i} -out {out} ' \
-                      '-omat {omat}'.format(ref=mni, i=mov_nii_stripped, out=mapmov, omat=aff_mat)
+            command = 'fsl_rigid_register -r {ref} -i {i} -o {out}'.format(ref=mni, i=mov_nii_stripped_disk, out=mapmov)
+            # command = 'flirt -ref {ref} -in {i} -out {out} ' \
+            #           '-omat {omat}'.format(ref=mni, i=mov_nii_stripped, out=mapmov, omat=aff_mat)
             print(command)
             os.system(command)
 
