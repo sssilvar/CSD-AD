@@ -54,7 +54,7 @@ if __name__ == '__main__':
         try:
             label = adnimerge.loc[subject, 'target']
             if label == 'MCIc' or label == 'MCInc':
-                nii_file = join(dataset_folder, subject, 'orig_reg.nii.gz')
+                nii_file = join(dataset_folder, subject, '001_reg.nii.gz')
                 nii = nb.load(nii_file)
                 nii_data = nii.get_data().ravel()
                 print('Loading subject: {} | shape: {} | Dx: {}'.format(subject, nii_data.shape, label))
