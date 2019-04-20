@@ -12,6 +12,7 @@ import pandas as pd
 import nibabel as nb
 
 root = dirname(dirname(realpath(__file__)))
+robex = join(os.getenv('HOME'), 'Apps', 'ROBEX', 'runROBEX.sh')
 print('[  ROOT  ] {}'.format(root))
 
 sys.path.append(root)
@@ -29,15 +30,15 @@ def register_subject_with_flirt(subject_id):
         Registers a NII image to a MNI152 template
     """
     # Define template volume directory
-    # dst = os.path.join(root, 'param', 'FSL_MNI152_FreeSurferConformed_1mm.nii')
-    dst = r'/home/ssilvari/Downloads/MNI152_T1_1mm_Brain_c.nii.gz'
+    mni = os.path.join(root, 'param', 'FSL_MNI152_FreeSurferConformed_1mm.nii')
+    # dst = r'/home/ssilvari/Downloads/MNI152_T1_1mm_Brain_c.nii.gz'
 
     # Get subjects directory from conf file
     subjects_dir = cfg.get('dirs', 'subjects_dir')
 
     # Define useful files for the registration process
-    mov = os.path.join(subjects_dir, subject_id, 'mri', 'orig.mgz')
-    mapmov = os.path.join(registered_folder, subject_id, 'orig_reg.nii.gz')
+    mov = os.path.join(subjects_dir, subject_id, 'mri', 'orig', '001.mgz')
+    mapmov = os.path.join(registered_folder, subject_id, '001_reg.nii.gz')
     aff_mat = os.path.join(registered_folder, subject_id, 'transform.mat')
 
     # Check if file is zipped
@@ -45,27 +46,19 @@ def register_subject_with_flirt(subject_id):
 
     if not isfile(mov) and isfile(zipped_file) and not isfile(mapmov):
         print('[  INFO  ] Extracting data from: {}'.format(zipped_file))
-        brain_path = join(subject_id, 'mri/orig.mgz')
-        aseg_path = join(subject_id, 'mri/aseg.mgz')
+        brain_path = join(subject_id, 'mri/orig/001.mgz')
 
         with ZipFile(zipped_file, 'r') as zf:
             try:
                 zf.extract(brain_path, '/dev/shm/')
-                zf.extract(aseg_path, '/dev/shm/')
             except KeyError as e:
                 print('[  ERROR  ] Extraction failed: {}'.format(e))
         subjects_dir = '/dev/shm'
 
     # Re-define moving image path (if subjects zipped)
-    mov = os.path.join(subjects_dir, subject_id, 'mri', 'orig.mgz')
-    aseg = os.path.join(subjects_dir, subject_id, 'mri', 'aseg.mgz')
-
-    # Extract RAW brain mask
-    brain_nii = nb.load(mov)
-    aseg_nii = nb.load(aseg)
-
-    bmask_raw = np.multiply(brain_nii.get_data(), aseg_nii.get_data() > 0)
-    nb.save(nb.Nifti1Image(bmask_raw, brain_nii.affine), mov)
+    mov = os.path.join(subjects_dir, subject_id, 'mri', 'orig', '001.mgz')
+    mov_nii = os.path.join(subjects_dir, subject_id, 'mri', 'orig', '001.nii.gz')
+    mov_nii_stripped = os.path.join(subjects_dir, subject_id, 'mri', 'orig', '001_stripped.nii.gz')
 
     # Check if file exists
     if isfile(mov) and not isfile(mapmov):
@@ -76,17 +69,19 @@ def register_subject_with_flirt(subject_id):
             print('[  ERROR  ] Error creating subject_id: {}.'.format(e))
 
         # Convert to NIFTI
-        # command = 'mri_convert {} {}'.format(mov, mov_nii)
-        # os.system(command)
+        command = 'mri_convert {} {}'.format(mov, mov_nii)
+        os.system(command)
+
+        # Skull stripping
+        if not isfile(mov_nii_stripped):
+            command = 'bash {robex} {in_file} {out}'.format(robex=robex, in_file=mov_nii, out=mov_nii_stripped)
+            os.system(command)
 
         # Register to MNI flirt
-        # -ref FSL_MNI152_FreeSurferConformed_1mm.nii -in brain.nii.gz
-        # -omat my_affine_transf.mat -out registered.nii.gz
-        # command = 'flirt -ref {} -in {} -omat {} -out {}'.format(dst, mov_nii, aff_mat, mapmov)
-
-        command = 'fsl_rigid_register -r {ref} -i {i} -o {out}'.format(ref=dst, i=mov, out=mapmov)
-        print(command)
-        os.system(command)
+        if not isfile(mapmov):
+            command = 'fsl_rigid_register -r {ref} -i {i} -o {out}'.format(ref=mni, i=mov_nii_stripped, out=mapmov)
+            print(command)
+            os.system(command)
 
         # Remove extracted if exist
         if isdir('/dev/shm/{}'.format(subject_id)):

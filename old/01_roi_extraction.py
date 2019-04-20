@@ -13,8 +13,12 @@ from os.path import join, dirname, realpath
 import numpy as np
 import pandas as pd
 import nibabel as nb
+from skimage import exposure
+
+import matplotlib.pyplot as plt
 
 root = dirname(dirname(realpath(__file__)))
+plt.style.use('ggplot')
 
 
 def parse_args():
@@ -60,7 +64,12 @@ if __name__ == '__main__':
         try:
             dx = mci_df.loc[sid, 'target']
             print('Processing {} - {}'.format(sid, dx))
-            mri_vol = nb.load(join(data_folder, sid, 'orig_reg.nii.gz')).get_data().astype(np.float)
+            mri_vol = nb.load(join(data_folder, sid, '001_reg.nii.gz')).get_data()  # .astype(np.float)
+            # plt.hist(mri_vol[np.where(mri_vol != 0)].ravel(), bins=100)
+            # plt.show()
+
+            mri_vol = exposure.equalize_hist(mri_vol, mask=(mri_vol != 0))
+
             if dx == 'MCIc':
                 converter_sum_vol -= mri_vol
                 n_converters += 1
@@ -80,7 +89,7 @@ if __name__ == '__main__':
     converter_avg_vol = converter_sum_vol / n_converters
 
     # Map of absolute differences
-    map_of_differences_vol = np.abs(stable_sum_vol, converter_sum_vol)
+    map_of_differences_vol = np.abs(stable_sum_vol - converter_sum_vol)
     map_of_differences_vol_norm = map_of_differences_vol / map_of_differences_vol.max() * 255
 
     # Create NIFTI images
