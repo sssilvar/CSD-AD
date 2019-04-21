@@ -82,7 +82,7 @@ def process_image(folder, n_scale, scale):
         sa = solid_cone(radius=(r_min, r_max), center=centroid)
 
         # Start go over the whole sphere (x_angle: [0, pi] and z_angle [-pi, pi])
-        ns = 2  # TODO: Chack if it's neccesary to change it
+        ns = 2  # TODO: Check if it's necessary to change it
         img_2d = np.zeros([360 // ns, 180 // ns])
         img_grad_2d = np.zeros_like(img_2d)
         img_sobel_2d = np.zeros_like(img_2d)
@@ -187,8 +187,8 @@ if __name__ == '__main__':
     # Calculate the inner and outer radius
     # for all the spheres: scales
     max_radius = 100
-    tk = 20
-    overlap = 5
+    tk = 30
+    overlap = 6
     n_spheres = max_radius // (tk - overlap)
     scales = [(i * (tk - overlap), ((i + 1) * tk) - (i * overlap)) for i in range(n_spheres)]
 

@@ -13,8 +13,10 @@ from os.path import join, dirname, realpath
 import numpy as np
 import pandas as pd
 import nibabel as nb
-from skimage import exposure
 from scipy.ndimage import filters
+
+from skimage import exposure
+from skimage.filters import threshold_otsu
 
 import matplotlib.pyplot as plt
 
@@ -65,7 +67,7 @@ if __name__ == '__main__':
         try:
             dx = mci_df.loc[sid, 'target']
             print('Processing {} - {}'.format(sid, dx))
-            mri_vol = nb.load(join(data_folder, sid, '001_reg.nii.gz')).get_data()  # .astype(np.float)
+            mri_vol = nb.load(join(data_folder, sid, 'orig_reg.nii.gz')).get_data()  # .astype(np.float)
             # plt.hist(mri_vol[np.where(mri_vol != 0)].ravel(), bins=100)
             # plt.show()
 
@@ -94,14 +96,20 @@ if __name__ == '__main__':
     map_of_differences_vol = np.abs(stable_sum_vol - converter_sum_vol)
     map_of_differences_vol_norm = map_of_differences_vol / map_of_differences_vol.max() * 255
 
+    # Threshold map
+    threshold = threshold_otsu(map_of_differences_vol_norm)
+    thresholded_roi = (map_of_differences_vol_norm > threshold).astype(np.int8)
+
     # Create NIFTI images
     stable_nii = nb.Nifti1Image(stable_avg_vol, affine=mni_nii.affine)
     converter_nii = nb.Nifti1Image(converter_avg_vol, affine=mni_nii.affine)
     map_of_differences_nii = nb.Nifti1Image(map_of_differences_vol, mni_nii.affine)
     map_of_differences_norm_nii = nb.Nifti1Image(map_of_differences_vol_norm, mni_nii.affine)
+    thresholded_roi_nii = nb.Nifti1Image(thresholded_roi, mni_nii.affine)
 
     # Save them all
     nb.save(stable_nii, join(out_folder, 'MCInc.nii.gz'))
     nb.save(converter_nii, join(out_folder, 'MCIc.nii.gz'))
     nb.save(map_of_differences_nii, join(out_folder, 'differences.nii.gz'))
     nb.save(map_of_differences_norm_nii, join(out_folder, 'differences_norm.nii.gz'))
+    nb.save(thresholded_roi_nii, join(out_folder, 'otsu.nii.gz'))
