@@ -14,6 +14,7 @@ import numpy as np
 import pandas as pd
 import nibabel as nb
 from skimage import exposure
+from scipy.ndimage import filters
 
 import matplotlib.pyplot as plt
 
@@ -69,6 +70,7 @@ if __name__ == '__main__':
             # plt.show()
 
             mri_vol = exposure.equalize_hist(mri_vol, mask=(mri_vol != 0))
+            mri_vol = filters.sobel(mri_vol)
 
             if dx == 'MCIc':
                 converter_sum_vol -= mri_vol
