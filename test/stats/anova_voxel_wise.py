@@ -14,6 +14,7 @@ from os.path import join, dirname, realpath
 import numpy as np
 import pandas as pd
 import nibabel as nb
+from scipy.ndimage import filters
 
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
@@ -56,7 +57,7 @@ if __name__ == '__main__':
             if label == 'MCIc' or label == 'MCInc':
                 nii_file = join(dataset_folder, subject, '001_reg.nii.gz')
                 nii = nb.load(nii_file)
-                nii_data = nii.get_data().ravel()
+                nii_data = filters.sobel(nii.get_data()).ravel()
                 print('Loading subject: {} | shape: {} | Dx: {}'.format(subject, nii_data.shape, label))
                 X.append(nii_data)
             else:
