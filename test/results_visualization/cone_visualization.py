@@ -13,7 +13,7 @@ from nilearn import plotting
 root = dirname(dirname(dirname(realpath(__file__))))
 
 sys.path.append(root)
-from lib.geometry import sphere
+from lib.geometry import sphere, solid_cone
 from lib.geometry import get_centroid, extract_sub_volume
 
 if __name__ == '__main__':
@@ -22,7 +22,7 @@ if __name__ == '__main__':
     cfg.read(join(root, 'config', 'config.cfg'))
     registered_folder = cfg.get('dirs', 'dataset_folder_registered')
     extract_subs = False
-    gradients = True
+    gradients = False
 
     # Define file names
     vol_filename = join(registered_folder, '002_S_0729/brainmask_reg.nii.gz')
@@ -58,9 +58,10 @@ if __name__ == '__main__':
         for i, radius in enumerate(scales):
             # Create a binary mask (cone between scales)
             mask = sphere(radius=radius, center=centroid)
+            cone = solid_cone(radius=radius, center=centroid)
 
             # Mask sub-sampled volume
-            vol_masked = np.multiply(vol, mask)
+            vol_masked = np.multiply(vol, cone)
 
             # Extract sub-volumes
             if extract_subs:
@@ -73,17 +74,23 @@ if __name__ == '__main__':
             # Create NIFTI Images
             nii_sub = nb.Nifti1Image(vol_sub, nii.affine)
             nii_mask = nb.Nifti1Image(mask.astype(np.int32), nii.affine)
-            nii_masked = nb.Nifti1Image(vol_masked, nii.affine)
+            nii_masked = nb.Nifti1Image(cone.astype(np.int32), nii.affine)
 
             # Plot result
             display = plotting.plot_anat(nii_sub,
                                          # title='%s to %s vox.' % radius,
                                          black_bg=True,
                                          alpha=0.8)
-            display.add_overlay(nii_mask, alpha=0.8)
-            display.add_overlay(nii_masked, alpha=0.7)
+            display.add_overlay(nii_mask, alpha=0.7, cmap='hot')
+            display.add_overlay(nii_masked, alpha=0.8)
 
             # Save figures
             plt.savefig('/tmp/%s_to_%s_visualization.png' % radius)
 
-    plt.show()
+            # save NIFTIs
+            if i == 1:
+                nb.save(nii_sub, '/tmp/brain.mgz')
+                nb.save(nii_mask, '/tmp/sphere.mgz')
+                nb.save(nii_masked, '/tmp/cone.mgz')
+
+    # plt.show()
