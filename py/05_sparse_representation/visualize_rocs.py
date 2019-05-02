@@ -12,6 +12,7 @@ if __name__ == '__main__':
     # Load config
     cfg = ConfigParser()
     cfg.read(join(root, 'config', 'config.cfg'))
+    fmt = 'png'  # Alt. 'eps'
 
     # Load params
     data_folder = cfg.get('dirs', 'sphere_mapping')
@@ -68,4 +69,4 @@ if __name__ == '__main__':
                 )
             )
             print('Saving figure at: {}'.format(fig_file))
-            plt.savefig(fig_file + '.eps', bbox_inches='tight')
+            plt.savefig(fig_file + '.{}'.format(fmt), bbox_inches='tight')
