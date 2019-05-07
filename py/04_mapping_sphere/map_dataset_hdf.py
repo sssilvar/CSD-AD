@@ -21,11 +21,11 @@ from lib.geometry import extract_sub_volume, get_centroid
 
 if __name__ == '__main__':
     # Set dataset folder and csv with subjects
-    # data_folder = '/run/media/ssilvari/HDD/ADNI_FS_registered_flirt'
-    data_folder = '/home/ssilvari/Documents/temp/ADNI_temp/ADNI_FS_registered_flirt'
+    data_folder = '/run/media/ssilvari/HDD/ADNI_FS_registered_flirt'
+    # data_folder = '/home/ssilvari/Documents/temp/ADNI_temp/ADNI_FS_registered_flirt'
     group_csv = join(data_folder, 'groupfile.csv')
     mni_file = join(root, 'param', 'FSL_MNI152_FreeSurferConformed_1mm.nii')
-    subj_file = 'sobel.nii.gz'
+    subj_file = 'brainmask_reg.nii.gz'
 
     # Load group file
     subjects = pd.read_csv(group_csv, index_col=0)
@@ -73,11 +73,11 @@ if __name__ == '__main__':
                 pix_count += 1
 
                 # Iterate over subjects
-                for subject in [subjects.index[0]]:
+                for subject in subjects.index:
                     # Load subject and process it
                     nii_file = join(data_folder, subject, subj_file)
                     nii_orig = nb.load(nii_file)
-                    img = nii_orig.get_data()
+                    img = nii_orig.get_data().astype(np.float32)
 
                     vol_sub, _ = extract_sub_volume(img, radius=(r_min, r_max), centroid=centroid)
                     roi_mean = np.nan_to_num(vol_sub[np.where(solid_ang_mask)].mean())
@@ -86,13 +86,13 @@ if __name__ == '__main__':
                     col_name = '{}_to_{}_{}'.format(r_min, r_max, pix_count)
                     pix_df.loc[subject, col_name] = roi_mean
 
-                    # # Save as NIFTI
-                    # sobel_x = ndi.sobel(img, axis=0, mode='reflect')
-                    # sobel_y = ndi.sobel(img, axis=1, mode='reflect')
-                    # sobel_z = ndi.sobel(img, axis=2, mode='reflect')
-                    # img = np.sqrt(sobel_x ** 2 + sobel_y ** 2 + sobel_z ** 2)
-                    # nii = nb.Nifti1Image(img, nii_orig.affine)
-                    # nb.save(nii, join(dirname(nii_file), 'sobel.nii.gz'))
+                    # Save as NIFTI
+                    sobel_x = ndi.sobel(img, axis=0, mode='reflect')
+                    sobel_y = ndi.sobel(img, axis=1, mode='reflect')
+                    sobel_z = ndi.sobel(img, axis=2, mode='reflect')
+                    img = np.sqrt(sobel_x ** 2 + sobel_y ** 2 + sobel_z ** 2)
+                    nii = nb.Nifti1Image(img, nii_orig.affine)
+                    nb.save(nii, join(dirname(nii_file), 'sobel.nii.gz'))
 
                     # # Create images
                     # nii = nb.Nifti1Image(vol_sub, mni_aseg.affine)
@@ -104,6 +104,7 @@ if __name__ == '__main__':
 
                     print('Scale: {} | Angle: {} | Processing subject: {}'.format((r_min, r_max), (z_angle, x_angle),
                                                                                   subject), roi_mean)
+                exit(0)
                 # print(pix_df.head())
                 print('-' * 10)
 
