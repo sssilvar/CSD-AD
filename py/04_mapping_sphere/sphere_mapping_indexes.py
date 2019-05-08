@@ -26,6 +26,9 @@ if __name__ == '__main__':
     df_out_file = join(data_folder, 'indexes.h5')
     mni_file = join(root, 'param', 'FSL_MNI152_FreeSurferConformed_1mm.nii')
 
+    # Print some info
+    print('\t- Output folder: %s' % data_folder)
+
     tk = 25
     overlap = 9
     max_radius = 100
