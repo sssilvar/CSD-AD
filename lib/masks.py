@@ -61,7 +61,7 @@ def circle(shape=(256, 256), radius=(1, 10), center=(128, 128), ang_range=(-pi, 
     return mask
 
 
-def cone(shape=(256, 256, 256), center=(128, 128, 128), r=100, m=10):
+def cone(shape=(256, 256, 256), center=(128, 128, 128), r=100, m=8):
     """Draw a cone"""
     # Create variables for simplicity
     sx, sy, sz = shape
