@@ -29,7 +29,7 @@ if __name__ == '__main__':
     overlap = 9
     max_radius = 100
 
-    ns = 4  # TODO: Check if it's necessary to change it (Scaling factor
+    ns = 2  # TODO: Check if it's necessary to change it (Scaling factor
     df_out_file = join(data_folder, 'indexes_tk_{}_overlap_{}_ns_{}.h5'.format(tk, overlap, ns))
 
     # Print some info
@@ -53,13 +53,6 @@ if __name__ == '__main__':
         sc = solid_cone(radius=(r_min, r_max), center=centroid)
         spheres[np.where(sc)] = i + 1
 
-    # nii_a = nb.Nifti1Image(spheres, mni_aseg.affine)
-    # nb.save(nii_a, '/tmp/cones.nii')
-    #
-    # display = plotting.plot_anat(mni_aseg)
-    # display.add_overlay(nii_a)
-    # plt.show()
-
     # ==== INDEX CALCULATION ====
     indexes = pd.DataFrame(columns=['scale', 'theta', 'phi', 'indexes'])
     for i, z_angle in enumerate(range(-180, 180, ns)):
@@ -76,6 +69,14 @@ if __name__ == '__main__':
                     'indexes': ix
                 }
                 indexes = indexes.append([data])
+            # Plot for (180, 0) degrees
+            if z_angle == -180 and x_angle == 0:
+                nii_a = nb.Nifti1Image(solid_ang_mask, mni_aseg.affine)
+                nb.save(nii_a, '/tmp/cones.nii')
+
+                display = plotting.plot_anat(mni_aseg)
+                display.add_overlay(nii_a)
+                plt.show()
 
     indexes = indexes.reset_index()
     indexes.to_hdf(df_out_file, key='indexes')
