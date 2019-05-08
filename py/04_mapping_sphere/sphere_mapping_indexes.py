@@ -23,7 +23,6 @@ if __name__ == '__main__':
     # Set parameters
     print(10 * '=' + ' Index saver ' + 10 * '=')
     data_folder = join(os.getenv('HOME'), 'Downloads')
-    df_out_file = join(data_folder, 'indexes.h5')
     mni_file = join(root, 'param', 'FSL_MNI152_FreeSurferConformed_1mm.nii')
 
     # Print some info
@@ -33,7 +32,7 @@ if __name__ == '__main__':
     overlap = 9
     max_radius = 100
 
-    ns = 1 # TODO: Check if it's necessary to change it (Scaling factor
+    ns = 4 # TODO: Check if it's necessary to change it (Scaling factor
 
     # Calculate the inner and outer radius
     # for all the spheres: scales
@@ -77,5 +76,6 @@ if __name__ == '__main__':
                 indexes = indexes.append([data])
 
     indexes = indexes.reset_index()
+    df_out_file = join(data_folder, 'indexes_tk_{}_overlap_{}_ns_{}.h5'.format(tk, overlap, ns))
     indexes.to_hdf(df_out_file, key='indexes')
     print('DONE!')
