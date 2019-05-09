@@ -95,7 +95,7 @@ if __name__ == '__main__':
     subjects = pd.read_csv(group_file, index_col=0)
 
     # Get scales, angles and mapped image dimensions
-    scales = ix_df['scale'].value_counts().sort_index().index[:2]
+    scales = ix_df['scale'].value_counts().sort_index().index
     thetas = ix_df['theta'].value_counts().sort_index().index
     phis = ix_df['phi'].value_counts().sort_index().index
     dx, dy = len(thetas), len(phis)
