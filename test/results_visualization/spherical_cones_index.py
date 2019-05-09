@@ -20,7 +20,7 @@ if __name__ == '__main__':
     subject_file = '/home/ssilvari/Documents/temp/ADNI_temp/ADNI_FS_registered_flirt/002_S_0729/brainmask_reg.nii.gz'
 
     # Load indexes file
-    indexes_file = join(os.getenv('HOME'), 'Downloads', 'indexes_tk_25_overlap_9_ns_4.h5')
+    indexes_file = join(os.getenv('HOME'), 'Downloads', 'indexes_tk_25_overlap_9_ns_2.h5')
     indexes_df = pd.read_hdf(indexes_file, key='indexes', index_col=0)
 
     print(indexes_df.head())
