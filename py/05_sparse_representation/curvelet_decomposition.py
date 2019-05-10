@@ -46,7 +46,7 @@ def parse_args():
 if __name__ == "__main__":
     # Parse arguments
     args = parse_args()
-    data_file = args.f
+    data_file = str(args.f)
     nbs = args.s
     nba = args.a
     subject_id = args.sid
@@ -74,7 +74,10 @@ if __name__ == "__main__":
             os.mkdir(out_folder)
 
         # Load img and split it in half
-        img = np.fromfile(data_file).reshape([180, 90])
+        if data_file.endswith('.raw'):
+            img = np.fromfile(data_file).reshape([180, 90])
+        elif data_file.endswith('.npz'):
+            img = np.load(data_file)['img']
         img_list = np.split(img, 2, axis=0)
 
         # Define a curvelet object
