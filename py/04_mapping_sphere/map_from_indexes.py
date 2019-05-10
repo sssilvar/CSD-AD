@@ -47,21 +47,24 @@ def process_subject(subject):
 
     for i, scale in enumerate(scales):
         print('Mapping scale {} ...'.format(scale))
-        for j, theta in enumerate(thetas):
-            for k, phi in enumerate(phis):
-                # print('Mapping scale: {} | angle ({}, {})'.format(scale, theta, phi))
-                ix = ix_df.loc[
-                    (ix_df['scale'] == scale) &
-                    (ix_df['theta'] == theta) &
-                    (ix_df['phi'] == phi)]['indexes'].values[0]
-                img_mapped[j, k] = vol_sobel[ix].mean()
-
-                if theta == 0 and phi == 0:
-                    rois[ix] = i + 1
-        # Save results
         filename_base = join(out_subject_dir, 'sobel_{}'.format(scale))
-        plt.imsave(filename_base + '.png', img_mapped.T, cmap='gray')
-        np.savez_compressed(filename_base, img=img_mapped, indexes=index_file, brain_file=subj_file)
+        if not isfile(filename_base + '.npz'):
+            for j, theta in enumerate(thetas):
+                for k, phi in enumerate(phis):
+                    # print('Mapping scale: {} | angle ({}, {})'.format(scale, theta, phi))
+                    ix = ix_df.loc[
+                        (ix_df['scale'] == scale) &
+                        (ix_df['theta'] == theta) &
+                        (ix_df['phi'] == phi)]['indexes'].values[0]
+                    img_mapped[j, k] = vol_sobel[ix].mean()
+
+                    if theta == 0 and phi == 0:
+                        rois[ix] = i + 1
+            # Save results
+            plt.imsave(filename_base + '.png', img_mapped.T, cmap='gray')
+            np.savez_compressed(filename_base, img=img_mapped, indexes=index_file, brain_file=subj_file)
+        else:
+            print('File {} already exists.'.format(filename_base + '.png'))
 
 
 if __name__ == '__main__':
