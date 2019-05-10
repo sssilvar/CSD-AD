@@ -78,7 +78,6 @@ if __name__ == "__main__":
             img = np.fromfile(data_file).reshape([180, 90])
         elif data_file.endswith('.npz'):
             img = np.load(data_file)['img']
-        img_list = np.split(img, 2, axis=0)
 
         # Define a curvelet object
         A = ct.fdct2(
@@ -89,17 +88,6 @@ if __name__ == "__main__":
             norm=False,
             vec=True,
             cpx=False)
-
-        # # Visualize if necessary
-        # plt.subplot(1,2,1)
-        # plt.imshow(img_list[0].T, cmap='gray')
-        # plt.axis('off')
-        # plt.title('Left')
-        # plt.subplot(1,2,2)
-        # plt.imshow(img_list[1].T, cmap='gray')
-        # plt.axis('off')
-        # plt.title('Right')
-        # plt.show()
 
         # Decompose
         feats = pd.Series()
