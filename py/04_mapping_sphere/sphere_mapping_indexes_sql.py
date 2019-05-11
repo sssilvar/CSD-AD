@@ -26,7 +26,6 @@ if __name__ == '__main__':
     print(10 * '=' + ' Index saver ' + 10 * '=')
     data_folder = join(os.getenv('HOME'), 'Downloads')
     mni_file = join(root, 'param', 'FSL_MNI152_FreeSurferConformed_1mm.nii')
-    engine = create_engine('sqlite:////dev/shm/indexes.sqlite')
 
     tk = 25
     overlap = 9
@@ -34,6 +33,7 @@ if __name__ == '__main__':
 
     ns = 4  # TODO: Check if it's necessary to change it (Scaling factor
     df_out_file = join(data_folder, 'indexes_tk_{}_overlap_{}_ns_{}.h5'.format(tk, overlap, ns))
+    engine = create_engine('sqlite:////dev/shm/indexes_tk_{}_overlap_{}_ns_{}.sqlite'.format(tk, overlap, ns))
 
     # Print some info
     print('\t- Output folder: %s' % data_folder)
