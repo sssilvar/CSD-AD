@@ -75,7 +75,7 @@ if __name__ == '__main__':
                 s = pd.DataFrame()
                 s = s.append(pd.Series(data), ignore_index=True)
                 s.to_sql('indexes', con=engine, if_exists='append')
-                print(s)
+                # print(s)
             # Plot for (180, 0) degrees
             if z_angle == -180 and x_angle == 0:
                 nii_a = nb.Nifti1Image(solid_ang_mask, mni_aseg.affine)
