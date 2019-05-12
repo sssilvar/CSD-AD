@@ -31,7 +31,7 @@ if __name__ == '__main__':
     overlap = 9
     max_radius = 100
 
-    ns = 4  # TODO: Check if it's necessary to change it (Scaling factor
+    ns = 1  # TODO: Check if it's necessary to change it (Scaling factor
     df_out_file = join(data_folder, 'indexes_tk_{}_overlap_{}_ns_{}.h5'.format(tk, overlap, ns))
     engine = create_engine('sqlite:////dev/shm/indexes_tk_{}_overlap_{}_ns_{}.sqlite'.format(tk, overlap, ns))
 
