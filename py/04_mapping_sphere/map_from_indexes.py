@@ -25,6 +25,13 @@ def sobel_magnitude(nii_file):
     return np.sqrt(sobel_x ** 2 + sobel_y ** 2 + sobel_z ** 2)
 
 
+def grad_magnitude(nii_file):
+    # Load file
+    vol = nb.load(nii_file).get_data().astype(np.float)
+    gx, gy, gz = np.gradient(vol)
+    return np.sqrt(gx ** 2 + gy ** 2 + gz ** 2)
+
+
 def process_subject(subject):
     print('Starting mapping for subject {} ...'.format(subject))
     # Create subjects directory
@@ -41,9 +48,12 @@ def process_subject(subject):
     print('\t- Output: {}'.format(out_subject_dir))
 
     # Initialize mapped image
-    img_mapped = np.zeros([dx, dy])
+    img_mapped_sobel = np.zeros([dx, dy])
+    img_mapped_grad = np.zeros_like(img_mapped_sobel)
     rois = np.zeros(vol_shape)
+
     vol_sobel = sobel_magnitude(subj_brain_file)
+    vol_grad = grad_magnitude(subj_brain_file)
 
     for i, scale in enumerate(scales):
         print('Mapping scale {} ...'.format(scale))
@@ -56,13 +66,14 @@ def process_subject(subject):
                         (ix_df['scale'] == scale) &
                         (ix_df['theta'] == theta) &
                         (ix_df['phi'] == phi)]['indexes'].values[0]
-                    img_mapped[j, k] = vol_sobel[ix].mean()
+                    img_mapped_sobel[j, k] = vol_sobel[ix].mean()
+                    img_mapped_grad[j, k] = vol_grad[ix].mean()
 
                     if theta == 0 and phi == 0:
                         rois[ix] = i + 1
             # Save results
-            plt.imsave(filename_base + '.png', img_mapped.T, cmap='gray')
-            np.savez_compressed(filename_base, img=img_mapped, indexes=index_file, brain_file=subj_file)
+            plt.imsave(filename_base + '.png', img_mapped_sobel.T, cmap='gray')
+            np.savez_compressed(filename_base, img=img_mapped_sobel, grad=img_mapped_grad, indexes=index_file, brain_file=subj_file)
         else:
             print('File {} already exists.'.format(filename_base + '.png'))
 
