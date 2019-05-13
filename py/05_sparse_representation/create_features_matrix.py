@@ -32,6 +32,7 @@ if __name__ == '__main__':
     output_file = join(out_folder, 'sobel_curvelet_features_non_split_{}_scales_{}_angles.csv'.format(nbs, nba))
     print('\t- Mapped subjects folder: {}'.format(mapped_subjects_dir))
     print('\t- Output folder: {}'.format(out_folder))
+    print('\t- Output file: {}'.format(output_file))
 
     # Find NPZ files
     raw_files = glob.glob(join(mapped_subjects_dir, '**', '*.npz'))#, recursive=True)
