@@ -23,13 +23,13 @@ if __name__ == '__main__':
     cfg_file = join(root, 'config', 'config.cfg')
     cfg = ConfigParser()
     cfg.read(cfg_file)
-    nbs = 4
+    nbs = 5
     nba = 32
 
     # Get subjects folder
     mapped_subjects_dir = cfg.get('dirs', 'sphere_mapping')
     out_folder = join(mapped_subjects_dir, 'curvelet')
-    output_file = join(out_folder, 'sobel_curvelet_features_non_split.csv')
+    output_file = join(out_folder, 'sobel_curvelet_features_non_split_{}_scales_{}_angles.csv'.format(nbs, nba))
     print('\t- Mapped subjects folder: {}'.format(mapped_subjects_dir))
     print('\t- Output folder: {}'.format(out_folder))
 
