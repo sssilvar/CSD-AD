@@ -16,12 +16,12 @@ if __name__ == '__main__':
 
     # Load params
     data_folder = cfg.get('dirs', 'sphere_mapping')
-    roc_folder = join(data_folder, 'curvelets_non_split', 'ROC')
+    roc_folder = join(data_folder, 'curvelet', 'ROC')
     n_folds = 10
 
     # Classifiers, image types and months
     classifiers = ['svm', 'rf']
-    img_types = ['gradient', 'sobel']
+    img_types = ['sobel']
     times = [24, 36, 60]
 
     for img_type in img_types:

@@ -286,7 +286,7 @@ if __name__ == "__main__":
                                     param_grid,
                                     cv=StratifiedKFold(n_splits=3, random_state=42),
                                     iid=True,
-                                    scoring='accuracy',
+                                    scoring='auc',
                                     n_jobs=n_cores)
             clf_grid.fit(X_train, y_train)
 
