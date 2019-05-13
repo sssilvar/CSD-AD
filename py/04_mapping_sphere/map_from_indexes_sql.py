@@ -34,7 +34,7 @@ if __name__ == '__main__':
     tk = 25
     overlap = 9
     max_radius = 100
-    ns = 1  # Overlap
+    ns = 6  # Overlap
     n_spheres = max_radius // (tk - overlap)
     scales = [(i * (tk - overlap), ((i + 1) * tk) - (i * overlap)) for i in range(n_spheres)]
 
@@ -72,12 +72,17 @@ if __name__ == '__main__':
         for scale in scales:
             scale_name = '%d_%d' % scale
             img = np.zeros([360 // ns, 180 // ns])
+
+            # Create dataframe per scale
+            res_sql = engine.execute(f'SELECT * FROM indexes WHERE scale=\'{scale_name}\'')
+            df = pd.DataFrame(res_sql.fetchall())
+            df.columns = res_sql.keys()
+
             for i, theta_i in enumerate(range(-180, 180, ns)):
                 print('Processing scale: {} | X = {} ...'.format(scale_name, theta_i))
                 for j, phi_j in enumerate(range(0, 180, ns)):
-                    query = f'SELECT ix, iy, iz FROM indexes WHERE [scale]=\'{scale_name}\' AND theta={theta_i} AND phi={phi_j};'
-                    # print(query)
-                    ix, iy, iz = engine.execute(query).fetchall()[0]
+                    ixs = df.query(f'theta == {theta_i} & phi == {phi_j}')[['ix', 'iy', 'iz']]
+                    ix, iy, iz = ixs['ix'].values[0], ixs['iy'].values[0], ixs['iz'].values[0]
                     ix_where = np.frombuffer(ix, dtype=int), np.frombuffer(iy, dtype=int), np.frombuffer(iz, dtype=int)
 
                     # Map result
