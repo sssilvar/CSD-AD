@@ -80,8 +80,9 @@ if __name__ == '__main__':
 
             for i, theta_i in enumerate(range(-180, 180, ns)):
                 print('Processing scale: {} | X = {} ...'.format(scale_name, theta_i))
+                ixs_theta = df.query(f'theta == {theta_i}')
                 for j, phi_j in enumerate(range(0, 180, ns)):
-                    ixs = df.query(f'theta == {theta_i} & phi == {phi_j}')[['ix', 'iy', 'iz']]
+                    ixs = ixs_theta.query(f'phi == {phi_j}')[['ix', 'iy', 'iz']]
                     ix, iy, iz = ixs['ix'].values[0], ixs['iy'].values[0], ixs['iz'].values[0]
                     ix_where = np.frombuffer(ix, dtype=int), np.frombuffer(iy, dtype=int), np.frombuffer(iz, dtype=int)
 
