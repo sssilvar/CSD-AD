@@ -23,7 +23,7 @@ if __name__ == '__main__':
     cfg_file = join(root, 'config', 'config.cfg')
     cfg = ConfigParser()
     cfg.read(cfg_file)
-    nbs = 5
+    nbs = 4
     nba = 32
 
     # Get subjects folder
