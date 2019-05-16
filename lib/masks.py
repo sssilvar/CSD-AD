@@ -80,14 +80,14 @@ def cone(shape=(256, 256, 256), center=(128, 128, 128), r=100, m=8):
     return mask
 
 
-def solid_cone(radius=(100, 110), center=(128, 128, 128)):
+def solid_cone(radius=(100, 110), center=(128, 128, 128), m=8):
     # Define variables for simplicity
     r_min, r_max = radius
     cx, cy, cz = center
 
     # Create a Sphere and a cone
     sphere_vol = sphere(radius=(r_min, r_max), center=center)
-    cone_vol = cone(r=r_min, center=center)
+    cone_vol = cone(r=r_min, center=center, m=m)
     mask = sphere_vol * cone_vol
 
     # vol = mask.astype(np.int8)
