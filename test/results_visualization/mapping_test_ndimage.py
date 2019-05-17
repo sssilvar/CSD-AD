@@ -21,17 +21,17 @@ from lib.transformations import rotate_ndi
 from lib.edges import sobel_magnitude
 
 
-def rotate(vol, centroid, angle=(0, 0)):
-    center = np.array(vol.shape) // 2
-    shift = center - centroid
-    print(f'Center: {center}, centroid: {centroid}, shifting: {shift}')
-
-    shifted_vol = ndi.shift(vol, shift=shift, order=0)
-    rotated_vol_theta = ndi.rotate(shifted_vol, axes=(1, 2), angle=angle[0], reshape=False, order=0)
-    rotated_vol_phi = ndi.rotate(rotated_vol_theta, axes=(0, 2), angle=angle[1], reshape=False, order=0)
-    unshift_vol = ndi.shift(rotated_vol_phi, shift=-shift, order=0)
-
-    return unshift_vol
+# def rotate(vol, centroid, angle=(0, 0)):
+#     center = np.array(vol.shape) // 2
+#     shift = center - centroid
+#     print(f'Center: {center}, centroid: {centroid}, shifting: {shift}')
+#
+#     shifted_vol = ndi.shift(vol, shift=shift, order=0)
+#     rotated_vol_theta = ndi.rotate(shifted_vol, axes=(1, 2), angle=angle[1], reshape=False, order=0)
+#     rotated_vol_phi = ndi.rotate(rotated_vol_theta, axes=(0, 2), angle=angle[0], reshape=False, order=0)
+#     unshift_vol = ndi.shift(rotated_vol_phi, shift=-shift, order=0)
+#
+#     return unshift_vol
 
 
 def generate_solid_cones(scales, m=1):
@@ -48,7 +48,7 @@ if __name__ == '__main__':
     out_folder = '/tmp/rois'
     ns = 9
 
-    tk = 24
+    tk = 25
     overlap = 0
     max_radius = 100
 
@@ -79,7 +79,7 @@ if __name__ == '__main__':
     for theta_i, theta in enumerate(range(-180, 180, ns)):
         for phi_i, phi in enumerate(range(-90, 90, ns)):
             print(f'Rotating ({theta}, {phi}) degrees...')
-            roi = rotate(vol=cones, centroid=centroid, angle=(theta, phi))
+            roi = rotate_ndi(vol=cones, centroid=centroid, angle=(theta, phi))
             # Create NIFTI and plot them
             # roi_nii = nb.Nifti1Image(roi, mni_aseg.affine)
             # display = plotting.plot_anat(mni_aseg, alpha=0.8, title=f'Theta: {theta} deg')
