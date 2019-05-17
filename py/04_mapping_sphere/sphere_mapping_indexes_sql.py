@@ -18,7 +18,7 @@ root = dirname(dirname(dirname(realpath(__file__))))
 sys.path.append(root)
 
 from lib.masks import solid_cone
-from lib.transformations import rotate_vol
+from lib.transformations import rotate_ndi
 from lib.geometry import extract_sub_volume, get_centroid
 
 if __name__ == '__main__':
@@ -28,10 +28,10 @@ if __name__ == '__main__':
     mni_file = join(root, 'param', 'FSL_MNI152_FreeSurferConformed_1mm.nii')
 
     tk = 25
-    overlap = 9
+    overlap = 0
     max_radius = 100
+    ns = 4  # TODO: Check if it's necessary to change it (Scaling factor
 
-    ns = 6  # TODO: Check if it's necessary to change it (Scaling factor
     engine = create_engine('sqlite:////dev/shm/indexes_tk_{}_overlap_{}_ns_{}.sqlite'.format(tk, overlap, ns))
 
     # Print some info
@@ -56,17 +56,17 @@ if __name__ == '__main__':
         spheres[np.where(sc)] = i + 1
 
     # ==== INDEX CALCULATION ====
-    for i, z_angle in enumerate(range(-180, 180, ns)):
-        for j, x_angle in enumerate(range(0, 180, ns)):
-            print('Processing angles: ({}, {})'.format(z_angle, x_angle))
-            solid_ang_mask = rotate_vol(spheres, angles=(x_angle, 0, z_angle))  # ROI
+    for i, theta in enumerate(range(-180, 180, ns)):
+        for j, phi in enumerate(range(-90, 90, ns)):
+            print('Processing angles: ({}, {})'.format(theta, phi))
+            solid_ang_mask = rotate_ndi(spheres, centroid=centroid, angle=(theta, phi))  # ROI
             for k, (r_min, r_max) in enumerate(scales):
                 scale = '{}_{}'.format(r_min, r_max)
                 ix = np.where(solid_ang_mask == k + 1)
                 data = {
                     'scale': scale,
-                    'theta': z_angle,
-                    'phi': x_angle,
+                    'theta': theta,
+                    'phi': phi,
                     'ix': ix[0].tostring(),
                     'iy': ix[1].tostring(),
                     'iz': ix[2].tostring(),
@@ -76,7 +76,7 @@ if __name__ == '__main__':
                 s.to_sql('indexes', con=engine, if_exists='append')
                 # print(s)
             # Plot for (180, 0) degrees
-            if z_angle == -180 and x_angle == 0:
+            if theta == -180 and phi == 0:
                 nii_a = nb.Nifti1Image(solid_ang_mask, mni_aseg.affine)
                 nb.save(nii_a, '/tmp/cones.nii')
 

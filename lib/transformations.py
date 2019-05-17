@@ -1,4 +1,5 @@
 import numpy as np
+import scipy.ndimage as ndi
 from scipy.ndimage import affine_transform
 
 
@@ -60,3 +61,23 @@ def rotate_vol(vol, angles=(0, 0, 0)):
 
     # Return value
     return out
+
+
+def rotate_ndi(vol, centroid, angle=(0, 0)):
+    """
+    Rotate volume using scipy.ndimage library
+    :param vol: Numpy volume
+    :param centroid: Anchor point to be used during the rotation
+    :param angle: tuple(theta, phi) angles in degrees to rotate
+    :return: A rotated volume with same shape as input
+    """
+    center = np.array(vol.shape) // 2
+    shift = center - centroid
+    print(f'Center: {center}, centroid: {centroid}, shifting: {shift}')
+
+    shifted_vol = ndi.shift(vol, shift=shift, order=0)
+    rotated_vol_theta = ndi.rotate(shifted_vol, axes=(0, 2), angle=angle[0], reshape=False, order=0)
+    rotated_vol_phi = ndi.rotate(rotated_vol_theta, axes=(1, 2), angle=angle[1], reshape=False, order=0)
+    unshift_vol = ndi.shift(rotated_vol_phi, shift=-shift, order=0)
+
+    return unshift_vol

@@ -59,7 +59,7 @@ def subject_mapping(subject):
         for i, theta_i in enumerate(range(-180, 180, ns)):
             print('Processing scale: {} | X = {} ...'.format(scale_name, theta_i))
             ixs_theta = df.query(f'theta == {theta_i}')
-            for j, phi_j in enumerate(range(0, 180, ns)):
+            for j, phi_j in enumerate(range(-90, 90, ns)):
                 ixs = ixs_theta.query(f'phi == {phi_j}')[['ix', 'iy', 'iz']]
                 ix, iy, iz = ixs['ix'].values[0], ixs['iy'].values[0], ixs['iz'].values[0]
                 ix_where = np.frombuffer(ix, dtype=int), np.frombuffer(iy, dtype=int), np.frombuffer(iz, dtype=int)
@@ -77,9 +77,10 @@ def subject_mapping(subject):
 if __name__ == '__main__':
     # Setup params
     tk = 25
-    overlap = 9
+    overlap = 0
     max_radius = 100
-    ns = 1  # Overlap
+    ns = 12
+
     n_spheres = max_radius // (tk - overlap)
     scales = [(i * (tk - overlap), ((i + 1) * tk) - (i * overlap)) for i in range(n_spheres)]
 

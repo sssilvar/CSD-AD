@@ -1,7 +1,8 @@
 #!/bin/env python3
 import os
 import sys
-from os.path import dirname, join, realpath
+import shutil
+from os.path import dirname, join, realpath, isdir
 
 import numpy as np
 import scipy.ndimage as ndi
@@ -16,6 +17,8 @@ sys.path.append(root)
 
 from lib.masks import solid_cone, sphere
 from lib.geometry import get_centroid
+from lib.transformations import rotate_ndi
+from lib.edges import sobel_magnitude
 
 
 def rotate(vol, centroid, angle=(0, 0)):
@@ -42,11 +45,19 @@ def generate_solid_cones(scales, m=1):
 
 if __name__ == '__main__':
     mni_file = join(root, 'param', 'FSL_MNI152_FreeSurferConformed_1mm.nii')
-    ns = 6
+    out_folder = '/tmp/rois'
+    ns = 9
 
-    tk = 25
+    tk = 24
     overlap = 0
     max_radius = 100
+
+    # Create output folder
+    if not isdir(out_folder):
+        os.mkdir(out_folder)
+    else:
+        shutil.rmtree(out_folder)
+        os.mkdir(out_folder)
 
     # Calculate the inner and outer radius
     # for all the spheres: scales
@@ -56,7 +67,7 @@ if __name__ == '__main__':
 
     # Get centroid of MNI152
     mni_aseg = nb.load(mni_file)
-    mni_data = mni_aseg.get_data().astype(np.float)
+    mni_data = sobel_magnitude(nii=mni_aseg)
     centroid = tuple(get_centroid(mni_data > 0))
     print('Centroid of MNI152: {}'.format(centroid))
 
@@ -68,7 +79,7 @@ if __name__ == '__main__':
     for theta_i, theta in enumerate(range(-180, 180, ns)):
         for phi_i, phi in enumerate(range(-90, 90, ns)):
             print(f'Rotating ({theta}, {phi}) degrees...')
-            roi = rotate(vol=cones, centroid=centroid, angle=(phi, theta))
+            roi = rotate(vol=cones, centroid=centroid, angle=(theta, phi))
             # Create NIFTI and plot them
             # roi_nii = nb.Nifti1Image(roi, mni_aseg.affine)
             # display = plotting.plot_anat(mni_aseg, alpha=0.8, title=f'Theta: {theta} deg')
@@ -80,7 +91,6 @@ if __name__ == '__main__':
                 # print(f'Mean: {mean_pix}')
 
     # Plot results
-    for i, scale in enumerate(scales):
+    for i, (r_min, r_max) in enumerate(scales):
         plt.imshow(mapped_imgs[i], cmap='gray')
-        plt.title(f'Scale: {scale}')
-        plt.show()
+        plt.savefig(join(out_folder, f'{r_min}_to_{r_max}.png'))
