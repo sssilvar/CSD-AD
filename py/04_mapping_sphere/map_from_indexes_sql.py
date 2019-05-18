@@ -79,7 +79,7 @@ if __name__ == '__main__':
     tk = 25
     overlap = 0
     max_radius = 100
-    ns = 12
+    ns = 4
 
     n_spheres = max_radius // (tk - overlap)
     scales = [(i * (tk - overlap), ((i + 1) * tk) - (i * overlap)) for i in range(n_spheres)]
