@@ -76,7 +76,7 @@ if __name__ == '__main__':
                 s.to_sql('indexes', con=engine, if_exists='append')
                 # print(s)
             # Plot for (180, 0) degrees
-            if theta == -180 and phi == 0:
+            if theta == 0 and phi == 0:
                 nii_a = nb.Nifti1Image(solid_ang_mask, mni_aseg.affine)
                 nb.save(nii_a, '/tmp/cones.nii')
 
