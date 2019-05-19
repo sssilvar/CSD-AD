@@ -26,8 +26,15 @@ if __name__ == '__main__':
     nbs = 4
     nba = 32
 
+    # Mapping parameters
+    tk = 25
+    overlap = 0
+    ns = 2
+
     # Get subjects folder
-    mapped_subjects_dir = cfg.get('dirs', 'sphere_mapping')
+    mapped_subjects_dir = join(
+        cfg.get('dirs', 'sphere_mapping'),
+        'ADNI_FS_mapped_tk_{}_overlap_{}_ns_{}'.format(tk, overlap, ns))
     out_folder = join(mapped_subjects_dir, 'curvelet')
     output_file = join(out_folder, 'sobel_curvelet_features_non_split_{}_scales_{}_angles.csv'.format(nbs, nba))
     print('\t- Mapped subjects folder: {}'.format(mapped_subjects_dir))
