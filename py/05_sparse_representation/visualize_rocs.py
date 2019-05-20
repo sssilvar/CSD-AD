@@ -14,8 +14,18 @@ if __name__ == '__main__':
     cfg.read(join(root, 'config', 'config.cfg'))
     fmt = 'png'  # Alt. 'eps'
 
+    # Number of scales and angles
+    nbs = 4
+    nba = 32
+
+    # Set Sphere thickness, overlapping and sampling rate (deg)
+    tk, overlap, ns = 25, 0, 2
+
     # Load params
-    data_folder = cfg.get('dirs', 'sphere_mapping')
+    data_folder = join(
+        cfg.get('dirs', 'sphere_mapping'),
+        f'ADNI_FS_mapped_tk_{tk}_overlap_{overlap}_ns_{ns}'
+    )
     roc_folder = join(data_folder, 'curvelet', 'ROC')
     n_folds = 10
 
@@ -30,11 +40,12 @@ if __name__ == '__main__':
             plt.figure(figsize=(7, 7))
             for t in times:
                 # gradient_curvelet_features_non_split_aio_5_fold_svm_60_months_final.csv
-                file_pattern = '{name}_curvelet_features_non_split_aio_{folds}_fold_{clf}_{time}_months_final.csv'
+                file_pattern = f'{img_type}_curvelet_features_non_split_{nbs}_scales_{nba}_angles_aio_{n_folds}_' \
+                    f'fold_{clf}_{t}_months_final.csv'
 
                 # # sobel_curvelet_features_4_scales_32_angles_aio_5_fold_rf_24_months_final.csv
                 # file_pattern = '{name}_curvelet_features_4_scales_32_angles_aio_{folds}_fold_{clf}_{time}_months_final.csv'
-                file_pattern = file_pattern.format(name=img_type, folds=n_folds, clf=clf, time=t)
+                # file_pattern = file_pattern.format(name=img_type, folds=n_folds, clf=clf, time=t)
 
                 data_file = join(roc_folder, file_pattern)
 
