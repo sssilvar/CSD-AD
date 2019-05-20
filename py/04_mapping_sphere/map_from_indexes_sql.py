@@ -2,7 +2,7 @@
 import os
 from configparser import ConfigParser
 from multiprocessing import Pool
-from os.path import join, dirname, realpath, isdir
+from os.path import join, dirname, realpath, isdir, isfile
 
 import numpy as np
 import pandas as pd
@@ -89,6 +89,10 @@ if __name__ == '__main__':
     cfg_file = join(root, 'config', 'config.cfg')
     print(f'SQL File: {sql_file}')
     print(f'Configuration File: {cfg_file}')
+
+    # Check if file exists
+    if not isfile(sql_file):
+        raise FileNotFoundError(f'File {sql_file} was not found.')
 
     # Load configuration
     cfg = ConfigParser()
