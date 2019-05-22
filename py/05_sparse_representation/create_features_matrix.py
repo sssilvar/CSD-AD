@@ -51,9 +51,13 @@ if __name__ == '__main__':
     nba = 32
 
     # Mapping parameters
-    tk = 25
-    overlap = 0
-    ns = 2
+    # tk = 25
+    # overlap = 0
+    # ns = 2
+    # Alternative
+    tk = int(sys.argv[1])
+    overlap = int(sys.argv[2])
+    ns = int(sys.argv[3])
 
     # Get subjects folder
     mapped_subjects_dir = join(
