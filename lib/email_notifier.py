@@ -1,41 +1,61 @@
 #!/bin/env python3
 import os
-import socket
-from os.path import basename, join, normpath
+from os.path import join, dirname, realpath
 
-import smtplib
-from email.mime.application import MIMEApplication
-from email.mime.multipart import MIMEMultipart
+import argparse
+import requests
+from configparser import ConfigParser
 
-# Setup sender information
-sender_email = os.environ['SENDER_EMAIL']
-sender_pwd = os.environ['SENDER_PASSWORD']
-sender_smtp = os.environ['SENDER_SMTP']
+# Some variables
+os_name = os.uname()[0]
+hostname = os.uname()[1]
+root = dirname(dirname(realpath(__file__)))
 
-# Setup email
-msg = MIMEMultipart()
-msg['From'] = sender_email
-msg['To'] = 'sssilvar@unal.edu.co'
-msg['Subject'] = 'Notification from server {}'.format(socket.gethostname())
+# Parse arguments
+parser = argparse.ArgumentParser(description="Email notification sender")
+parser.add_argument('-msg',
+                    help='Message to send',
+                    type=str,
+                    default='Your process on {} has finished.'.format(hostname))
+parser.add_argument('-subject',
+                    help='Subject of the message',
+                    type=str,
+                    default='Notification from {} - {}'.format(hostname, os_name))
 
-# Attach file
-data_folder = normpath('/home/jullygh/sssilvar/Documents/Dataset/ADNI_FS_sphere_mapped/ROC')
-filenames = [join(data_folder, f) for f in os.listdir(data_folder) if f.endswith('.log') or f.endswith('.png')]
+# Parse arguments
+args = parser.parse_args()
+message = args.msg
+subject = args.subject
 
-for filename in filenames:
-    base_filename = basename(filename)
-    with open(filename, 'rb') as f:
-        part = MIMEApplication(
-            f.read(),
-            Name=basename(base_filename)
-        )
-    part['Content-Disposition'] = 'attachment; filename="{}"'.format(base_filename)
-    msg.attach(part)
+# Parse configuration
+cfg = ConfigParser()
+cfg.read(join(root, 'config', 'config.cfg'))
+user = cfg.get('notifier', 'user')
+passwd = cfg.get('notifier', 'pass')
+email_from = cfg.get('notifier', 'from')
+email_to = cfg.get('notifier', 'to')
 
-# Setup server information
-server = smtplib.SMTP(sender_smtp)
-server.ehlo()
-server.starttls()
-server.login(sender_email, sender_pwd)
-server.sendmail(sender_email, msg['To'], msg.as_string())
-server.quit()
+# Built HTTP request
+html_msg = '<h1>Notification from {}!</h1><p>'.format(hostname) + \
+           'Machine details: {} <br><br>'.format(os.uname()) + \
+           '<strong>Message:</strong> {} </p>'.format(message)
+data = {
+    'Messages': [
+        {
+            'From': {'Email': email_from, 'Name': 'Jarvis'},
+            'To': [{'Email': email_to}],
+            'Subject': subject,
+            'TextPart': message,
+            'HTMLPart': html_msg
+        }
+    ]
+}
+
+# Send request
+res = requests.post(
+    url='https://api.mailjet.com/v3.1/send',
+    json=data,
+    auth=(user, passwd)
+)
+print(res.json())
+print('Done!')
