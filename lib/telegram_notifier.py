@@ -28,7 +28,7 @@ if __name__ == '__main__':
     chat_id = cfg.get('telegram', 'chat_id')
     token = cfg.get('telegram', 'token')
 
-    msg_styled = emojize(f'**Message from {hostname}:**\n:poop: {args.msg} :poop:', use_aliases=True)
+    msg_styled = emojize(f'Message from {hostname}:\n:poop: {args.msg} :poop:', use_aliases=True)
 
     # Send message
     params = {
