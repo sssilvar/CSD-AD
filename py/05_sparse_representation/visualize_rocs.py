@@ -19,7 +19,7 @@ if __name__ == '__main__':
     nba = 32
 
     # Set Sphere thickness, overlapping and sampling rate (deg)
-    tk, overlap, ns = 25, 0, 2
+    tk, overlap, ns = 25, 5, 1
 
     # Load params
     data_folder = join(
@@ -31,7 +31,7 @@ if __name__ == '__main__':
 
     # Classifiers, image types and months
     classifiers = ['svm', 'rf']
-    img_types = ['sobel']
+    img_types = ['gradient', 'sobel']
     times = [24, 36, 60]
 
     for img_type in img_types:
