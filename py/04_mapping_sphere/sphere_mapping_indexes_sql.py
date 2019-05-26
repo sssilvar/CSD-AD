@@ -1,7 +1,7 @@
 #!/bin/env python3
 import os
 import sys
-from os.path import join, dirname, realpath
+from os.path import join, dirname, realpath, basename
 
 import numpy as np
 import pandas as pd
@@ -27,16 +27,17 @@ if __name__ == '__main__':
     data_folder = join(os.getenv('HOME'), 'Downloads')
     mni_file = join(root, 'param', 'FSL_MNI152_FreeSurferConformed_1mm.nii')
 
-    tk = 25
-    overlap = 0
+    tk = int(sys.argv[1])
+    overlap = int(sys.argv[2])
     max_radius = 100
-    ns = 4  # TODO: Check if it's necessary to change it (Scaling factor
-
-    engine = create_engine('sqlite:////dev/shm/indexes_tk_{}_overlap_{}_ns_{}.sqlite'.format(tk, overlap, ns))
+    ns = 1  # TODO: Check if it's necessary to change it (Scaling factor
+    sql_file = f'/dev/shm/indexes_tk_{tk}_overlap_{overlap}_ns_{ns}.sqlite'
+    disk_sql_file = join(os.getenv('HOME'), 'Downloads', basename(sql_file))
 
     # Print some info
     print('\t- Output folder: %s' % data_folder)
-    print('\t- Output file: %s' % '/dev/shm/')
+    print('\t- Output file: %s' % sql_file)
+    print('\t- Output file (in disk): %s' % disk_sql_file)
 
     # Calculate the inner and outer radius
     # for all the spheres: scales
@@ -49,6 +50,10 @@ if __name__ == '__main__':
     centroid = tuple(get_centroid(mni_aseg.get_data() > 0))
     print('Centroid of MNI152: {}'.format(centroid))
 
+    # Make SQL connection
+    engine = create_engine(f'sqlite:///{sql_file}')
+
+    # Initialize spheres
     spheres = np.zeros(mni_aseg.shape)
     for i, (r_min, r_max) in enumerate(scales):
         print('Creating sphere: {} ...'.format(i + 1))
@@ -84,3 +89,4 @@ if __name__ == '__main__':
                 display.add_overlay(nii_a)
                 plt.show()
     print('DONE!')
+    os.system(f'mv {sql_file}  {disk_sql_file}')

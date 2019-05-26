@@ -1,6 +1,6 @@
 import os
 from configparser import ConfigParser
-from os.path import join, dirname, realpath, isdir
+from os.path import join, dirname, realpath, isdir, isfile
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -42,16 +42,15 @@ if __name__ == '__main__':
                 # gradient_curvelet_features_non_split_aio_5_fold_svm_60_months_final.csv
                 file_pattern = f'{img_type}_curvelet_features_non_split_{nbs}_scales_{nba}_angles_aio_{n_folds}_' \
                     f'fold_{clf}_{t}_months_final.csv'
-
-                # # sobel_curvelet_features_4_scales_32_angles_aio_5_fold_rf_24_months_final.csv
-                # file_pattern = '{name}_curvelet_features_4_scales_32_angles_aio_{folds}_fold_{clf}_{time}_months_final.csv'
-                # file_pattern = file_pattern.format(name=img_type, folds=n_folds, clf=clf, time=t)
-
                 data_file = join(roc_folder, file_pattern)
 
-                df = pd.read_csv(data_file)
+                if not isfile(data_file):
+                    print(f'File {data_file} not found')
+                    continue
 
+                # Load data as DataFrame and
                 # Plot ROC
+                df = pd.read_csv(data_file)
                 plt.plot([0, 1], [0, 1], 'k--')
                 plt.plot(
                     df['mean_fpr'], df['mean_tpr'],
@@ -64,7 +63,6 @@ if __name__ == '__main__':
                 plt.xlabel('False positive rate')
                 plt.ylabel('True positive rate')
                 plt.legend()
-
                 plt.title('Mean ROC - {} - {} - {} folds'.format(clf_name, img_type.capitalize(), n_folds))
             # Save figures
             fig_folder = join(roc_folder, 'roc_by_month')
