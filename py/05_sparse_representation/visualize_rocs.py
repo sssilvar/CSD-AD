@@ -1,4 +1,5 @@
 import os
+import argparse
 from configparser import ConfigParser
 from os.path import join, dirname, realpath, isdir, isfile
 
@@ -8,25 +9,48 @@ import matplotlib.pyplot as plt
 root = dirname(dirname(dirname(realpath(__file__))))
 plt.style.use('ggplot')
 
+
+def parse_args():
+    parser = argparse.ArgumentParser(description='Compile classification results in a single conversion-time ROC')
+    parser.add_argument('-folder', default=None)
+    parser.add_argument('-nbs', type=int, default=4)
+    parser.add_argument('-nba', type=int, default=32)
+
+    parser.add_argument('-tk', type=int, default=25)
+    parser.add_argument('-overlap', type=int, default=0)
+    parser.add_argument('-ns', type=int, default=1)
+    return parser.parse_args()
+
+
 if __name__ == '__main__':
+    # Parse arguments
+    args = parse_args()
+
     # Load config
     cfg = ConfigParser()
     cfg.read(join(root, 'config', 'config.cfg'))
     fmt = 'png'  # Alt. 'eps'
 
     # Number of scales and angles
-    nbs = 4
-    nba = 32
+    nbs = args.nbs
+    nba = args.nba
 
     # Set Sphere thickness, overlapping and sampling rate (deg)
-    tk, overlap, ns = 25, 5, 1
+    tk = args.tk
+    overlap = args.overlap
+    ns = args.ns
 
     # Load params
-    data_folder = join(
-        cfg.get('dirs', 'sphere_mapping'),
-        f'ADNI_FS_mapped_tk_{tk}_overlap_{overlap}_ns_{ns}'
-    )
-    roc_folder = join(data_folder, 'curvelet', 'ROC')
+    if args.folder is None:
+        data_folder = join(
+            cfg.get('dirs', 'sphere_mapping'),
+            f'ADNI_FS_mapped_tk_{tk}_overlap_{overlap}_ns_{ns}',
+            'curvelet'
+        )
+    else:
+        data_folder = args.folder
+
+    roc_folder = join(data_folder, 'ROC')
     n_folds = 10
 
     # Classifiers, image types and months
