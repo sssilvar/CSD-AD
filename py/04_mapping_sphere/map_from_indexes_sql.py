@@ -1,5 +1,6 @@
 #!/bin/env python3
 import os
+import argparse
 from configparser import ConfigParser
 from multiprocessing import Pool
 from os.path import join, dirname, realpath, isdir, isfile
@@ -13,6 +14,14 @@ from sqlalchemy import create_engine
 import matplotlib.pyplot as plt
 
 root = dirname(dirname(dirname(realpath(__file__))))
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description='Map images to sphere from SQL indexes')
+    parser.add_argument('-tk', type=int, default=25)
+    parser.add_argument('-overlap', type=int, default=4)
+    parser.add_argument('-ns', type=int, default=1)
+    return parser.parse_args()
 
 
 def mkdir(path):
@@ -75,11 +84,14 @@ def subject_mapping(subject):
 
 
 if __name__ == '__main__':
+    # Parse arguments
+    args = parse_args()
+
     # Setup params
-    tk = 25
-    overlap = 0
+    tk = args.tk
+    overlap = args.overlap
     max_radius = 100
-    ns = 4
+    ns = args.ns
 
     n_spheres = max_radius // (tk - overlap)
     scales = [(i * (tk - overlap), ((i + 1) * tk) - (i * overlap)) for i in range(n_spheres)]
