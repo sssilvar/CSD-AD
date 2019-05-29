@@ -7,8 +7,8 @@ NOTIFIER="${CURRENT_DIR}/../lib/email_notifier.py -subject 'Index calculation fi
 echo "Executing ${SQL_INDEX_GEN} ..."
 
 # Thicknesses and overlaps
-TKS=(15 20 30)
-OVERLAPS=(4 5 7)
+TKS=(15)
+OVERLAPS=(0 2 3)
 
 ## Test only
 #TKS=(5641)
