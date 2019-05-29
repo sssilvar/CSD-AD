@@ -4,6 +4,7 @@ from __future__ import print_function
 import os
 import sys
 import glob
+import argparse
 from os.path import join, realpath, dirname, basename, splitext, isdir
 from configparser import ConfigParser
 
@@ -18,6 +19,14 @@ root = dirname(dirname(dirname(realpath(__file__))))
 sys.path.append(join(root))
 from lib.curvelets import get_sub_bands
 
+def parse_args():
+    parser = argparse.ArgumentParser(description='Map images to sphere from SQL indexes')
+    parser.add_argument('-tk', type=int, default=25)
+    parser.add_argument('-overlap', type=int, default=4)
+    parser.add_argument('-ns', type=int, default=1)
+    parser.add_argument('-nbs', type=int, default=4)
+    parser.add_argument('-nba', type=int, default=32)
+    return parser.parse_args()
 
 def curvelet_decomposition(A, img, sphere, subject_id):
     """
@@ -43,21 +52,20 @@ def curvelet_decomposition(A, img, sphere, subject_id):
 
 
 if __name__ == '__main__':
+    # Parse arguments
+    args = parse_args()
+
     # Load configuration file
     cfg_file = join(root, 'config', 'config.cfg')
     cfg = ConfigParser()
     cfg.read(cfg_file)
-    nbs = 4
-    nba = 32
+    nbs = args.nbs
+    nba = args.nba
 
-    # Mapping parameters
-    # tk = 25
-    # overlap = 0
-    # ns = 2
     # Alternative
-    tk = int(sys.argv[1])
-    overlap = int(sys.argv[2])
-    ns = int(sys.argv[3])
+    tk = args.tk
+    overlap = args.overlap
+    ns = args.ns
 
     # Get subjects folder
     mapped_subjects_dir = join(
