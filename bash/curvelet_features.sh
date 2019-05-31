@@ -11,9 +11,14 @@ FOLDERS=($(find ${MAPPED_FOLDER} -type d -name "ADNI*tk*overlap*"))
 for folder in ${FOLDERS[@]} ; do
     if [[ ! -d "${folder}/curvelet" ]]; then
         n=$(ls ${folder} | grep _S_ | wc -l)
-        echo "Number of subjects in $folder: $n"
         if [[ "${n}" == "${N_SUBJ}" ]]; then
-            echo "Processing $folder"
+            echo "Processing ${folder} (${n} subjects)"
+            tk=$(echo basename ${folder} | awk -F'_' '{ print $5 }')
+            overlap=$(echo basename ${folder} | awk -F'_' '{ print $7 }')
+            ns=$(echo basename ${folder} | awk -F'_' '{ print $9 }')
+
+            CMD=".${SCRIPT} -tk ${tk} -overlap ${overlap} -ns ${ns}"
+            echo ${CMD}
         fi
     fi
 done
