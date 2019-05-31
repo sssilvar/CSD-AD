@@ -8,7 +8,7 @@ MAPPED_FOLDER="/home/jullygh/sssilvar/Documents/Dataset/mapped"
 FOLDERS=($(ls ${MAPPED_FOLDER} | grep overlap))
 
 for folder in ${FOLDERS[@]} ; do
-    if [[ ! -d "${folder}/curvelet" ]]; then
+    if [[ -d "${folder}/curvelet" ]]; then
         echo "PRocessing $folder"
     fi
 done
