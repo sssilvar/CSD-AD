@@ -17,8 +17,8 @@ for folder in ${FOLDERS[@]} ; do
             overlap=$(echo basename ${folder} | awk -F'_' '{ print $7 }')
             ns=$(echo basename ${folder} | awk -F'_' '{ print $9 }')
 
-            CMD="python 2.7 ${SCRIPT} -tk ${tk} -overlap ${overlap} -ns ${ns}"
-            CMD="${CMD} && python3 ${NOTIFIER} -msg 'Curvelet calculation for tk=${tk} and overlap=${overlap} done.'"
+            CMD="${SCRIPT} -tk ${tk} -overlap ${overlap} -ns ${ns}"
+            CMD="${CMD} && ${NOTIFIER} -msg 'Curvelet calculation for tk=${tk} and overlap=${overlap} done.'"
             CMD="tmux new-session -d -s \"curvelet_tk_${tk}_ov_${overlap}\" \"${CMD}\""
 
             echo ${CMD}
