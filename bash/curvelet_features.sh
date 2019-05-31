@@ -11,7 +11,7 @@ OVERLAPS=(0 4 5 7 9)
 for tk in ${TKS[@]}; do
     for overlap in ${OVERLAPS[@]} ; do
         FOLDER="${MAPPED_FOLDER}/ADNI_FS_mapped_tk_${tk}_overlap_${overlap}_ns_1/curvelet"
-        if ![[ -d ${FOLDER} ]]; then
+        if [[ ! -d ${FOLDER} ]]; then
             echo "Processing folder ${FOLDER}"
         fi        
     done
