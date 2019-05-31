@@ -12,7 +12,7 @@ for folder in ${FOLDERS[@]} ; do
     if [[ ! -d "${folder}/curvelet" ]]; then
         n=$(ls ${folder} | grep _S_ | wc -l)
         echo "Number of subjects in $folder: $n"
-        if [[ n == ${N_SUBJ} ]]; then
+        if [[ n == "${N_SUBJ}" ]]; then
             echo "Processing $folder"
         fi
     fi
