@@ -2,7 +2,7 @@
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 SCRIPT="${CURRENT_DIR}/../py/05_sparse_representation/create_features_matrix.py"
-NOTIFIER="${CURRENT_DIR}/../lib/email_notifier.py -subject 'Index calculation finished'"
+NOTIFIER="${CURRENT_DIR}/../lib/telegram_notifier.py"
 MAPPED_FOLDER="/home/jullygh/sssilvar/Documents/Dataset/mapped"
 N_SUBJ=829
 
@@ -17,7 +17,10 @@ for folder in ${FOLDERS[@]} ; do
             overlap=$(echo basename ${folder} | awk -F'_' '{ print $7 }')
             ns=$(echo basename ${folder} | awk -F'_' '{ print $9 }')
 
-            CMD=".${SCRIPT} -tk ${tk} -overlap ${overlap} -ns ${ns}"
+            CMD="python 2.7 ${SCRIPT} -tk ${tk} -overlap ${overlap} -ns ${ns}"
+            CMD="${CMD} && python3 ${NOTIFIER} -msg 'Curvelet calculation for tk=${tk} and overlap=${overlap} done.'"
+            CMD="tmux new-session -d -s \"curvelet_tk_${tk}_ov_${overlap}\" \"${CMD}\""
+
             echo ${CMD}
         fi
     fi
