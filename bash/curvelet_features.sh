@@ -22,6 +22,7 @@ for folder in ${FOLDERS[@]} ; do
             CMD="tmux new-session -d -s \"curvelet_tk_${tk}_ov_${overlap}\" \"${CMD}\""
 
             echo ${CMD}
+            eval ${CMD}
         fi
     fi
 done
