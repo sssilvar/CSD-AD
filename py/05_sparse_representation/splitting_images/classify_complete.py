@@ -312,6 +312,14 @@ if __name__ == "__main__":
                           labels=[0, 1],
                           target_names=['MCInc', 'MCIc']))
 
+        # Print and log feature importances
+        sel_feats_mask = pipeline.named_steps['feature_selection'].get_support()
+
+        if clf == 'rf':
+            feat_weights = pipeline.named_steps['clf'].feature_importances_
+            fi_srt = 'Feature importances'
+            for index, feature_importance in zip(X.columns[sel_feats_mask], feat_weights):
+                fi_srt += f', {index}, {feature_importance}'
         # Compile extra metrics
         acc = accuracy_score(y_test, y_pred, normalize=True)
         tn, fp, fn, tp = confusion_matrix(y_test, y_pred).ravel()
