@@ -19,9 +19,10 @@ for folder in ${FOLDERS[@]} ; do
             overlap=$(echo basename ${folder} | awk -F'_' '{ print $7 }')
             ns=$(echo basename ${folder} | awk -F'_' '{ print $9 }')
 
+            eval "rm -rf ${curv_folder}/ROC"
             CMD="${SCRIPT} ${curv_folder}"
-            CMD="${CMD} && ${NOTIFIER} -msg 'Curvelet calculation for tk=${tk} and overlap=${overlap} done.'"
-            CMD="tmux new-session -d -s \"curvelet_tk_${tk}_ov_${overlap}\" \"${CMD}\""
+            CMD="${CMD} && ${NOTIFIER} -msg 'Classification for tk=${tk} and overlap=${overlap} done.'"
+            CMD="tmux new-session -d -s \"classification_tk_${tk}_ov_${overlap}\" \"${CMD}\""
 
             echo ${CMD}
 #            eval ${CMD}
