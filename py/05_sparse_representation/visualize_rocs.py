@@ -4,6 +4,7 @@ from configparser import ConfigParser
 from os.path import join, dirname, realpath, isdir, isfile
 
 import pandas as pd
+import matplotlib
 import matplotlib.pyplot as plt
 
 root = dirname(dirname(dirname(realpath(__file__))))
