@@ -316,7 +316,7 @@ if __name__ == "__main__":
         print_and_log('Getting importances ...')
         sel_feats_mask = pipeline.named_steps['feature_selection'].get_support()
 
-        if clf == 'rf':
+        if clf_type == 'rf':
             feat_weights = pipeline.named_steps['clf'].feature_importances_
             fi_srt = 'Feature importances'
             for index, feature_importance in zip(X.columns[sel_feats_mask], feat_weights):
