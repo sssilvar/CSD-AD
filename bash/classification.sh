@@ -23,7 +23,7 @@ for folder in ${FOLDERS[@]} ; do
             eval "rm -rf ${curv_folder}/ROC"
             CMD="${SCRIPT} ${curv_folder}"
             CMD="${CMD} && ${ROC_SCRIPT} --folder ${curv_folder}"
-            CMD="${CMD} && ${NOTIFIER} -msg 'Classification for tk=${tk} and overlap=${overlap} done.'"
+            CMD="${CMD} && ${NOTIFIER} -msg 'Classification for tk=${tk}, overlap=${overlap} and ns=${ns} done.'"
             CMD="tmux new-session -d -s \"classification_tk_${tk}_ov_${overlap}\" \"${CMD}\""
 
             echo ${CMD}
