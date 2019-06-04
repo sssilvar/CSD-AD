@@ -313,6 +313,7 @@ if __name__ == "__main__":
                           target_names=['MCInc', 'MCIc']))
 
         # Print and log feature importances
+        print_and_log('Getting importances ...')
         sel_feats_mask = pipeline.named_steps['feature_selection'].get_support()
 
         if clf == 'rf':
