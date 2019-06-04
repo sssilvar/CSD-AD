@@ -320,6 +320,8 @@ if __name__ == "__main__":
             fi_srt = 'Feature importances'
             for index, feature_importance in zip(X.columns[sel_feats_mask], feat_weights):
                 fi_srt += f', {index}, {feature_importance}'
+            print_and_log(fi_srt)
+
         # Compile extra metrics
         acc = accuracy_score(y_test, y_pred, normalize=True)
         tn, fp, fn, tp = confusion_matrix(y_test, y_pred).ravel()
