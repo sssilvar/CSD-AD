@@ -2,6 +2,7 @@
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 SCRIPT="${CURRENT_DIR}/../py/05_sparse_representation/classify_all.sh"
+ROC_SCRIPT="${CURRENT_DIR}/../py/05_sparse_representation/visualize_rocs.py"
 NOTIFIER="${CURRENT_DIR}/../lib/telegram_notifier.py"
 MAPPED_FOLDER="/home/jullygh/sssilvar/Documents/Dataset/mapped"
 N_SUBJ=829
@@ -21,6 +22,7 @@ for folder in ${FOLDERS[@]} ; do
 
             eval "rm -rf ${curv_folder}/ROC"
             CMD="${SCRIPT} ${curv_folder}"
+            CMD="${CMD} && ${ROC_SCRIPT} --folder ${curv_folder}"
             CMD="${CMD} && ${NOTIFIER} -msg 'Classification for tk=${tk} and overlap=${overlap} done.'"
             CMD="tmux new-session -d -s \"classification_tk_${tk}_ov_${overlap}\" \"${CMD}\""
 
