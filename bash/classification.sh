@@ -21,8 +21,9 @@ for folder in ${FOLDERS[@]} ; do
             ns=$(echo basename ${folder} | awk -F'_' '{ print $9 }')
 
             eval "rm -rf ${curv_folder}/ROC"
-            CMD="${SCRIPT} ${curv_folder}"
-            CMD="${CMD} && ${ROC_SCRIPT} --folder ${curv_folder}"
+#            CMD="${SCRIPT} ${curv_folder}"
+            CMD="ls"
+            CMD="${CMD} && ${ROC_SCRIPT} ${curv_folder}"
             CMD="${CMD} && ${NOTIFIER} -msg 'Classification for tk=${tk}, overlap=${overlap} and ns=${ns} done.'"
             CMD="tmux new-session -d -s \"classification_tk_${tk}_ov_${overlap}_${ns}\" \"${CMD}\""
 
