@@ -16,6 +16,7 @@ plt.style.use('ggplot')
 def parse_args():
     parser = argparse.ArgumentParser(description='Compile classification results in a single conversion-time ROC')
     parser.add_argument('-folder', default=None)
+    parser.add_argument('-folds', default=10, type=int)
     parser.add_argument('-nbs', type=int, default=4)
     parser.add_argument('-nba', type=int, default=32)
 
@@ -54,7 +55,7 @@ if __name__ == '__main__':
         data_folder = args.folder
 
     roc_folder = join(data_folder, 'ROC')
-    n_folds = 10
+    n_folds = args.folds
 
     # Classifiers, image types and months
     classifiers = ['svm', 'rf']
