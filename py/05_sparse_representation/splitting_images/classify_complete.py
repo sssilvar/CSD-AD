@@ -313,12 +313,11 @@ if __name__ == "__main__":
                           target_names=['MCInc', 'MCIc']))
 
         # Print and log feature importances
-        print_and_log('Getting importances ...')
         sel_feats_mask = pipeline.named_steps['feature_selection'].get_support()
 
         if clf_type == 'rf':
             feat_weights = pipeline.named_steps['clf'].feature_importances_
-            fi_srt = 'Feature importances'
+            fi_srt = '\nFeature importances'
             for index, feature_importance in zip(X.columns[sel_feats_mask], feat_weights):
                 fi_srt += f', {index}, {feature_importance}'
             print_and_log(fi_srt)
