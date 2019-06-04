@@ -7,8 +7,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 root = dirname(dirname(dirname(realpath(__file__))))
-plt.style.use('ggplot')
 matplotlib.use('Agg')
+plt.style.use('ggplot')
 
 
 def parse_args():
