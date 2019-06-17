@@ -46,10 +46,7 @@ def curvelet_decomposition(A, img, sphere, subject_id):
     f = A.fwd(img)  # Forward transformation
     data_dict = get_sub_bands(A, f)  # Transform into a dictionary
     for key, val in data_dict.items():
-        beta_est, mean_est, var_est = gennorm.fit(val)
-        feats[key + '_beta'] = beta_est
-        feats[key + '_mean'] = mean_est
-        feats[key + '_var'] = var_est
+        feats[key + '_beta'] = np.linalg.norm(val)
     return feats
 
 
@@ -122,7 +119,7 @@ if __name__ == '__main__':
     print(features_sobel.head())
 
     # Save results as CSV
-    features_basename = '_curvelet_features_non_split_{}_scales_{}_angles.csv'.format(nbs, nba)
+    features_basename = '_curvelet_features_non_split_{}_scales_{}_angles_norm.csv'.format(nbs, nba)
     features_grad.to_csv(join(out_folder, 'gradient' + features_basename))
     features_sobel.to_csv(join(out_folder, 'sobel' + features_basename))
 
