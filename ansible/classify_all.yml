@@ -1,0 +1,17 @@
+---
+- hosts: umng
+  become: no
+  gather_facts: False
+
+  tasks:
+    - name: Go to CSD-AD directory
+      command: cd ~/sssilvar/Documents/code/CSD-AD
+
+    - name: Ignore any changes made before
+      command: git stash
+
+    - name: Update to last version
+      command: git pull
+
+    - name: Launch software
+      command: bash

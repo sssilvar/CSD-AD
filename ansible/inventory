@@ -1,0 +1,4 @@
+node1 ansible_ssh_host=umng
+
+[umng]
+node1
