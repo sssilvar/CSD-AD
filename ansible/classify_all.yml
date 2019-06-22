@@ -2,16 +2,15 @@
 - hosts: umng
   become: no
   gather_facts: False
+  vars:
+    csd_ad: ~/sssilvar/Documents/code/CSD-AD
 
   tasks:
-    - name: Go to CSD-AD directory
-      command: cd ~/sssilvar/Documents/code/CSD-AD
-
     - name: Ignore any changes made before
-      command: git stash
+      shell: chdir={{ csd_ad }} git stash
 
     - name: Update to last version
-      command: git pull
+      shell: chdir={{ csd_ad }} git stash
 
     - name: Launch software
-      command: bash bash/notify.sh
+      shell: chdir={{ csd_ad }} bash bash/notify.sh
