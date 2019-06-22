@@ -10,7 +10,7 @@ N_SUBJ=829
 FOLDERS=($(find ${MAPPED_FOLDER} -type d -name "ADNI*tk*overlap*"))
 
 for folder in ${FOLDERS[@]} ; do
-    curv_folder="${folder}/curvelet"
+    curv_folder="${folder}/curvelet/"
     count_files=`ls -1 ${curv_folder}*.csv 2>/dev/null | wc -l`
     if [[ ${count_files} > 0 ]]; then
         n=$(ls ${folder} | grep _S_ | wc -l)
