@@ -16,7 +16,7 @@ from sklearn.ensemble import RandomForestClassifier
 
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import LabelBinarizer, StandardScaler
-from sklearn.feature_selection import SelectFromModel, SelectKBest, mutual_info_classif
+from sklearn.feature_selection import SelectFromModel, SelectKBest, mutual_info_classif, RFE
 from sklearn.model_selection import GridSearchCV, StratifiedKFold, train_test_split, KFold
 from sklearn.metrics import classification_report, roc_auc_score, roc_curve, accuracy_score, confusion_matrix
 
@@ -276,7 +276,8 @@ if __name__ == "__main__":
         pipeline = Pipeline([
             ('scaler', StandardScaler()),
             # ('feature_selection', SelectFromModel(LinearSVC(penalty='l2'))),
-            ('feature_selection', SelectKBest(mutual_info_classif)),
+            ('feature_selection', RFE(LinearSVC(penalty='l2'))),
+            # ('feature_selection', SelectKBest(mutual_info_classif)),
             ('clf', clf)
         ])
 
