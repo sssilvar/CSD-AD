@@ -8,6 +8,7 @@ MAPPED_FOLDER="/home/jullygh/sssilvar/Documents/Dataset/mapped"
 N_SUBJ=829
 
 FOLDERS=($(find ${MAPPED_FOLDER} -type d -name "ADNI*tk*overlap*"))
+eval "rm ~/Downloads/ROCS.tar.gz"
 
 for folder in ${FOLDERS[@]} ; do
     curv_folder="${folder}/curvelet/"
