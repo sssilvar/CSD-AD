@@ -16,7 +16,7 @@ for folder in ${FOLDERS[@]} ; do
         n=$(ls ${folder} | grep _S_ | wc -l)
         if [[ "${n}" == "${N_SUBJ}" ]]; then
             if [[ -d "${curv_folder}/ROC" ]]; then
-                CMD="tar -rvz ~/Downloads/ROCS.tar.gz ${curv_folder}/ROC"
+                CMD="tar -rvf ~/Downloads/ROCS.tar.gz ${curv_folder}/ROC"
                 echo ${CMD}
                 eval ${CMD}
             fi
