@@ -6,5 +6,5 @@ MSG=${1-"Notification from ${HOSTNAME}"}
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 NOTIFIER="${CURRENT_DIR}/../lib/telegram_notifier.py"
 
-CMD="${NOTIFIER} -msg ${MSG}"
+CMD="${NOTIFIER} -msg '${MSG}'"
 eval ${CMD}

@@ -10,7 +10,7 @@
       shell: chdir={{ csd_ad }} git stash
 
     - name: Update to last version
-      shell: chdir={{ csd_ad }} git stash
+      shell: chdir={{ csd_ad }} git pull
 
     - name: Launch software
       shell: chdir={{ csd_ad }} bash bash/notify.sh
