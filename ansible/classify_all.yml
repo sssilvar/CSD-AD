@@ -14,4 +14,4 @@
       command: git pull
 
     - name: Launch software
-      command: bash
+      command: bash bash/notify.sh
