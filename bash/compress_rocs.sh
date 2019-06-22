@@ -15,7 +15,7 @@ for folder in ${FOLDERS[@]} ; do
     if [[ ${count_files} > 0 ]]; then
         n=$(ls ${folder} | grep _S_ | wc -l)
         if [[ "${n}" == "${N_SUBJ}" ]]; then
-            if [[ -d "${curv_folder}/ROC"]]; then
+            if [[ -d "${curv_folder}/ROC" ]]; then
                 echo "$curv_folder/roc"
             fi
         fi
