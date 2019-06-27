@@ -216,6 +216,7 @@ if __name__ == "__main__":
 
     # Split dataset
     print_and_log('Splitting dataset...')
+    print_and_log(f'Classes:\n{pd.Series(y).value_counts()}')
     # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=21, stratify=y)
     skf = StratifiedKFold(n_splits=n_folds, random_state=42)
     # skf = KFold(n_splits=n_folds, random_state=42)
