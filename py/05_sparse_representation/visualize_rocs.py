@@ -68,7 +68,7 @@ if __name__ == '__main__':
             plt.figure(figsize=(7, 7))
             for t in times:
                 # gradient_curvelet_features_non_split_aio_5_fold_svm_60_months_final.csv
-                file_pattern = f'{img_type}_curvelet_features_non_split_{nbs}_scales_{nba}_angles_aio_{n_folds}_' \
+                file_pattern = f'{img_type}_curvelet_features_non_split_{nbs}_scales_{nba}_angles_norm_aio_{n_folds}_' \
                     f'fold_{clf}_{t}_months_final.csv'
                 data_file = join(roc_folder, file_pattern)
 
