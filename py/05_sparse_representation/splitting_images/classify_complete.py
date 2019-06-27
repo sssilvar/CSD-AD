@@ -24,6 +24,11 @@ import matplotlib
 import matplotlib.pyplot as plt
 
 root = dirname(dirname(dirname(dirname(realpath(__file__)))))
+# Import mRMR
+sys.path.append(root)
+from lib.feature_selection import MRMR
+
+# Style matplotlib
 plt.style.use('ggplot')
 matplotlib.use('Agg')
 
@@ -276,8 +281,9 @@ if __name__ == "__main__":
         pipeline = Pipeline([
             ('scaler', StandardScaler()),
             # ('feature_selection', SelectFromModel(LinearSVC(penalty='l2'))),
-            ('feature_selection', RFE(LinearSVC(penalty='l2'))),
+            # ('feature_selection', RFE(LinearSVC(penalty='l2'))),
             # ('feature_selection', SelectKBest(mutual_info_classif)),
+            ('feature_selection', MRMR(method='MIQ', k_features=30)),
             ('clf', clf)
         ])
 
