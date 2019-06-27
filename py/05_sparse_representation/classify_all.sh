@@ -25,7 +25,11 @@ do
             echo "Processing ${imtype} images for subjects in ${t} months of conversion/stability..."
             FEATS_FILE="${FEATS}/${imtype}_curvelet_features_non_split_${NBS}_scales_${NBA}_angles_norm.csv"
             SCRIPT="${CURRENT_DIR}/splitting_images/classify_complete.py -time ${t} -folds ${FOLDS} -clf ${clf} -imtype ${imtype} -tune 0 -features ${FEATS_FILE}"
-            eval "python3 ${SCRIPT}"
+            if [[ -f $FEATS_FILE ]]; then
+                eval "python3 ${SCRIPT}"
+            else
+                echo "File ${FEATS_FILE} not found"
+            fi
 
             echo -e "\n\n"
         done
