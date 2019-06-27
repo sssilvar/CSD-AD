@@ -20,7 +20,7 @@ for folder in ${FOLDERS[@]} ; do
             overlap=$(echo basename ${folder} | awk -F'_' '{ print $7 }')
             ns=$(echo basename ${folder} | awk -F'_' '{ print $9 }')
 
-            eval "rm -rf ${curv_folder}/ROC"
+#            eval "rm -rf ${curv_folder}/ROC"
             CMD="${SCRIPT} ${curv_folder}"
             CMD="${CMD} && ${ROC_SCRIPT} -folder ${curv_folder} -folds 7"
             CMD="${CMD} && ${NOTIFIER} -msg 'Classification for tk=${tk}, overlap=${overlap} and ns=${ns} done.'"
