@@ -210,7 +210,7 @@ if __name__ == "__main__":
     print_and_log('Number of observations:\n{}'.format(X.target.value_counts()))
 
     # Assign values to X and y
-    y = [1 if i == 'MCIc' else -1 for i in X.target]
+    y = np.array([1 if i == 'MCIc' else -1 for i in X.target])
     X = X.drop('target', axis='columns')
     X = X.fillna(X.mean())
 
