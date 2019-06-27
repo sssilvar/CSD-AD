@@ -24,7 +24,7 @@ do
         do
             echo "Processing ${imtype} images for subjects in ${t} months of conversion/stability..."
             FEATS_FILE="${FEATS}/${imtype}_curvelet_features_non_split_${NBS}_scales_${NBA}_angles.csv"
-            SCRIPT="${CURRENT_DIR}/splitting_images/classify_complete.py -time ${t} -folds ${FOLDS} -clf ${clf} -imtype ${imtype} -tune 1 -features ${FEATS_FILE}"
+            SCRIPT="${CURRENT_DIR}/splitting_images/classify_complete.py -time ${t} -folds ${FOLDS} -clf ${clf} -imtype ${imtype} -tune 0 -features ${FEATS_FILE}"
             eval "python3 ${SCRIPT}"
 
             echo -e "\n\n"
