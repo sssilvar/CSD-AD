@@ -1,0 +1,25 @@
+---
+- hosts: umng
+  become: no
+  gather_facts: False
+  vars:
+    csd_ad: ~/sssilvar/Documents/code/CSD-AD
+    mapped_dir: ~/sssilvar/Documents/Dataset/mapped/
+    end_msg: Classification task running. Wait for results.
+
+  tasks:
+    - name: Ignore any changes made before
+      shell: chdir={{ csd_ad }} git stash
+
+    - name: Update to last version
+      shell: chdir={{ csd_ad }} git pull
+
+    - name: Delete previous ROCs
+      shell: find {{ mapped_dir }} -type d -name "ROC" -exec rm -rf {} \;
+      ignore_errors: yes
+
+    - name: Run classification tasks (sequentially)
+      shell: chdir={{ csd_ad }} tmux new-session -d -s "clf_sequential" "bash bash/classification_sequential.sh"
+
+    - name: Notify it is running
+      shell: chdir={{ csd_ad }} bash bash/notify.sh '{{ end_msg }}'

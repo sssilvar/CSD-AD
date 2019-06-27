@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-PLAYBOOK="${CURRENT_DIR}/classify_all.yml"
+PLAYBOOK="${CURRENT_DIR}/classify_all_sequential.yml"
 INVENTORY="${CURRENT_DIR}/inventory"
 
 CMD="ansible-playbook ${PLAYBOOK} -i ${INVENTORY}"
