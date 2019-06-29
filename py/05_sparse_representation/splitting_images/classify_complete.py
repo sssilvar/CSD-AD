@@ -280,11 +280,11 @@ if __name__ == "__main__":
 
         # Start classification
         pipeline = Pipeline([
-            ('scaler', StandardScaler()),
+            # ('scaler', StandardScaler()),
             # ('feature_selection', SelectFromModel(LinearSVC(penalty='l2'))),
             # ('feature_selection', RFE(LinearSVC(penalty='l2'))),
             # ('feature_selection', SelectKBest(mutual_info_classif)),
-            ('feature_selection', MRMR(method='MIQ', k_features=50)),
+            ('feature_selection', MRMR(method='MIQ', k_features=60)),
             ('clf', clf)
         ])
 
