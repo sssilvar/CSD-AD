@@ -284,7 +284,7 @@ if __name__ == "__main__":
             # ('feature_selection', SelectFromModel(LinearSVC(penalty='l2'))),
             # ('feature_selection', RFE(LinearSVC(penalty='l2'))),
             # ('feature_selection', SelectKBest(mutual_info_classif)),
-            ('feature_selection', MRMR(method='MIQ', k_features=30)),
+            ('feature_selection', MRMR(method='MIQ', k_features=50)),
             ('clf', clf)
         ])
 
