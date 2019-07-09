@@ -13,9 +13,13 @@ class MRMR(BaseEstimator):
         self.selected_indexes = []
 
     def fit(self, X, y):
+        print('***** Fitting *****')
         # Check if DataFrame
         X = self.check_df(X)
         y = self.check_df(y)
+        print(f'X shape: {np.shape(X)}')
+        print(f'Y shape: {np.shape(y)}')
+        print(type(X), type(y))
 
         # Compose new DataFrame
         feat_cols = [f'feat_{i}' for i in range(X.shape[1])]
@@ -55,6 +59,7 @@ class MRMR(BaseEstimator):
     @staticmethod
     def check_df(X):
         if isinstance(X, pd.DataFrame) or isinstance(X, pd.Series):
+            print(X.head())
             return X.values
         else:
             return np.array(X)

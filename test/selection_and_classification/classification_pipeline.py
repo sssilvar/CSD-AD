@@ -23,6 +23,7 @@ root = dirname(dirname(dirname(realpath(__file__))))
 sys.path.append(root)
 from lib.feature_selection import MRMR
 
+
 if __name__ == '__main__':
     # Features file
     try:
@@ -50,6 +51,10 @@ if __name__ == '__main__':
     df.drop(subjects_to_drop, inplace=True)
     print(df.head())
 
+    # # Drop Scale 0
+    # drop_cols = [c for c in df.columns if '0_0_' in c]
+    # df.drop(drop_cols, axis=1, inplace=True)
+
     classifiers = {
         'svm': SVC(gamma='auto', kernel='rbf'),
         'rf': RandomForestClassifier(),
@@ -60,7 +65,7 @@ if __name__ == '__main__':
     pipeline = Pipeline([
         # ('scaler', RobustScaler()),
         ('selector', MRMR(method='MIQ', k_features=10)),
-        ('clf', classifiers['lda'])
+        ('clf', classifiers['rf'])
     ])
 
     # Define conversion times in months
@@ -69,37 +74,40 @@ if __name__ == '__main__':
     print(adnimerge['Month.STABLE'].head())
 
     for t in times:
+        print(f'-- Conversion time: {t} months --')
         subjects_in_time = adnimerge.loc[(adnimerge['Month.STABLE'] >= t) | (adnimerge['Month.CONVERSION'] <= t)].index
         df_time = df.loc[subjects_in_time]
-        # Classify per sphere
-        for sphere in spheres:
-            # Extract sphere features and features
-            sph_df = df_time.query(f'sphere == "{sphere}"')
-            X_df = sph_df.drop(['label', 'sphere'], axis='columns').fillna(0)
-            y_df = sph_df['label'].astype('category')
 
-            print(X_df.head())
-            print(y_df.value_counts())
-            print(y_df.head())
-            print(y_df.cat.codes.head())
+        feature_cols = [c for c in df_time.columns if '_' in c] + ['label']
+        X_df = df_time.pivot(columns='sphere', values=feature_cols)
+        X_df = X_df.dropna(axis='columns', how='all').fillna(0)
 
-            X, y = X_df.values, y_df.cat.codes.values
-
-            # Perform a k-fold
-            kf = StratifiedKFold(n_splits=5)
-            for train_index, test_index in kf.split(X, y):
-                X_train, X_test = X[train_index], X[test_index]
-                y_train, y_test = y[train_index], y[test_index]
-
-                # Train model
-                pipeline.fit(X_train, y_train)
-
-                # Test model
-                y_pred = pipeline.predict(X_test)
-                accuracy = accuracy_score(y_test, y_pred)
-                print(f'Accuracy: {accuracy}')
-                print(classification_report(y_test, y_pred, labels=y_df.cat.categories.tolist()))
+        y_df = X_df['label'].iloc[:, 0]
+        categories = ['MCInc', 'MCIc']
 
         # Print info
-        print(f'-- Conversion time: {t} months --')
-        print(y.value_counts())
+        print(y_df.value_counts())
+
+        print(X_df.head())
+        print(y_df.value_counts())
+        print(y_df.head())
+        print(y_df.head())
+
+        X = X_df.drop('label', axis='columns').values
+        y = np.array([1 if label == 'MCIc' else -1 for label in y_df])
+        print(X.shape, y.shape)
+
+        # Perform a k-fold
+        kf = StratifiedKFold(n_splits=5)
+        for train_index, test_index in kf.split(X, y):
+            X_train, X_test = X[train_index], X[test_index]
+            y_train, y_test = y[train_index], y[test_index]
+
+            # Train model
+            pipeline.fit(X_train, y_train)
+
+            # Test model
+            y_pred = pipeline.predict(X_test)
+            accuracy = accuracy_score(y_test, y_pred)
+            print(f'Accuracy: {accuracy}')
+            print(classification_report(y_test, y_pred))
