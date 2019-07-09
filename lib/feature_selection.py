@@ -17,9 +17,9 @@ class MRMR(BaseEstimator):
         # Check if DataFrame
         X = self.check_df(X)
         y = self.check_df(y)
-        print(f'X shape: {np.shape(X)}')
-        print(f'Y shape: {np.shape(y)}')
-        print(type(X), type(y))
+        # print(f'X shape: {np.shape(X)}')
+        # print(f'Y shape: {np.shape(y)}')
+        # print(type(X), type(y))
 
         # Compose new DataFrame
         feat_cols = [f'feat_{i}' for i in range(X.shape[1])]
