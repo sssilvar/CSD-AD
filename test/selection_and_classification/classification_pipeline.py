@@ -1,6 +1,7 @@
 #!/bin/env python3
 import os
 import sys
+from multiprocessing import cpu_count
 from os.path import join, isfile, dirname, realpath, basename
 
 import numpy as np
@@ -35,6 +36,8 @@ if __name__ == '__main__':
                      '/sobel_curvelet_features_non_split_4_scales_32_angles_norm.csv'
     assert isfile(feats_file), f'File {feats_file} not found.'
 
+    n_cores = cpu_count() // 2
+
     tk = feats_file.split('/')[-3].split('_')[4]
     overlap = feats_file.split('/')[-3].split('_')[6]
 
@@ -68,7 +71,7 @@ if __name__ == '__main__':
 
     selectors = {
         'mrmr': MRMR(method='MID', k_features=10),
-        'mrmr2': MutualInformationFeatureSelector(method='MRMR', n_features=100, n_jobs=3),
+        'mrmr2': MutualInformationFeatureSelector(method='MRMR', n_features=100, n_jobs=n_cores),
         'svc': SelectFromModel(LinearSVC(penalty='l2')),
         'lasso': SelectFromModel(LassoCV(cv=5))
     }
