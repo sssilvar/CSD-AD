@@ -75,7 +75,7 @@ if __name__ == '__main__':
         for sphere in spheres:
             # Extract sphere features and features
             sph_df = df_time.query(f'sphere == "{sphere}"')
-            X_df = sph_df.drop(['label', 'sphere'], axis='columns')
+            X_df = sph_df.drop(['label', 'sphere'], axis='columns').fillna(0)
             y_df = sph_df['label'].astype('category')
 
             print(X_df.head())
