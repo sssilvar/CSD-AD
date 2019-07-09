@@ -162,6 +162,7 @@ if __name__ == '__main__':
             for feature in selected_features:
                 feat_series = pd.Series({'time': t, 'fold': fold_i, 'feature': feature})
                 selected_features_df.append(feat_series, ignore_index=True)
+                print(selected_features_df.head())
 
             # Plot
             plt.plot(fpr, tpr, label=f'Fold {fold_i + 1} AUC = {roc_auc:0.2f}')
