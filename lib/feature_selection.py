@@ -54,7 +54,7 @@ class MRMR(BaseEstimator):
 
     @staticmethod
     def check_df(X):
-        if isinstance(X, pd.DataFrame):
+        if isinstance(X, pd.DataFrame) or isinstance(X, pd.Series):
             return X.values
         else:
             return np.array(X)
