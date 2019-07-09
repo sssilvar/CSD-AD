@@ -88,6 +88,7 @@ if __name__ == '__main__':
 
     # Results dataframe
     results = pd.DataFrame()
+    selected_features_df = pd.DataFrame()
 
     for t in times:
         print(f'-- Conversion time: {t} months --')
@@ -118,13 +119,12 @@ if __name__ == '__main__':
         # Perform a k-fold
         kf = StratifiedKFold(n_splits=5, random_state=42)
         plt.figure()
-        selected_features_list = []
-        for i, (train_index, test_index) in enumerate(kf.split(X, y)):
+        for fold_i, (train_index, test_index) in enumerate(kf.split(X, y)):
             X_train, X_test = X[train_index], X[test_index]
             y_train, y_test = y[train_index], y[test_index]
 
             # Train model
-            print(f'--- Training model (Fold {i}/{kf.get_n_splits()}) ---')
+            print(f'--- Training model (Fold {fold_i}/{kf.get_n_splits()}) ---')
             pipeline.fit(X_train, y_train)
 
             # Test model
@@ -145,7 +145,7 @@ if __name__ == '__main__':
                 'fpr': fpr,
                 'tpr': tpr,
                 'auc': roc_auc
-            }, name=f'Fold {i + 1}')
+            }, name=f'Fold {fold_i + 1}')
             results = results.append(res_series)
 
             # Print selected features
@@ -158,10 +158,13 @@ if __name__ == '__main__':
             selected_features = feature_names[features_mask]
             print(f'Selected features:\n{selected_features}')
             print(f'Number of features selected: {len(selected_weights)}')
-            selected_features_list.append(selected_features)
+
+            for feature in selected_features:
+                feat_series = pd.Series({'time': t, 'fold': fold_i, 'feature': feature})
+                selected_features_df.append(feat_series, ignore_index=True)
 
             # Plot
-            plt.plot(fpr, tpr, label=f'Fold {i + 1} AUC = {roc_auc:0.2f}')
+            plt.plot(fpr, tpr, label=f'Fold {fold_i + 1} AUC = {roc_auc:0.2f}')
 
         mean_auc = results['auc'].mean()
 
@@ -174,6 +177,10 @@ if __name__ == '__main__':
         plt.xlabel('False Positive Rate')
 
         os.makedirs('/tmp/results', exist_ok=True)
-        np.savez_compressed(f'/tmp/results/sel_feats', selected_features=selected_features_list)
         figname = f'rocs_{t}_months_tk_{tk}_overlap_{overlap}.png'
         plt.savefig(f'/tmp/results/{figname}')
+
+    # Saving results
+    selected_features_df.to_csv(
+        f'/tmp/results/selected_features_tk_{tk}_overlap_{overlap}.csv'
+    )
