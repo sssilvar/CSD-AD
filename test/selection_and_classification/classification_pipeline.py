@@ -118,6 +118,7 @@ if __name__ == '__main__':
         # Perform a k-fold
         kf = StratifiedKFold(n_splits=5, random_state=42)
         plt.figure()
+        selected_features_list = []
         for i, (train_index, test_index) in enumerate(kf.split(X, y)):
             X_train, X_test = X[train_index], X[test_index]
             y_train, y_test = y[train_index], y[test_index]
@@ -157,6 +158,7 @@ if __name__ == '__main__':
             selected_features = feature_names[features_mask]
             print(f'Selected features:\n{selected_features}')
             print(f'Number of features selected: {len(selected_weights)}')
+            selected_features_list.append(selected_features)
 
             # Plot
             plt.plot(fpr, tpr, label=f'Fold {i + 1} AUC = {roc_auc:0.2f}')
@@ -172,5 +174,6 @@ if __name__ == '__main__':
         plt.xlabel('False Positive Rate')
 
         os.makedirs('/tmp/results', exist_ok=True)
+        np.savez_compressed(f'/tmp/results/sel_feats', selected_features=selected_features_list)
         figname = f'rocs_{t}_months_tk_{tk}_overlap_{overlap}.png'
         plt.savefig(f'/tmp/results/{figname}')
