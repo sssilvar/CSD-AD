@@ -161,8 +161,8 @@ if __name__ == '__main__':
 
             for feature in selected_features:
                 feat_series = pd.Series({'time': t, 'fold': fold_i, 'feature': feature})
-                selected_features_df= selected_features_df.append(feat_series, ignore_index=True)
-                print(selected_features_df.head())
+                selected_features_df = selected_features_df.append(feat_series, ignore_index=True)
+            print(selected_features_df.head())
 
             # Plot
             plt.plot(fpr, tpr, label=f'Fold {fold_i + 1} AUC = {roc_auc:0.2f}')
@@ -183,5 +183,5 @@ if __name__ == '__main__':
 
     # Saving results
     selected_features_df.to_csv(
-        f'/tmp/results/selected_features_tk_{tk}_overlap_{overlap}.csv'
+        f'/tmp/results/selected_features.csv'
     )
