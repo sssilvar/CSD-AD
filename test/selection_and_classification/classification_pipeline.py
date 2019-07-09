@@ -28,6 +28,7 @@ from mifs import MutualInformationFeatureSelector
 from lib.feature_selection import MRMR
 
 if __name__ == '__main__':
+    print('\n============== CLASSIFICATION PIPELINE ==============')
     # Features file
     try:
         feats_file = sys.argv[1]
@@ -71,7 +72,7 @@ if __name__ == '__main__':
 
     selectors = {
         'mrmr': MRMR(method='MID', k_features=10),
-        'mrmr2': MutualInformationFeatureSelector(method='MRMR', n_features=10, n_jobs=n_cores),
+        'mrmr2': MutualInformationFeatureSelector(method='MRMR', n_features=100, n_jobs=n_cores),
         'svc': SelectFromModel(LinearSVC(penalty='l2')),
         'lasso': SelectFromModel(LassoCV(cv=5))
     }
@@ -183,5 +184,6 @@ if __name__ == '__main__':
 
     # Saving results
     selected_features_df.to_csv(
-        f'/tmp/results/selected_features.csv'
+        f'/tmp/results/selected_features_tk_{tk}_overlap_{overlap}.csv'
     )
+    print('======= DONE! =======\n\n')
