@@ -29,7 +29,7 @@ if __name__ == '__main__':
     try:
         feats_file = sys.argv[1]
     except IndexError:
-        feats_file = '/home/ssilvari/Documents/temp/ADNI_temp/mapped/ADNI_FS_mapped_tk_25_overlap_0_ns_1/curvelet' \
+        feats_file = '/home/ssilvari/Documents/temp/ADNI_temp/mapped/ADNI_FS_mapped_tk_15_overlap_4_ns_1/curvelet' \
                      '/sobel_curvelet_features_non_split_4_scales_32_angles.csv'
     assert isfile(feats_file), f'File {feats_file} not found.'
 
@@ -71,8 +71,6 @@ if __name__ == '__main__':
     # Define conversion times in months
     times = [24, 36, 60]
 
-    print(adnimerge['Month.STABLE'].head())
-
     for t in times:
         print(f'-- Conversion time: {t} months --')
         subjects_in_time = adnimerge.loc[(adnimerge['Month.STABLE'] >= t) | (adnimerge['Month.CONVERSION'] <= t)].index
@@ -80,7 +78,7 @@ if __name__ == '__main__':
 
         feature_cols = [c for c in df_time.columns if '_' in c] + ['label']
         X_df = df_time.pivot(columns='sphere', values=feature_cols)
-        X_df = X_df.dropna(axis='columns', how='all').fillna(0)
+        X_df = X_df.dropna(axis='columns', how='all').fillna(X_df.mean())
 
         y_df = X_df['label'].iloc[:, 0]
         categories = ['MCInc', 'MCIc']
@@ -98,7 +96,7 @@ if __name__ == '__main__':
         print(X.shape, y.shape)
 
         # Perform a k-fold
-        kf = StratifiedKFold(n_splits=5)
+        kf = StratifiedKFold(n_splits=5, random_state=42)
         for train_index, test_index in kf.split(X, y):
             X_train, X_test = X[train_index], X[test_index]
             y_train, y_test = y[train_index], y[test_index]
