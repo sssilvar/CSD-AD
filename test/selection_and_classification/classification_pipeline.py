@@ -64,7 +64,7 @@ if __name__ == '__main__':
     # Create a classification pipeline
     pipeline = Pipeline([
         # ('scaler', RobustScaler()),
-        ('selector', MRMR(method='MIQ', k_features=10)),
+        ('selector', MRMR(method='MIQ', k_features=100)),
         ('clf', classifiers['rf'])
     ])
 
