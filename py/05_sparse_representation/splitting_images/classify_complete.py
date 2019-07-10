@@ -281,10 +281,10 @@ if __name__ == "__main__":
         # Start classification
         pipeline = Pipeline([
             # ('scaler', StandardScaler()),
-            # ('feature_selection', SelectFromModel(LinearSVC(penalty='l2'))),
+            ('feature_selection', SelectFromModel(LinearSVC(penalty='l2'))),
             # ('feature_selection', RFE(LinearSVC(penalty='l2'))),
             # ('feature_selection', SelectKBest(mutual_info_classif)),
-            ('feature_selection', MRMR(method='MIQ', k_features=60)),
+            # ('feature_selection', MRMR(method='MIQ', k_features=60)),
             ('clf', clf)
         ])
 
@@ -330,6 +330,8 @@ if __name__ == "__main__":
             for index, feature_importance in zip(X.columns[sel_feats_mask], feat_weights):
                 fi_srt += f', {index}, {feature_importance}'
             print_and_log(fi_srt)
+
+        print(f'Total features selected: {np.sum(sel_feats_mask)}')
 
         # Compile extra metrics
         acc = accuracy_score(y_test, y_pred, normalize=True)

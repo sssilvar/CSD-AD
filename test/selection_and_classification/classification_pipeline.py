@@ -157,7 +157,7 @@ if __name__ == '__main__':
             features_mask = selector._get_support_mask() + [False]
             print(len(features_mask), len(feature_names))
             selected_features = feature_names[features_mask]
-            print(f'Selected features:\n{selected_features}')
+            # print(f'Selected features:\n{selected_features}')
             print(f'Number of features selected: {len(selected_weights)}')
 
             for feature in selected_features:
