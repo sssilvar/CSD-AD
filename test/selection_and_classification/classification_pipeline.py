@@ -105,19 +105,15 @@ if __name__ == '__main__':
         y_df = X_df['label'].iloc[:, 0]
         categories = ['MCInc', 'MCIc']
 
-        # Print info
-        print(y_df.value_counts())
+        # Drop label from X_df
+        X_df.drop('label', axis=1, inplace=True)
 
-        print(X_df.head())
-        print(y_df.value_counts())
-        print(y_df.head())
-
-        feature_names = np.array([i[0] for i in X_df.columns if 'label' not in i])
-        X = X_df.drop('label', axis='columns').values
+        feature_names = np.array([f'{i[0]}_{i[1]}' for i in X_df.columns if 'label' not in i])
+        X = X_df.values
         y = np.array([1 if label == 'MCIc' else 0 for label in y_df])
-        print(X.shape, y.shape)
 
         # Perform a k-fold
+        print('--- Splitting dataset ---')
         kf = StratifiedKFold(n_splits=5, random_state=42)
         plt.figure()
         for fold_i, (train_index, test_index) in enumerate(kf.split(X, y)):
@@ -151,14 +147,11 @@ if __name__ == '__main__':
 
             # Print selected features
             selector = pipeline.named_steps['selector']
-            selected_weights = selector.ranking_
-            print(f'Weights:\n{selected_weights}')
-
             features_mask = selector._get_support_mask() + [False]
             print(len(features_mask), len(feature_names))
             selected_features = feature_names[features_mask]
             # print(f'Selected features:\n{selected_features}')
-            print(f'Number of features selected: {len(selected_weights)}')
+            print(f'Number of features selected: {np.sum(features_mask)}')
 
             for feature in selected_features:
                 feat_series = pd.Series({'time': t, 'fold': fold_i, 'feature': feature})
