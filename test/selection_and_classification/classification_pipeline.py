@@ -124,7 +124,6 @@ if __name__ == '__main__':
         for fold_i, (train_index, test_index) in enumerate(kf.split(X, y)):
             X_train, X_test = X[train_index], X[test_index]
             y_train, y_test = y[train_index], y[test_index]
-            print(y)
 
             # Train model
             print(f'--- Training model (Fold {fold_i}/{kf.get_n_splits()}) ---')
