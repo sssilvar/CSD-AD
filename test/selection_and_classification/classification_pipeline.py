@@ -99,13 +99,13 @@ if __name__ == '__main__':
         print('--- Reshaping dataframe ---')
         feature_cols = [c for c in df_time.columns if '_' in c] + ['label']
         X_df = df_time.pivot(columns='sphere', values=feature_cols)
-        X_df = X_df.dropna(axis='columns', how='all').fillna(0)
 
         print('--- Extracting labels --')
         y_df = X_df['label'].iloc[:, 0]
         categories = ['MCInc', 'MCIc']
 
         # Drop label from X_df
+        X_df = X_df.dropna(axis='columns', how='all').fillna(0)
         X_df.drop('label', axis=1, inplace=True)
 
         feature_names = np.array([f'{i[0]}_{i[1]}' for i in X_df.columns if 'label' not in i])
