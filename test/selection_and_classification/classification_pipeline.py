@@ -101,8 +101,9 @@ if __name__ == '__main__':
         X_df = df_time.pivot(columns='sphere', values=feature_cols)
 
         print('--- Extracting labels --')
-        y_df = X_df['label'].iloc[:, -1]
+        y_df = X_df['label'].dropna(axis=1, how='all').iloc[:, -1]
         categories = ['MCInc', 'MCIc']
+        print(y_df)
 
         # Drop label from X_df
         X_df = X_df.dropna(axis='columns', how='all').fillna(0)
