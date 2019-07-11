@@ -8,8 +8,8 @@ sns.set_context('paper')
 sns.set(font_scale=1.2)
 
 if __name__ == '__main__':
-    # selected_feats_file = '/home/ssilvari/Downloads/results/results_angles_mrmr/selected_features_tk_25_overlap_0.csv'
-    selected_feats_file = '/tmp/results/selected_features_tk_15_overlap_4.csv'
+    selected_feats_file = '/home/ssilvari/Documents/temp/ADNI_temp/mapped/ADNI_FS_mapped_tk_25_overlap_4_ns_1' \
+                          '/selected_features_tk_25_overlap_4.csv'
     df = pd.read_csv(selected_feats_file, index_col=0)
 
     df['band'] = df['feature'].map(lambda x: 'Scale {} Sub {}'.format(x.split('_')[0], x.split('_')[1]))

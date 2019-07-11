@@ -93,8 +93,8 @@ if __name__ == '__main__':
 
         # Load image
         np_data = np.load(raw_file)
-        img_sobel = np_data['img']
-        img_grad = np_data['grad']
+        img_sobel = np_data['img'].astype(np.float)
+        img_grad = np_data['grad'].astype(np.float)
 
         # Curvelet analysis
         A = ct.fdct2(
