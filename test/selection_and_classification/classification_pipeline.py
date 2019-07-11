@@ -33,8 +33,8 @@ if __name__ == '__main__':
     try:
         feats_file = sys.argv[1]
     except IndexError:
-        feats_file = '/home/ssilvari/Documents/temp/ADNI_temp/mapped/ADNI_FS_mapped_tk_15_overlap_4_ns_1/curvelet' \
-                     '/sobel_curvelet_features_non_split_4_scales_32_angles_norm.csv'
+        feats_file = '/home/ssilvari/Documents/temp/ADNI_temp/mapped/ADNI_FS_mapped_tk_25_overlap_0_ns_1/curvelet' \
+                     '/sobel_curvelet_features_non_split_4_scales_32_angles.csv'
     assert isfile(feats_file), f'File {feats_file} not found.'
 
     n_cores = cpu_count() // 2
@@ -65,7 +65,7 @@ if __name__ == '__main__':
     # df.drop(drop_cols, axis=1, inplace=True)
 
     classifiers = {
-        'svm': SVC(gamma='auto', kernel='rbf'),
+        'svm': SVC(gamma='auto', kernel='rbf', probability=True),
         'rf': RandomForestClassifier(),
         'lda': LinearDiscriminantAnalysis()
     }
@@ -101,16 +101,20 @@ if __name__ == '__main__':
         X_df = df_time.pivot(columns='sphere', values=feature_cols)
 
         print('--- Extracting labels --')
-        y_df = X_df['label'].iloc[:, 0]
+        y_df = X_df['label'].iloc[:, -1]
         categories = ['MCInc', 'MCIc']
 
         # Drop label from X_df
         X_df = X_df.dropna(axis='columns', how='all').fillna(0)
-        X_df.drop('label', axis=1, inplace=True)
+        X_df.drop('label', axis='columns', inplace=True)
+        print(X_df.head())
+        print(y_df.head())
 
         feature_names = np.array([f'{i[0]}_{i[1]}' for i in X_df.columns if 'label' not in i])
         X = X_df.values
         y = np.array([1 if label == 'MCIc' else 0 for label in y_df])
+        print(f'X shape: {X.shape}')
+        print(f'y shape: {y.shape}')
 
         # Perform a k-fold
         print('--- Splitting dataset ---')
