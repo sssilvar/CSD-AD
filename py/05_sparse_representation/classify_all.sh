@@ -14,7 +14,7 @@ NBA=${3-"32"}
 # Set other params
 #CLASSIFIERS=("svm" "rf")
 CLASSIFIERS=("rf")
-FOLDS=7
+FOLDS=10
 IMG_TYPES=("gradient" "sobel")
 
 for clf in ${CLASSIFIERS[@]}
