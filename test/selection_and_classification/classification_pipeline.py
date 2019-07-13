@@ -107,7 +107,7 @@ if __name__ == '__main__':
 
         # Drop label from X_df
         X_df = X_df.dropna(axis='columns', how='all')
-        X_df.fillna(X_df.mean(), inplace=True)
+        X_df.fillna(0, inplace=True)
         X_df.drop('label', axis='columns', inplace=True)
         print(X_df.head())
         print(y_df.head())
@@ -120,7 +120,7 @@ if __name__ == '__main__':
 
         # Perform a k-fold
         print('--- Splitting dataset ---')
-        kf = StratifiedKFold(n_splits=5, random_state=42)
+        kf = StratifiedKFold(n_splits=10, random_state=42)
         plt.figure()
         for fold_i, (train_index, test_index) in enumerate(kf.split(X, y)):
             X_train, X_test = X[train_index], X[test_index]
