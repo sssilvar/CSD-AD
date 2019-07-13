@@ -106,7 +106,8 @@ if __name__ == '__main__':
         print(y_df)
 
         # Drop label from X_df
-        X_df = X_df.dropna(axis='columns', how='all').fillna(0)
+        X_df = X_df.dropna(axis='columns', how='all')
+        X_df.fillna(X_df.mean(), inplace=True)
         X_df.drop('label', axis='columns', inplace=True)
         print(X_df.head())
         print(y_df.head())
