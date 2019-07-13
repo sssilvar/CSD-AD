@@ -8,12 +8,12 @@ sns.set_context('paper')
 sns.set(font_scale=1.2)
 
 if __name__ == '__main__':
-    selected_feats_file = '/home/ssilvari/Documents/temp/ADNI_temp/mapped/ADNI_FS_mapped_tk_25_overlap_4_ns_1' \
-                          '/selected_features_tk_25_overlap_4.csv'
+    selected_feats_file = '/home/ssilvari/Documents/temp/ADNI_temp/mapped/ADNI_FS_mapped_tk_25_overlap_0_ns_1' \
+                          '/selected_features_tk_25_overlap_0.csv'
     df = pd.read_csv(selected_feats_file, index_col=0)
 
     df['band'] = df['feature'].map(lambda x: 'Scale {} Sub {}'.format(x.split('_')[0], x.split('_')[1]))
-    df['sphere'] = df['feature'].map(lambda x: 'Sphere {} to {}'.format(x.split('_')[3], x.split('_')[5]))
+    df['sphere'] = df['feature'].map(lambda x: '{} to {} voxels'.format(x.split('_')[3], x.split('_')[5]))
 
     print(df.head())
 
@@ -48,4 +48,5 @@ if __name__ == '__main__':
     g.set_xlabels('Counts', fontsize=21)
     g.set_ylabels('Sphere', fontsize=21)
 
+    plt.savefig('/tmp/top_spheres.eps')
     plt.show()
