@@ -26,6 +26,7 @@ import matplotlib.pyplot as plt
 root = dirname(dirname(dirname(dirname(realpath(__file__)))))
 # Import mRMR
 sys.path.append(root)
+from mifs import MutualInformationFeatureSelector
 from lib.feature_selection import MRMR
 
 # Style matplotlib
@@ -281,10 +282,11 @@ if __name__ == "__main__":
         # Start classification
         pipeline = Pipeline([
             # ('scaler', StandardScaler()),
-            ('feature_selection', SelectFromModel(LinearSVC(penalty='l2'))),
+            # ('feature_selection', SelectFromModel(LinearSVC(penalty='l2'))),
             # ('feature_selection', RFE(LinearSVC(penalty='l2'))),
             # ('feature_selection', SelectKBest(mutual_info_classif)),
             # ('feature_selection', MRMR(method='MIQ', k_features=60)),
+            ('feature_selection', MutualInformationFeatureSelector(method='MRMR', n_features=50, n_jobs=n_cores)),
             ('clf', clf)
         ])
 
