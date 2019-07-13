@@ -72,7 +72,7 @@ if __name__ == '__main__':
 
     selectors = {
         'mrmr': MRMR(method='MID', k_features=10),
-        'mrmr2': MutualInformationFeatureSelector(method='MRMR', n_features=100, n_jobs=n_cores),
+        'mrmr2': MutualInformationFeatureSelector(method='MRMR', n_features=50, n_jobs=n_cores),
         'svc': SelectFromModel(LinearSVC(penalty='l2')),
         'lasso': SelectFromModel(LassoCV(cv=5))
     }
